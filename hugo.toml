@@ -1,0 +1,312 @@
+# basics ============================================================
+# baseURL = "http://localhost:1313/"
+baseURL = "https://hyunlibro.com"
+theme = "KeepIt"
+
+defaultContentLanguage = "ko"
+hasCJKLanguage = true
+
+# googleAnalytics = ""
+copyright = ""
+enableRobotsTXT = true
+enableGitInfo = false
+enableEmoji = true
+
+[author]
+  name = "Changhyun Jee"
+  email = "dmhys@naver.com"
+  link = ""
+
+# language settings =================================================
+[languages]
+  [languages.ko]
+    disabled = false
+    languageCode = "ko-KR"
+    languageDirection = "ltr"
+    languageName = "Korean"
+    title = "Hyun.Libro"
+    weight = 1
+  [languages.en]
+    disabled = false
+    languageCode = "en-US"
+    languageDirection = "ltr"
+    languageName = "English"
+    title = "Hyun.Libro"
+    weight = 2
+
+# Menu config =======================================================
+[menu]
+  [[menu.main]]
+    weight = 1
+    identifier = "posts"
+    pre = ""
+    post = ""
+    name = "Posts"
+    url = "posts/"
+    title = ""
+  [[menu.main]]
+    weight = 2
+    identifier = "tags"
+    pre = ""
+    post = ""
+    name = "Tags"
+    url = "tags/"
+    title = ""
+  [[menu.main]]
+    weight = 3
+    identifier = "categories"
+    pre = ""
+    post = ""
+    name = "Categories"
+    url = "categories/"
+    title = ""
+  [[menu.main]]
+    weight = 4
+    identifier = "about"
+    pre = ""
+    post = ""
+    name = "About"
+    url = "about/"
+    title = ""
+
+[markup]
+  # Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
+  [markup.highlight]
+    # false is a necessary configuration (https://github.com/Fastbyte01/KeepIt/issues/158)
+    noClasses = false
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+# theme settings
+[params]
+  defaultTheme = "auto"
+  fingerprint = "sha256"
+  title = "Hyun.Libro"
+  description = "3D vision Library."
+
+  [params.header]
+    [params.header.title]
+      name = "Hyun . Libro"
+
+  [params.footer]
+    enable = true
+    copyright = true
+
+  [params.section]
+    paginate = 20
+
+  [params.app]
+    title = "Hyun . Libro"
+
+  [params.search]
+    enable = true
+    type = "lunr"
+
+  [params.home]
+    [params.home.profile]
+      enable = true
+      gravatarEmail = "dmhys@naver.com"
+      subtitle = "I do camera/lidar thingies."
+      typeit = false
+      social = true
+      disclaimer = ""
+    # Home page posts
+    [params.home.posts]
+      enable = true
+      paginate = 5
+
+  [params.social]
+    GitHub = "dmhys"
+    Linkedin = "changhyun-jee-6583b6232"
+    Email = "dmhys@naver.com"
+    Twitter = ""
+    Instagram = ""
+    Facebook = ""
+    Telegram = ""
+    Medium = ""
+    Gitlab = ""
+    Youtubelegacy = ""
+    Youtubecustom = ""
+    Youtubechannel = ""
+    Tumblr = ""
+    Quora = ""
+    Keybase = ""
+    Pinterest = ""
+    Reddit = ""
+    Codepen = ""
+    FreeCodeCamp = ""
+    Bitbucket = ""
+    Stackoverflow = ""
+    Weibo = ""
+    Odnoklassniki = ""
+    VK = ""
+    Flickr = ""
+    Xing = ""
+    Snapchat = ""
+    Soundcloud = ""
+    Spotify = ""
+    Bandcamp = ""
+    Paypal = ""
+    Fivehundredpx = ""
+    Mix = ""
+    Goodreads = ""
+    Lastfm = ""
+    Foursquare = ""
+    Hackernews = ""
+    Kickstarter = ""
+    Patreon = ""
+    Steam = ""
+    Twitch = ""
+    Strava = ""
+    Skype = ""
+    Whatsapp = ""
+    Zhihu = ""
+    Douban = ""
+    Angellist = ""
+    Slidershare = ""
+    Jsfiddle = ""
+    Deviantart = ""
+    Behance = ""
+    Dribbble = ""
+    Wordpress = ""
+    Vine = ""
+    Googlescholar = ""
+    Researchgate = ""
+    Mastodon = ""
+    Thingiverse = ""
+    Devto = ""
+    Gitea = ""
+    XMPP = ""
+    Matrix = ""
+    Bilibili = ""
+    RSS = ""
+
+  [params.page]
+    ruby = false
+    fraction = false
+    fontawesome = false
+
+    [params.page.toc]
+      enable = true
+      keepStatic = false
+      auto = false
+
+    # KaTeX mathematical formulas config (KaTeX https://katex.org/)
+    [params.page.math]
+      enable = true
+    # Mapbox GL JS config (Mapbox GL JS https://docs.mapbox.com/mapbox-gl-js)
+
+    [params.page.share]
+      enable = true
+      Twitter = true
+      Facebook = true
+      Linkedin = true
+      Whatsapp = false
+      Pinterest = false
+      Tumblr = false
+      HackerNews = false
+      Reddit = false
+      VK = false
+      Buffer = false
+      Xing = false
+      Line = false
+      Instapaper = false
+      Pocket = false
+      Flipboard = false
+      Weibo = false
+      Blogger = false
+      Baidu = false
+      Odnoklassniki = false
+      Evernote = false
+      Skype = false
+      Trello = false
+      Mix = false
+
+    # Comment config
+    [params.page.comment]
+      enable = false
+      # Disqus comment config (https://disqus.com/)
+      # Disqus 评论系统设置 (https://disqus.com/)
+      [params.page.comment.disqus]
+        enable = false
+        # Disqus shortname to use Disqus in posts
+        # Disqus 的 shortname，用来在文章中启用 Disqus 评论系统
+        shortname = ""
+      # Gitalk comment config (https://github.com/gitalk/gitalk)
+      [params.page.comment.gitalk]
+        enable = false
+        owner = ""
+        repo = ""
+        clientId = ""
+        clientSecret = ""
+      # Valine comment config (https://github.com/xCss/Valine)
+      [params.page.comment.valine]
+        enable = false
+        appId = ""
+        appKey = ""
+        placeholder = ""
+        avatar = "mp"
+        meta= ""
+        pageSize = 10
+        lang = ""
+        visitor = true
+        recordIP = true
+        highlight = true
+        enableQQ = false
+        serverURLs = ""
+        # emoji data file name, default is "google.yml"
+        # ["apple.yml", "google.yml", "facebook.yml", "twitter.yml"]
+        # located in "themes/KeepIt/assets/data/emoji/" directory
+        # you can store your own data files in the same path under your project:
+        # "assets/data/emoji/"
+        emoji = ""
+      # Facebook comment config (https://developers.facebook.com/docs/plugins/comments)
+      [params.page.comment.facebook]
+        enable = false
+        width = "100%"
+        numPosts = 10
+        appId = ""
+        languageCode = ""
+      # Telegram comments config (https://comments.app/)
+      [params.page.comment.telegram]
+        enable = false
+        siteID = ""
+        limit = 5
+        height = ""
+        color = ""
+        colorful = true
+        dislikes = false
+        outlined = false
+      # Commento comment config (https://commento.io/)
+      [params.page.comment.commento]
+        enable = false
+      # Utterances comment config (https://utteranc.es/)
+      [params.page.comment.utterances]
+        enable = false
+        # owner/repo
+        repo = ""
+        issueTerm = "pathname"
+        label = ""
+        lightTheme = "github-light"
+        darkTheme = "github-dark"
+    # Third-party library config
+    [params.page.library]
+      [params.page.library.css]
+        # someCSS = "some.css"
+        # located in "assets/"
+        # Or 
+        # someCSS = "https://cdn.example.com/some.css"
+      [params.page.library.js]
+        # someJavascript = "some.js"
+        # located in "assets/" 
+        # Or 
+        # someJavascript = "https://cdn.example.com/some.js"
+    # Page SEO config
+    [params.page.seo]
+      # image URL
+      images = []
+      # Publisher info
+      [params.page.seo.publisher]
+        name = ""
+        logoUrl = ""

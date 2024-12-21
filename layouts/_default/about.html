@@ -1,0 +1,18 @@
+{{- define "content" -}}
+    {{- $params := .Scratch.Get "params" -}}
+    {{- $profile := .Site.Params.home.profile -}}
+    {{- $posts := .Site.Params.home.posts -}}
+
+    <div class="page home"{{ if ne $posts.enable false }} data-home="posts"{{ end }}>
+        {{ partial "home/profile.html" (dict "AvatarSize" "big" "Ctx" $) }}
+    </div>
+
+    <div data-header-desktop="normal">
+        <article class="page single" data-header-desktop="normal">
+            {{- /* Content */ -}}
+            <div class="content" id="content">
+                {{- dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            </div>
+        </article>
+    </div>
+{{- end -}}
