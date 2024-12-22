@@ -149,6 +149,12 @@
     {{- $config = dict "accessToken" $params.mapbox.accessToken "RTLTextPlugin" "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.0/mapbox-gl-rtl-text.js" | dict "mapbox" | merge $config -}}
 {{- end -}}
 
+{{- /* Plotly */ -}}
+{{- if (.Scratch.Get "this").plotly -}}
+    {{- $source := $cdn.plotly | default "lib/plotly/plotly.min.js" -}}
+    {{- dict "Source" $source "Fingerprint" $fingerprint | dict "Scratch" .Scratch "Data" | partial "scratch/script.html" -}}
+{{- end -}}
+
 {{- /* Music */ -}}
 {{- if (.Scratch.Get "this").music -}}
     {{- /* APlayer */ -}}

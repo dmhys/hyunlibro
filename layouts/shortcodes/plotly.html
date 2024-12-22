@@ -1,0 +1,18 @@
+{{ $cleanedInner := replaceRE "[\n\t]" " " .Inner }}
+{{ $content := $cleanedInner | transform.Unmarshal | default (dict) }}
+
+{{- $id := dict "Content" "" "Scratch" .Page.Scratch | partial "function/id.html" -}}
+{{- $width := cond .IsNamedParams (.Get "width") (.Get 0) | default "100%" -}}
+{{- $height := cond .IsNamedParams (.Get "height") (.Get 1) | default "30rem" -}}
+
+    <div class="plotly" id="{{ $id }}" style="width: {{ $width }}; height: {{ $height }};"></div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {{ $content.variables | safeJS }}
+        const data = {{ $content.data | safeJS }}
+        var layout = {};
+        var config = {responsive: true};
+        Plotly.newPlot({{ $id }}, data, layout, config);
+    })
+    </script>
+    {{- .Page.Scratch.SetInMap "this" "plotly" true -}}
