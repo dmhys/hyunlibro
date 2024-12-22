@@ -103,7 +103,6 @@
     h6 {
       font-weight: bold;
       margin: 1rem 0;
-      margin-top: 3rem;
       line-height: 1.5;
 
       [theme=dark] & {
@@ -111,14 +110,27 @@
       }
     }
 
+    h1,
+    h2,
+    h3 {
+      margin-top: 3rem;
+    }
+
+    >p{
+      text-indent: 0.5rem;
+    }
+
     p {
       margin: .5rem 0;
       line-height: 1.75;
-      text-indent: 0.5em;
 
       img {
         display: block;
         margin: 0 auto;
+      }
+
+      >code{
+        text-indent: 0;
       }
 
       @import "../_partial/_single/katex";

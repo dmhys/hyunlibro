@@ -1,6 +1,6 @@
 # basics ============================================================
-# baseURL = "http://localhost:1313/"
-baseURL = "https://hyunlibro.com"
+baseURL = "http://localhost:1313/"
+# baseURL = "https://hyunlibro.com"
 theme = "KeepIt"
 
 defaultContentLanguage = "ko"

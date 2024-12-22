@@ -8,8 +8,8 @@ summary = "19세기의 가장 중요한 수학적 발명 중 하나인 사원수
 
 isCJKLanguage = true
 
-tags = ["Quaternion", "Mathematics"]
-categories = ["Translations"]
+tags = ["quaternion", "mathematics"]
+categories = ["translations"]
 
 +++
 
