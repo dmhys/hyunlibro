@@ -3,25 +3,25 @@ date = 2022-02-06T13:52:00+09:00
 lastmod = ''
 draft = false
 
-title = "How fast is Atomic compared to mutex?"
+title = "Atomic 이 mutex보다 얼마나 빠를까?"
 summary = ""
 
-isCJKLanguage = false
+isCJKLanguage = true
 
-tags = ["c++", "multithread"]
-categories = ["coading"]
+tags = ["multithread"]
+categories = ["c++"]
 
 +++
 
 ### Test Goal
 
-- How fast is Atomic compared to mutex?
+- Mutex에 비해 atomic 변수를 쓰는게 얼마나 빠를까?
 
-- When using a mutex, is the overhead of `lock_guard` significant?
+- Mutex 를 쓸 때, `lock_guard`의 overhead가 유의미한가?
 
-- When using atomic, is there any meaningful benefits with `memory_order_relaxed`?
+- Atomic을 쓸 때, `memory_order_relaxed` 가 어떤 유의미함을 가져다주는가?
 
-### Settings
+### 세팅
 
 ```cpp
 void workerWithLock(int work_count, int work_size) {
@@ -40,7 +40,7 @@ void workerWithLock(int work_count, int work_size) {
 }
 ```
 
-In this manner, I placed the RNG in `thread_local`, and used two parameters, which is `work_count` and `work_size`. The conditions were the following four.
+이런 식으로 난수 생성기를 `thread_local` 에 배치하고, `work_count`와 `work_size`를 입력받는다. 조건은 다음 넷이었다.
 
 - mutex self lock & unlock
 
@@ -68,12 +68,12 @@ void test(int work_count, int work_size) {
   ...
 ```
 
-For each test, I created two contesting workers.  `work_size` represents the amount of work that can be done without contention at one time, so the smaller the `work_size`, the more frequently contention occurs.  To keep the total time relatively uniform, `work_count` was added. The compilation was done with the `O3` flag.
+그리고 각각의 test는 두 개의 경합 worker를 생성한다. `work_size`는 한 번에 경합 없이 할 일이므로, `work_size`가 작을수록 경합은 자주 일어난다. 전체 시간을 어느정도 균일하게 하기 위해 `work_count`를 추가했다. 컴파일은 `O3` 플래그를 제공했다.
 
 
-### Result
+### 결과
 
-###### work_size is big.
+###### work_size가 클 때
 
 ```bash
 work count : 100 / work size : 100000
@@ -83,7 +83,7 @@ work count : 100 / work size : 100000
     with atomic Relaxed : 106.172ms
 ```
 
-###### work_size is small
+###### work_size가 작을 때
 
 ```bash
 work count : 2000000 / work size : 5
@@ -93,7 +93,8 @@ work count : 2000000 / work size : 5
     with atomic Relaxed : 120.621ms
 ```
 
-###### Whole results
+###### 전체
+
 ```bash
 Lock free atomic is supported
 More work count - more race condition
@@ -141,11 +142,11 @@ work count : 10000000 / work size : 1
     with atomic Relaxed : 209.97ms
 ```
 
-### Conclusions
+### 결론
 
-Naturally, when the race condition is high, atomics become increasingly faster. However, when each work takes about 1ms, the difference between `mutex` and atomic wasn't that significant! Additionally, depending on the experiment, it's worth noting that the overhead of the `lock_guard` constructor and destructor is almost negligible. If there's a possibility of making mistakes, it's better to use the RAII pattern rather than managing the `mutex` directly.
+당연하지만, race가 클 때는 atomic이 점점 빨라진다. 그런데 work 하나에 1ms정도 걸릴 때, mutex와 atomic의 차이가 그리 크지 않았다! 또 실험 따라 다르겠지만, `lock_guard`의 생성자-소멸자 오버헤드가 거의 존재하지 않는 것도 알아둘만 하다. 기왕 실수할 여지가 있으면, `mutex`를 직접 관리하기보단 RAII 패턴을 쓰는게 맞다.
 
-Personally, I was surprised that `memory_order_relaxed` didn't provide any advantages, and in the more extreme cases below, this tendency was clear.
+개인적으론 `memory_order_relaxed`가 어떠한 이점도 가져다주지 못한 점이 놀라운데, 아래 더 극단적인 케이스에서도 이 경향성은 뚜렷했다.
 
 ```bash
 work count : 10000000 / work size : 1
@@ -155,17 +156,17 @@ work count : 10000000 / work size : 1
     with atomic Relaxed : 209.97ms
 ```
 
-Under extreme contention conditions, for some reason, `memory_order_relaxed` became slower...? Overall, it became slower as the race condition intensified, which needs further investigation. However, for now, it can be reasonably concluded that there's no need to use relaxed memory order for optimization even under such contention conditions.
+극단적인 경합조건에서 어째서인지 `memory_order_relaxed`가 더 느려졌다...? 전체적으로 race가 심해질 때 더 느려진건데, 이는 더 살펴봐야하긴 할 것 같지만 우선은 이런 경합조건에서도 굳이 최적화를 위해 relaxed memory order를 사용할 필요는 없다는 것으로 적당히 결론 내려도 될 것 같다.
 
-Even when contention occurs at around 0.01ms, the mutex was surprisingly fast. The critical section isn't as expensive as expected. When dealing with sensor data in research areas at around 1000Hz, there doesn't seem to be much to worry about. While there is ample room for differences depending on the number of threads, at least in single producer-consumer scenarios, it doesn't seem significant.
+0.01ms정도 단위에서 경합이 일어나도 mutex가 생각보다 빨랐다. 생각보다도 더욱 임계영역이 비싸지 않다. 연구영역에서 센서 데이터를 다룰 때 1000hz정도에서도 크게 조심할 것은 없어 보인다. 쓰레드 숫자 따라서 더 차이가 날 여지는 충분하지만, 적어도 단일 생산-단일 소비에선 중요하지 않아 보인다.
 
-1. Don't worry too much about critical sections.
+1. 임계영역은 크게 신경쓰지 말자.
 
-2. RAII is always the right choice. Actively utilize it and use `lock_guard`.
+2. RAII는 언제나 옳다. 적극적으로 활용하고 `lock_guard`를 사용하자.
 
-3. Regarding the experimental results of `memory_order_relaxed`, I'm not entirely sure, but it seems acceptable to use the default value.
+3. `memory_order_relaxed`의 실험결과에 대해선 잘 모르겠지만, 그냥 기본 값을 써도 될거같다.
 
-### Entire test code
+### 전체 실험 코드
 
 ```cpp
 #include <atomic>
