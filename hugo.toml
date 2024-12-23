@@ -310,3 +310,11 @@ enableEmoji = true
       [params.page.seo.publisher]
         name = ""
         logoUrl = ""
+
+  [params.analytics]
+    enable = true
+    # Google Analytics
+    [params.analytics.google]
+      id = "G-JSZZVZZZS9"
+      # whether to anonymize IP
+      anonymizeIP = false
