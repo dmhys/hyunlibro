@@ -555,17 +555,6 @@ var Theme = /*#__PURE__*/function () {
       var $tocCore = document.getElementById('TableOfContents');
       if ($tocCore === null) return;
       
-      // empty toc
-      if ($tocCore.querySelectorAll('a:first-child').length == 0){
-        var $tocAuto = document.getElementById('toc-auto');
-        if ($tocAuto) $tocAuto.parentElement.removeChild($tocAuto);
-
-        var $tocStatic = document.getElementById('toc-static');
-        if ($tocStatic) $tocStatic.parentElement.removeChild($tocStatic);
-
-        return;
-      }
-
       if (document.getElementById('toc-static').getAttribute('data-kept') || this.util.isTocStatic()) {
         var $tocContentStatic = document.getElementById('toc-content-static');
 
