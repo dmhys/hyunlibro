@@ -6,8 +6,7 @@ theme = "KeepIt"
 defaultContentLanguage = "ko"
 hasCJKLanguage = true
 
-# googleAnalytics = ""
-copyright = ""
+copyright = "https://creativecommons.org/licenses/by-nc/4.0/"
 enableRobotsTXT = true
 enableGitInfo = false
 enableEmoji = true
@@ -92,6 +91,7 @@ enableEmoji = true
   [params.footer]
     enable = true
     copyright = true
+    license = "<a href='https://creativecommons.org/licenses/by-nc/4.0/' target='_blank'>CC BY-NC 4.0</a>"
 
   [params.section]
     paginate = 20
