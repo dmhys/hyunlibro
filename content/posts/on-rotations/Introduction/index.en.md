@@ -3,7 +3,7 @@ date = 2024-12-24T10:33:15+09:00
 lastmod = ""
 draft = false
 
-title = "On Rotations - Introduction"
+title = "Introduction"
 summary = ""
 
 isCJKLanguage = false
