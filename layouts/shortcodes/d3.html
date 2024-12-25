@@ -1,0 +1,9 @@
+{{- $id := dict "Content" "" "Scratch" .Page.Scratch | partial "function/id.html" -}}
+
+<div class="d3-canvas" id="{{ $id }}"></div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const canvas = document.getElementById("{{ $id }}")
+        {{ .Inner | safeJS }}
+    })
+</script>

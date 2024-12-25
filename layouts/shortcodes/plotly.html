@@ -1,18 +1,50 @@
 {{ $cleanedInner := replaceRE "[\n\t]" " " .Inner }}
-{{ $content := $cleanedInner | transform.Unmarshal | default (dict) }}
+{{ $plotlyContent := $cleanedInner | transform.Unmarshal | default (dict) }}
 
 {{- $id := dict "Content" "" "Scratch" .Page.Scratch | partial "function/id.html" -}}
 {{- $width := cond .IsNamedParams (.Get "width") (.Get 0) | default "100%" -}}
 {{- $height := cond .IsNamedParams (.Get "height") (.Get 1) | default "30rem" -}}
 
+{{- if $plotlyContent.data -}}
     <div class="plotly" id="{{ $id }}" style="width: {{ $width }}; height: {{ $height }};"></div>
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        {{ $content.variables | safeJS }}
-        const data = {{ $content.data | safeJS }}
-        var layout = {};
-        var config = {responsive: true};
-        Plotly.newPlot({{ $id }}, data, layout, config);
+    <script>document.addEventListener("DOMContentLoaded", function () {
+        {{/* Variables */}}
+        {{- if $plotlyContent.variables -}}
+            {{ $plotlyContent.variables | safeJS }};;
+        {{- end -}}
+
+        {{/* data */}}
+        const data = {{ $plotlyContent.data | safeJS }};
+
+        {{/* config */}}
+        {{- if $plotlyContent.config -}}
+            const config = {{ $plotlyContent.config | safeJS }};
+            config.responsive = true;
+        {{- else -}}
+            const config = {responsive:true};
+        {{- end -}}
+
+        {{/* layout */}}
+        {{- if $plotlyContent.layout -}}
+            const layout = {{ $plotlyContent.layout | safeJS }};
+        {{- else -}}
+            const layout = {};
+        {{- end -}}
+
+        {{/* frames */}}
+        {{- if $plotlyContent.frames -}}
+            const frames = {{ $plotlyContent.frames | safeJS }};
+            const payload = { data: data, layout: layout, config: config, frames: frames };
+        {{- else -}}
+            const payload = { data: data, layout: layout, config: config };
+        {{- end -}}
+
+        Plotly.newPlot("{{ $id }}", payload);
     })
     </script>
     {{- .Page.Scratch.SetInMap "this" "plotly" true -}}
+{{- else -}}
+    <div class="plotly-error" id="{{ $id }}" style="width: {{ $width }}; height: {{ $height }}; display: flex; justify-content: center; align-items: center; color:red">
+        Rendering Error : No data given
+    </div>
+{{- end -}}

@@ -1,0 +1,61 @@
+
+Introduction
+SO3(1) - Basic concepts
+SO3(2) - Basic Parameterizations
+Advanced parameterizations(1) - Bivector&Rotor
+Advanced parameterizations(2) - Quaternion basics
+Advanced parameterizations(3) - Quaternion application
+
+
+Handbook
+
+2. SO3: 순수 회전
+2.1 SO3의 기본적 정의와 의미
+  - Toy Example
+    - 행렬 이전 방정식을 이용한 2D
+  - SO3
+    - SO3를 이용한 R3의 회전
+  - 직교군
+    - 직교군의 개념(determinant=1, transpose등등 기본적인 개념)
+  - 다시 Toy example로 돌아와서
+    - 방정식으로 rotation을 구하려함->
+        쉽지 않음(왜냐하면 2D에선 parameterization이 쉬웠기 때문)
+  - 회전을 어떻게 정의할 것인가?
+    prarameter화가 필요하다.
+2.2 parameterization of SO3
+    Euler Angles: 직관적이지만 한계가 있는 표현.
+    Axis-Angle: 회전축과 회전각도로 표현.
+3. Advanced parameterizations
+3-1. Bivector & Rotor
+    회전의 근본에 대해 생각해보자. 2차원 성분에서 정의됨
+    Bivector: 회전을 기하적으로 이해.
+        bivector와 dome
+        -> bivector 평면을 기준으로 dome의 높이로 rotation의 scale을 표현가능하다.
+        Hodge dual
+        exterior product
+        2D example -> rotation was pseudo scalar bivector
+    Rotor: Bivector 기반의 회전 연산과 기하적 대수.
+        3D -> rotation and close relationship with axis-angle
+    Action on vectors
+3-2. Quaternion basics
+    Quaternion: Bivector로부터 연결하여 기술
+    대수구조의 정의와 quaternion이 대수구조인이유    
+    addition & multiplication
+    conjugate norm inverse
+    power exponential log
+3-3. Quaternion application
+    action on vectors(sandwich product)
+    differentiation
+    interpolation
+    to other parameterizations
+4. SE3: 회전과 병진
+    SE3의 정의와 예제
+    Screw Theory: 운동학적 응용.
+    Dual Quaternion: 효율적인 SE3 표현.
+    기타 - DH파라미터
+5. Lie Group과 Lie Algebra
+    군론의 의미
+    SO3, SE3를 Lie Group 관점에서 이해.
+    Lie 대수와 axis-angle rep
+    Manifold와 lie 대수 application
+6. Handbook - representations 변환 수식
