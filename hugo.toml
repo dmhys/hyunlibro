@@ -91,6 +91,7 @@ enableEmoji = true
   [params.footer]
     enable = true
     copyright = true
+    since = 2021
     license = "<a href='https://creativecommons.org/licenses/by-nc/4.0/' target='_blank'>CC BY-NC 4.0</a>"
 
   [params.section]
@@ -114,7 +115,7 @@ enableEmoji = true
     # Home page posts
     [params.home.posts]
       enable = true
-      paginate = 5
+      paginate = 10
 
   [params.social]
     GitHub = "dmhys"
@@ -241,7 +242,7 @@ enableEmoji = true
       images = []
       # Publisher info
       [params.page.seo.publisher]
-        name = ""
+        name = "Hyun.Libro"
         logoUrl = ""
 
   [params.analytics]

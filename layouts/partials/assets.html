@@ -155,6 +155,14 @@
     {{- dict "Source" $source "Fingerprint" $fingerprint | dict "Scratch" .Scratch "Data" | partial "scratch/script.html" -}}
 {{- end -}}
 
+{{- /* d3 */ -}}
+{{- if (.Scratch.Get "this").plotly -}}
+    {{- $source := $cdn.d3 | default "lib/d3/d3.v7.min.js" -}}
+    {{- dict "Source" $source "Fingerprint" $fingerprint | dict "Scratch" .Scratch "Data" | partial "scratch/script.html" -}}
+    {{- $source := "lib/d3/d3-simple-slider.min.js" -}}
+    {{- dict "Source" $source "Fingerprint" $fingerprint | dict "Scratch" .Scratch "Data" | partial "scratch/script.html" -}}
+{{- end -}}
+
 {{- /* Music */ -}}
 {{- if (.Scratch.Get "this").music -}}
     {{- /* APlayer */ -}}
