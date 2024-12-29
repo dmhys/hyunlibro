@@ -64,7 +64,7 @@ float Q_rsqrt( float number )
 ### Delving into float and int
 
 여기서 핵심은 float representation이다.
-![float](Float_point_example_frac.svg "wikipedia : Float_point_example_frac.svg")
+![float](Float_point_example_frac.svg.png "wikipedia : Float_point_example_frac.svg.png")
 
 IEEE 754의 32비트 부동소수점 데이터 포맷에 따르면 float는 위 구조를 가지고 있다.
 
