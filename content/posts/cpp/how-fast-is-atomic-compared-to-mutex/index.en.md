@@ -13,7 +13,7 @@ categories = ["c++"]
 
 +++
 
-### Test Goal
+## Test Goal
 
 - How fast is Atomic compared to mutex?
 
@@ -21,7 +21,7 @@ categories = ["c++"]
 
 - When using atomic, is there any meaningful benefits with `memory_order_relaxed`?
 
-### Settings
+## Settings
 
 ```cpp
 void workerWithLock(int work_count, int work_size) {
@@ -71,9 +71,9 @@ void test(int work_count, int work_size) {
 For each test, I created two contesting workers.  `work_size` represents the amount of work that can be done without contention at one time, so the smaller the `work_size`, the more frequently contention occurs.  To keep the total time relatively uniform, `work_count` was added. The compilation was done with the `O3` flag.
 
 
-### Result
+## Result
 
-###### work_size is big.
+#### work_size is big.
 
 ```bash
 work count : 100 / work size : 100000
@@ -83,7 +83,7 @@ work count : 100 / work size : 100000
     with atomic Relaxed : 106.172ms
 ```
 
-###### work_size is small
+#### work_size is small
 
 ```bash
 work count : 2000000 / work size : 5
@@ -93,7 +93,7 @@ work count : 2000000 / work size : 5
     with atomic Relaxed : 120.621ms
 ```
 
-###### Whole results
+#### Whole results
 ```bash
 Lock free atomic is supported
 More work count - more race condition
@@ -141,7 +141,7 @@ work count : 10000000 / work size : 1
     with atomic Relaxed : 209.97ms
 ```
 
-### Conclusions
+## Conclusions
 
 Naturally, when the race condition is high, atomics become increasingly faster. However, when each work takes about 1ms, the difference between `mutex` and atomic wasn't that significant! Additionally, depending on the experiment, it's worth noting that the overhead of the `lock_guard` constructor and destructor is almost negligible. If there's a possibility of making mistakes, it's better to use the RAII pattern rather than managing the `mutex` directly.
 
@@ -165,7 +165,7 @@ Even when contention occurs at around 0.01ms, the mutex was surprisingly fast. T
 
 3. Regarding the experimental results of `memory_order_relaxed`, I'm not entirely sure, but it seems acceptable to use the default value.
 
-### Entire test code
+## Entire test code
 
 ```cpp
 #include <atomic>
