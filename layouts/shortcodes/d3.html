@@ -7,3 +7,5 @@
         {{ .Inner | safeJS }}
     })
 </script>
+
+{{- .Page.Scratch.SetInMap "this" "d3" true -}}

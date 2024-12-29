@@ -13,7 +13,7 @@ categories = ["c++"]
 
 +++
 
-### Test Goal
+## Test Goal
 
 - Mutex에 비해 atomic 변수를 쓰는게 얼마나 빠를까?
 
@@ -21,7 +21,7 @@ categories = ["c++"]
 
 - Atomic을 쓸 때, `memory_order_relaxed` 가 어떤 유의미함을 가져다주는가?
 
-### 세팅
+## 세팅
 
 ```cpp
 void workerWithLock(int work_count, int work_size) {
@@ -71,9 +71,9 @@ void test(int work_count, int work_size) {
 그리고 각각의 test는 두 개의 경합 worker를 생성한다. `work_size`는 한 번에 경합 없이 할 일이므로, `work_size`가 작을수록 경합은 자주 일어난다. 전체 시간을 어느정도 균일하게 하기 위해 `work_count`를 추가했다. 컴파일은 `O3` 플래그를 제공했다.
 
 
-### 결과
+## 결과
 
-###### work_size가 클 때
+#### work_size가 클 때
 
 ```bash
 work count : 100 / work size : 100000
@@ -83,7 +83,7 @@ work count : 100 / work size : 100000
     with atomic Relaxed : 106.172ms
 ```
 
-###### work_size가 작을 때
+#### work_size가 작을 때
 
 ```bash
 work count : 2000000 / work size : 5
@@ -93,7 +93,7 @@ work count : 2000000 / work size : 5
     with atomic Relaxed : 120.621ms
 ```
 
-###### 전체
+#### 전체
 
 ```bash
 Lock free atomic is supported
@@ -142,7 +142,7 @@ work count : 10000000 / work size : 1
     with atomic Relaxed : 209.97ms
 ```
 
-### 결론
+## 결론
 
 당연하지만, race가 클 때는 atomic이 점점 빨라진다. 그런데 work 하나에 1ms정도 걸릴 때, mutex와 atomic의 차이가 그리 크지 않았다! 또 실험 따라 다르겠지만, `lock_guard`의 생성자-소멸자 오버헤드가 거의 존재하지 않는 것도 알아둘만 하다. 기왕 실수할 여지가 있으면, `mutex`를 직접 관리하기보단 RAII 패턴을 쓰는게 맞다.
 
@@ -166,7 +166,7 @@ work count : 10000000 / work size : 1
 
 3. `memory_order_relaxed`의 실험결과에 대해선 잘 모르겠지만, 그냥 기본 값을 써도 될거같다.
 
-### 전체 실험 코드
+## 전체 실험 코드
 
 ```cpp
 #include <atomic>
