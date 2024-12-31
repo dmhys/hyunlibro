@@ -352,7 +352,7 @@ float Q_rsqrt( float number )
 }
 ```
 
-## square root 명령어
+## Instructions for sqrt
 
 ### Basic instruction sets
 
