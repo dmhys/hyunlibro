@@ -1,6 +1,6 @@
 +++
 date = 2024-12-27T15:09:31+09:00
-lastmod = ''
+lastmod = 2024-12-30T16:35:59+09:00
 draft = false
 
 title = "고속 역제곱근과 그 후 구현체들"
@@ -12,9 +12,9 @@ tags = ["Assembly", "fast inverse square root", "mathematics", ]
 categories = ["dev"]
 +++
 
-예전에도 fast inverse square root알고리즘을 본 적은 있지만, 그 때는 그저 '오-신기하네' 하고 넘어갔던 기억이 있다. 문득 최근 갑자기 거기에 생각이 미쳐 이해해보려 했으나, 위키피디아의 문서가 살짝 부실해서 개인적으로 직접 유도해보았고, 그 김에 궁금증이 생겨서 모던 방법론까지 찾아보았다. 이 포스팅은 그에 대한 정리다.
+예전에도 fast inverse square root알고리즘을 본 적이 있지만, 그 때는 그저 '오-신기하네' 하고 넘어갔던 기억이 있다. 문득 갑자기 거기에 생각이 미쳐 이해해보려 했으나, 위키피디아의 문서가 살짝 부실해서 개인적으로 직접 유도해보았고, 그 김에 궁금증이 생겨서 모던 방법론까지 찾아보았다. 이 포스팅은 그에 대한 정리다.
 
-이 포스트에선 조금 더 친절하게 유도해준다. 그러나 각 실행 시간 및 명령어 셋에 대한 상세한 정보를 담진 않았고, 그에 대한 자세하고 좋은 포스팅을 발견했기 때문에(특히 어떤 컴파일 플래그를 사용했을 때 어떻게 달라지는지에 대해 아주 상세한 보고를 담고 있었다.) 이에 링크를 건다.
+이 포스트에선 위키피디아보단 조금 더 친절하게 유도해준다. 그러나 실행 시간 및 명령어 셋에 대한 상세한 정보를 담진 않았고, 그에 대한 자세하고 좋은 포스팅을 발견했기 때문에(특히 어떤 컴파일 플래그를 사용했을 때 어떻게 달라지는지에 대해 아주 상세한 보고를 담고 있었다.) 이에 링크를 건다.
 
 [Revisiting The Fast Inverse Square Root - Is It Still Useful?](https://hllmn.net/blog/2023-04-20_rsqrt)
 
@@ -22,7 +22,7 @@ categories = ["dev"]
 
 ### Intro
 
-이미 너무 잘 알려진 일화지만, 우선 설명을 해보겠다. 렌더링 분야에서 조명 및 셰이딩등의 필요로 인해 normal을 상당히 자주 구해야한다. 이 때 이 normal을 정규화 하기 위해 제곱근의 역수를 계산의 필요성이 컸다. 이 중 퀘이크 3 아레나에 쓰인 Fast inverse square root라는 알고리즘이 아주 유명하다. 골때리는 주석과 선뜻 이해하기 힘든 로직이 이 유명세의 백미이다.
+이미 너무 잘 알려진 일화지만, 여기에 간략히 설명을 해보겠다. 렌더링을 할 때엔 광원 계산등에서 normal을 필요로 한다. 이 때 이 normal은 크기가 1을 가지도록 정규화 되어야 하기 때문에, 제곱근의 역수를 아주 자주 계산해야했다. 이런 와중, 퀘이크 3 아레나에서 이를 해결하기 위해 Fast inverse square root라는 신기한 알고리즘을 가져왔다. 이후 공개되어 아주 유명해졌는데, 골때리는 주석과 선뜻 이해하기 힘든 로직이 이 유명세의 백미이다.
 
 c와 친하지 않은 분들을 위해 설명하자면,(뒤쪽 iteration 부분은 빼고)
 
@@ -184,6 +184,49 @@ $$
     .attr("stroke-width", 2)
     .attr("d", lineLinear);
 
+  const legend = svg.append("g")
+  .attr("transform", `translate(${margin+20}, ${margin+20})`);
+
+  legend.append("rect")
+  .attr("x",0)
+  .attr("y",-5)
+  .attr("width",115)
+  .attr("height",45)
+  .attr("rx", 2)
+  .attr("ry", 2)
+  .attr("stroke", "black")
+  .attr("stroke-width", 1)
+  .attr("fill-opacity", 0.7)
+  .attr("fill", "white");
+
+  legend.append("line")
+  .attr("x1", 10)
+  .attr("y1", 10)
+  .attr("x2", 30)
+  .attr("y2", 10)
+  .attr("stroke", "steelblue")
+  .attr("stroke-width", 2);
+
+  legend.append("text")
+    .attr("x", 40)
+    .attr("y", 10)
+    .attr("dominant-baseline", "middle")
+    .text("log₂(1 + x)");
+
+  legend.append("line")
+  .attr("x1", 10)
+  .attr("y1", 30)
+  .attr("x2", 30)
+  .attr("y2", 30)
+  .attr("stroke", "red")
+  .attr("stroke-width", 2);
+
+legend.append("text")
+  .attr("x", 40)
+  .attr("y", 30)
+  .attr("dominant-baseline", "middle")
+  .text("x + c");
+
   canvas.append(svg.node());
 {{</ d3 >}}
 
@@ -224,7 +267,6 @@ $$
 $$
 2^{23} (\log_2 y^{-{1\over2}} - {1\over2} (127 - c) ) + 2^{23}({3\over2}(127-c))
 \newline
-
 = 2^{23} (\log_2 y^{-{1\over2}} + 127 - c)
 $$
 
@@ -328,11 +370,11 @@ AVX부터는 종류가 많다. 이 중 `fsqrt`는 잘 사용되지 않으며, AM
 
 - `sqrt` : 당연히 제곱근을 의미한다.
 - `rsqrt` : reciprocal of square root. 제곱근 역수.
-- `s`/`p` : packed. SIMD명령어에서 여러 데이터를 동시에 처리한다.
+- `s`/`p` : scalar/packed. SIMD명령어에서 여러 데이터를 동시에 처리한다.
 - `s`/`d` : single precision / double precision
 - `v` : vectored extenson. 3-operand등의 방식을 사용 가능하다. (src/dst등이 더 자유로움)
 - `zmm` : name of register
-- `14` : 근사 계산의 precision. `14` 는 
+- `14` : 근사 계산의 precision. `14` 는 14-bit accurate.
 
 예를들어, `vrsqrt14ps` 같은 경우는 packed single precision 데이터에 대해 제곱근의 역수를 계산하며, $2^{-14}$의 상대 오차를 보장한다는 뜻이다.
 
@@ -343,15 +385,15 @@ AVX부터는 종류가 많다. 이 중 `fsqrt`는 잘 사용되지 않으며, AM
 우선 3DNow! 시절 알고리즘을 보면 다음과같다. `b`가 제곱근을 구할 대상이며, `X3` 가 reciprocal of square root가 된다.
 
 ```
-X0 = PFRSQRT(b)
-X1 = PFMUL(X0, X0)
-X2 = PFRSQIT1(b, X1)
-X3 = PFRCPIT2(X2, X0)
+X0 = PFRSQRT(b) // Packed float reciprocal of square root
+X1 = PFMUL(X0, X0) // packed float multiplication
+X2 = PFRSQIT1(b, X1) // packed float reciprocal of square root iteration#1
+X3 = PFRCPIT2(X2, X0) // packed float reciprocal iteration#2
 ```
 
 !["PFRSQIT"](amd64-ref-pfrsqit.png)
 
-이에 대해 PFRSQRT 는 15비트까지 accurate하며, `PFRSQIT1` 를 이용해 iteration을 하고, 역수를 계산하기 위한 iteration 명령어인 `PFRCPIT1`과 `PFRCPIT2` 중 `PFRCPIT2` 명령어를 재사용하여 24비트 정확도를 얻어낸다고 되어있다. 여기 technical manual에서 명시적으로 위의 bit-level hacking과 동일한 구조의 Newton-Rhapson method에 대해 발언한다.
+이에 대해 `PFRSQRT` 는 15비트까지 accurate하며, `PFRSQIT1` 를 이용해 iteration을 하고, 역수를 계산하기 위한 iteration 명령어인 `PFRCPIT1`과 `PFRCPIT2` 중 `PFRCPIT2` 명령어를 재사용하여 24비트 정확도를 얻어낸다고 되어있다. 여기 technical manual에서 명시적으로 위의 bit-level hacking과 동일한 구조의 Newton-Rhapson method에 대해 발언한다.
 
 !["LUT"](amd64-ref-lookup.png "명시적으로 Lookup table이라 쓰여있다.")
 
@@ -362,13 +404,13 @@ floating point의 데이터는 exponent/mantissa 의 분리가 가능한데, 이
 
 ### Modern instruction choices
 
-`sqrt`  방법은 근사치라고 되어있지 않은데에 반해, `rsqrt` reciprocal의 경우 근사치라고 명시되어있다. 여기서 근사치와 근사치가 아님의 기준은 $\pm0.5 \mathrm{ulp}$ 인데, ulp는 unit of least precision으로 lsb에 대한 상대 단위를 나타낸다. 이 단위의 0.5 이하로 오차가 들어온다면 이 bit representation으로 표시 불가능한 차이이기 때문에 근사치가 아니다라고 말할 수 있다.
+`sqrt`  방법은 근사치라고 되어있지 않은데에 반해, `rsqrt` reciprocal의 경우 근사치라고 명시되어있다. 여기서 근사치와 근사치가 아님의 기준은 $\pm0.5 \mathrm{ulp}$ 인데, ulp는 unit of least precision으로 lsb에 대한 상대 단위를 나타낸다. 이 단위의 0.5 이하로 오차가 들어온다면 이 bit representation으로 표시 불가능한 차이이기 때문에, 오차가 이 값 아래로 들어온다면 근사치가 아니다라고 말할 수 있다.
 
-재미있게도 3DNow!의 경우엔 `fsqrt` 를 구할 때 `RFRCPIT2` 이후 원본 데이터와 곱해주어 제곱근을 얻어내는 선택지를 골랐는데, 이후엔 `sqrtss` 명령어 쪽이 조금 더 dedicated 되어 `rsqrt`를 사용하는 데에 쓰도록 바뀌었다. 이에 대해서 [Intel® 64 and IA-32 Architectures Optimization Reference Manual: Volume 1](https://www.intel.com/content/www/us/en/content-details/671488/intel-64-and-ia-32-architectures-optimization-reference-manual-volume-1.html) 에서는, 다음과 같은 자료를 제공해준다.
+재미있게도 3DNow!의 경우엔 `fsqrt` 를 구할 때 `rsqrt` 후 `RFRCPIT2` 를 거쳐 원본 데이터와 곱해주어 제곱근을 얻어내는 선택지를 골랐는데, 이후엔 `sqrtss` 명령어 쪽이 조금 더 dedicated 되어 `rsqrt`를 사용하는 데에 쓰도록 바뀌었다. 이에 대해서 [Intel® 64 and IA-32 Architectures Optimization Reference Manual: Volume 1](https://www.intel.com/content/www/us/en/content-details/671488/intel-64-and-ia-32-architectures-optimization-reference-manual-volume-1.html) 에서는, 다음과 같은 자료를 제공해준다.
 
 !["Intel Ref"](intel-ref.png)
 
-여기서 22-bit와 11-bit항목은 각 항목을 24-bit accurate 데이터로 처리하는 것에 비해 얼마나 throughput이 나오는지인데, 재밌게도 몇몇 예시 operation의 경우 24-bit accurate 데이터보다 22-bit accurate 데이터가 더 throughput이 낮다. 이에 대해선 `DIVPS` / `SQRTPS` 등의 명령어셋이 레이턴시가 더 빠르기 때문에 반복적인 근사작업을 하는 것 보다 더 빠른 결과를 낸다는 설명이 주어졌다.
+여기서 22-bit와 11-bit항목은 각 항목을 24-bit accurate 데이터로 처리하는 것에 비해 얼마나 throughput이 나오는지인데, 재밌게도 몇몇 예시 operation의 경우 24-bit accurate 데이터보다 22-bit accurate 데이터가 더 throughput이 낮다. 이에 대해선 `DIVPS` / `SQRTPS` 등의 명령어셋이 레이턴시가 더 낮기 때문에 반복적인 근사작업을 하는 것 보다 더 빠른 결과를 낸다는 설명이 주어졌다.
 
 !["Intel Ref2"](intel-ref-alternatives.png)
 
