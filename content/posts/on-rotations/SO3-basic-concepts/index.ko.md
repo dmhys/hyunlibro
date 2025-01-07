@@ -1,6 +1,6 @@
 +++
 date = 2024-12-24T17:33:15+09:00
-lastmod = ""
+lastmod = 2025-01-07T00:33:41+09:00
 draft = false
 
 title = "SO3(1) - Basic concepts"
@@ -15,7 +15,7 @@ categories = ["on rotations"]
 
 ## Toy Example
 
-2D Toy example 에 대해 생각해보자. 2차원에서 돌아다니는 로봇에 대해서 기술해본다고 하자. 여기서의 기술은 $pos_x,$ $pos_y,$ $\theta$ 3자유도로 이루어질 수 있다. 그러면 이제 이 로봇의 좌표에서 바라본 물체의 위치를 $x_{local} ,$ $y_{local}$ 로 표현하면 **로봇의 pose를 감안한** 위치가 된다. (첨자를 많이 쓰기 싫어서 $x$, $y$ 등으로 표현하였다.) 이 로봇이 바라본 위치를 로봇의 pose를 나타낸 글로벌 좌표계에서 본다고 하면,
+2D Toy example로 2차원에서 돌아다니는 로봇의 위치에 대해 기술해본다고 하자. 여기서의 기술은 $pos_x,$ $pos_y,$ $\theta$ 3자유도로 이루어질 수 있다. 이제 이 로봇의 좌표에서 바라본 물체의 위치를 $x_{local} ,$ $y_{local}$ 로 표현하면 **로봇의 pose를 감안한** 위치가 된다. (첨자를 많이 쓰기 싫어서 $x$, $y$ 등으로 표현하였다.) 이 로봇이 바라본 위치를 로봇의 pose를 나타낸 글로벌 좌표계에서 본다고 하면,
 
 $$
 x_{global} = \cos \theta \\ x_{local} - \sin \theta \\ y_{local} + pos_x
@@ -76,7 +76,7 @@ $$
 - 회전은 각 축들 사이의 각도를 유지한다.(공간을 꼬지 않는다.)
 - 회전을 한 번 하고, 다시 **반대 방향**으로 회전하면 동일해진다.
 
-여기서 사실 중요한 두 개의 조건은 물체의 크기를 바꿀 수 없다는 점과 각도를 유지한다는 점이다. 즉, 어떠한 변환을 했을 때 크기가 바뀌지 않으며 공간의 꼬임이 없어야한다. 이를 조금 수학적으로 표현해보자면, 어떤 변환이 모든 벡터 간의 내적을 보존한다 라고 생각해 볼 수 있다. 
+여기서 사실 중요한 두 개의 조건은 물체의 크기를 바꿀 수 없다는 점과 각도를 유지한다는 점이다. 즉, **어떠한 변환을 했을 때 크기가 바뀌지 않으며 공간의 꼬임이 없어야한다.** 이를 조금 수학적으로 표현해보자면, 어떤 변환이 모든 벡터 간의 내적을 보존한다 라고 생각해 볼 수 있다. 
 
 $$
 (R\mathrm v)\cdot(R \mathrm w) = \mathrm v \cdot \mathrm w
@@ -94,7 +94,7 @@ $$
 R^T R = I
 $$
 
-다만 여기서 $R$ 의 determinant는 두 가지의 선택지가 있다. 우선 transpose가 determinant를 바꾸지 않으며, 우변의 determinant가 1이기 때문에 결국  $R$ 의 determinant 의 경우 $\pm 1$ 외엔 선택지가 없다. (허수까지 나아가지 말자. 이 모든건 실수행렬에서 정의한다.) 여기서 determinant가 음수일 경우엔 orientation reversing 이라 부르며, 오른손 좌표계를 왼손좌표계로 만드는 카이랄성(chirality)을 가지고 있다고 표현가능하다. 이 $R^T R = I$ 조건을 가진 실수 행렬을 **직교 행렬*orthogonal matrix***이라 부르며, 이 중 orientation을 보존하는 determinant가 1인 행렬을 **특수 직교행렬*special orthogonal matrix***이라 부른다.
+다만 여기서 $R$ 의 determinant엔 두 가지의 선택지가 있다. 우선 transpose가 determinant를 바꾸지 않으며, 우변의 determinant가 1이기 때문에 결국  $R$ 의 determinant 의 경우 $\pm 1$ 외엔 선택지가 없다. 여기서 determinant가 음수일 경우엔 orientation reversing 이라 부르며, 오른손 좌표계를 왼손좌표계로 만드는 카이랄성(chirality)을 가지고 있다고 표현가능하다. 이 $R^T R = I$ 조건을 가진 실수 행렬을 **직교 행렬*orthogonal matrix***이라 부르며, 이 중 orientation을 보존하는 determinant가 1인 행렬을 **특수 직교행렬*special orthogonal matrix***이라 부른다.
 
 즉, 모든 회전 행렬은 특수 직교행렬이며, transpose가 역방향 회전을 뜻하며, $R^T = R^{-1}$ 인 성질을 갖는다. 그리고 이 특수 직교행렬로 이루어진 그룹을 **특수직교군*special orthogonal group***이라고 부르며, 이를 다음과 같이 표현한다.
 

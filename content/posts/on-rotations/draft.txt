@@ -58,4 +58,7 @@ Handbook
     SO3, SE3를 Lie Group 관점에서 이해.
     Lie 대수와 axis-angle rep
     Manifold와 lie 대수 application
-6. Handbook - representations 변환 수식
+6. applications
+    rotation averaging
+    madgwick filter
+7. Handbook - representations 변환 수식

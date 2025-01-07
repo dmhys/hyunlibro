@@ -69,6 +69,12 @@ enableEmoji = true
     title = ""
 
 [markup]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.typographer]
+        leftSingleQuote = "'"
+        rightSingleQuote = "'"
+
   # Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
   [markup.highlight]
     # false is a necessary configuration (https://github.com/Fastbyte01/KeepIt/issues/158)

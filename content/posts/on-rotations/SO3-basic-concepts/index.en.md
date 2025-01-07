@@ -1,6 +1,6 @@
 +++
 date = 2024-12-24T17:33:15+09:00
-lastmod = ""
+lastmod = 2025-01-07T00:33:41+09:00
 draft = false
 
 title = "SO3(1) - Basic concepts"
@@ -76,7 +76,7 @@ Now, let's assume the conditions to represent this rotation.
 - Rotation preserves the angles between the axes. (It does not skew space.)
 - If you rotate once and then rotate in the **opposite direction**, it remains unchanged.
 
-Here, the two important conditions are one, that the size of the object cannot be changed and the ohter, that the angles are preserved. That is, when a transformation is applied, the size does not change, and there is no twisting of space. If we express this a bit mathematically, we can think that a transformation preserves the inner product between all vectors.
+Here, the two important conditions are one, that the size of the object cannot be changed and the ohter, that the angles are preserved. That is, **when a transformation is applied, the size should remain unchanged, and there should be no twisting of space.** If we express this a bit mathematically, we can think that a transformation preserves the inner product between all vectors.
 
 $$
 (R\mathrm v)\cdot(R \mathrm w) = \mathrm v \cdot \mathrm w
@@ -94,7 +94,7 @@ $$
 R^T R = I
 $$
 
-However, in this case, the determinant of $R$ has two options. Firstly, the transpose does not change the determinant, and since the determinant on the right side is 1, ultimately the determinant of $R$ has no option other than $\pm 1$. (Let's not go into imaginary numbers. This is all defined in real matrices.) If the determinant is negative, it is called orientation reversing, and it can be said to have chirality that turns a right-handed coordinate system into a left-handed coordinate system. A *real matrix* that satisfies the condition $R^T R = I$ is called an orthogonal matrix, and among these, matrices with determinant 1 that preserve orientation are called special orthogonal matrices.
+However, in this case, the determinant of $R$ has two options. Firstly, the transpose does not change the determinant, and since the determinant on the right side is 1, ultimately the determinant of $R$ has no option other than $\pm 1$. If the determinant is negative, it is called orientation reversing, and it can be said to have chirality that turns a right-handed coordinate system into a left-handed coordinate system. A *real matrix* that satisfies the condition $R^T R = I$ is called an orthogonal matrix, and among these, matrices with determinant 1 that preserve orientation are called special orthogonal matrices.
 
 In other words, all rotation matrices are special orthogonal matrices, the transpose represents the inverse rotation, and they have the property $R^T = R^{-1}$. The group formed by these special orthogonal matrices is called the special orthogonal group, and it is expressed as follows.
 
