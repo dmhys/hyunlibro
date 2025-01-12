@@ -1,0 +1,65 @@
+\documentclass[border=10pt,tikz]{standalone}
+\usepackage{physics}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+\colorlet{darkgreen}{green!50!black}
+
+\begin{document}
+
+\tdplotsetmaincoords{40}{135}
+\begin{tikzpicture}[scale=1.2,line width=1pt, font=\LARGE, tdplot_main_coords]
+  
+  % VARIABLES ===================================================================
+  % Camera 1
+  \coordinate (C1_O) at (10,0,0);
+  \coordinate (C1_UL) at (8,-3,2);
+  \coordinate (C1_UR) at (8,3,2);
+  \coordinate (C1_LL) at (8,-3,-2);
+  \coordinate (C1_LR) at (8,3,-2);
+
+  % Camera 2
+  \coordinate (C2_O) at (0,10,0);
+  \coordinate (C2_UL) at (3,8,2);
+  \coordinate (C2_UR) at (-3,8,2);
+  \coordinate (C2_LL) at (3,8,-2);
+  \coordinate (C2_LR) at (-3,8,-2);
+
+  % e1, e2
+  \coordinate (e1) at (8,2,0);
+  \coordinate (e2) at (2,8,0);
+  
+  % X
+  \coordinate (X) at (0,0,0);
+  \coordinate (x) at (8,0,0);
+  \coordinate (x') at (0,8,0);
+
+  % Draw ===================================================================
+  \fill[color=yellow!10] (X)--(C1_O)--(C2_O)--cycle;
+  \draw (C1_O)--(X);
+  \draw (C2_O)--(X);
+  \draw[dashed] (C1_O)--(C2_O);
+
+  % draw cameras 1
+  \draw[] (C1_O)--(C1_UL)--(C1_UR)--cycle;
+  \draw[] (C1_O)--(C1_UR)--(C1_LR)--cycle;
+  \draw[] (C1_O)--(C1_LR)--(C1_LL)--cycle;
+  \draw[] (C1_O)--(C1_LL)--(C1_UL)--cycle;
+  \fill[black] (C1_O) circle(2pt) node[below=2] {$O_1$};
+
+  % draw cameras 2
+  \draw[] (C2_O)--(C2_UL)--(C2_UR)--cycle;
+  \draw[] (C2_O)--(C2_UR)--(C2_LR)--cycle;
+  \draw[] (C2_O)--(C2_LR)--(C2_LL)--cycle;
+  \draw[] (C2_O)--(C2_LL)--(C2_UL)--cycle;
+  \fill[black] (C2_O) circle(3pt) node[below=2] {$O_2$};
+
+  % epipoles
+  \fill[darkgreen] (e1) circle(3pt) node[below=2] {$e_1$};
+  \fill[darkgreen] (e2) circle(3pt) node[below=2] {$e_2$};
+
+  % vectors
+  \fill[black] (X) circle(3pt) node[above=5] {$\mathrm{X}$};
+  \draw[very thick,->] (C1_O) -- (x) node[above left=1]{$\mathrm{x}$};
+  \draw[very thick,->] (C2_O) -- (x') node[above right=1]{$\mathrm{x'}$};
+\end{tikzpicture}
+\end{document}

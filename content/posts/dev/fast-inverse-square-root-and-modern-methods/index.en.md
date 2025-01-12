@@ -66,7 +66,7 @@ The second point might be trivial in some sense, but if you’re not familiar wi
 
 The core concept here is the binary float representation.
 
-![float](Float_point_example_frac.svg.png "wikipedia : Float_point_example_frac.svg.png")
+![float](Float_example.svg "wikipedia : Float_example.svg, CC-BY-SA")
 
 According to the IEEE 754 32-bit floating-point format, a float has the following structure:
 

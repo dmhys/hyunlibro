@@ -1,6 +1,6 @@
 +++
 date = 2025-01-07T00:42:15+09:00
-lastmod = ""
+lastmod = 2025-01-10T23:57:48+09:00
 draft = true
 
 title = "SO3(2) - Basic parameterizations"
@@ -23,9 +23,9 @@ categories = ["on rotations"]
 
 앞 챕터에서 세 개의 회전으로 어떠한 회전 운동을 나타낼 수 있음을 보였는데, 일반적으로 classical 한 Euler configuration에선 Z-X-Z축에 대한 각각의 회전을 이용하여 어떤 회전 운동을 기술한다.
 
-![Euler angles](Eulerangles.svg.png "https://en.wikipedia.org/wiki/File:Eulerangles.svg")
+![Euler angles](Euler2a.gif "wikipedia : Euler2a.gif, CC-BY-SA")
 
-본문엔 삽입하지 못했지만, [여기 좋은 이미지가 있다.](https://en.wikipedia.org/wiki/File:Euler2a.gif) 위 그림에서 알아보기 어렵겠지만, z축을 이용하여 $\alpha$ 만큼 회전하고, N축(즉 회전 후의 x축) 을 기준으로 $\beta$ 만큼 회전한 후, 마지막으로 z축을 기준으로 $\gamma$만큼 회전하면 파란 좌표축이 빨간 좌표축으로 변환되는 원리이다.
+z축을 이용하여 $\alpha$ 만큼 회전하고, 회전 후의 x축을 기준으로 $\beta$ 만큼 회전한 후, 마지막으로 z축을 기준으로 $\gamma$만큼 회전하면 파란 좌표축이 빨간 좌표축으로 변환되는 원리이다.
 
 수식으로 나타내면 다음과 같다.
 
