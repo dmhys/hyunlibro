@@ -150,3 +150,7 @@ Nistér's algorithm은 세 가지 변종이 있다. $9\times20$ 행렬을 사용
 $$
 x^3, y^3, x^2y, xy^2, x^2z, x^2, y^2z, y^2, xyz, xy, xz^2, xz, x, yz^2, yz, y, z^3, z^2, z, 1.
 $$
+
+이 계수 행렬을 $A$라고 하자. 여기서 Gauss-Jordan elimination을 통해, 다음 sparsity pattern이 된다. 여기서 두 행은 마저 eliminate하지 않아도 된다.
+
+그리고 다음 
