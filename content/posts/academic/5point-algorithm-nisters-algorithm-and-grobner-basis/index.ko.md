@@ -141,9 +141,9 @@ $$
 
 ## Nistér's algorithm
 
-Nistér's algorithm은 세 가지 변종이 있다. $9\times20$ 행렬을 사용하는 2003년 버전, $10\times20$ 행렬을 사용하는 2004년 버전, 그리고 상당히 손으로 푼 앞 두가지 방법과 달리, 추후 Gröbner basis를 사용하여 general하게 된 마지막 버전이 있다.
+Nistér's algorithm은 세 가지 변종이 있다. $9\times20$ 행렬을 사용하는 2003년 버전, $10\times20$ 행렬을 사용하는 2004년 버전, 그리고 상당히 손으로 푼 앞 두가지 방법과 달리, 추후 Gröbner basis를 사용하여 general하게 된 마지막 버전이 있다. 사실 2003년 버전에 비해 2004년 버전이 훨씬 논문이 더 풍성하다. 다만 일반적으로 구글링 했을때 나오는 버전이 03년 버전이며, 완전히 동일한 제목을 가지고 있다. 03년 버전은 *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-CVPR-2003* 이며, 04년 버전은 *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-T-PAMI* 이다. 
 
-### 2003 version
+### 2003 Version
 
 우선 2003년 버전에선, 다음과 같은 monomial ordering으로 matrix를 생성한다.
 
@@ -151,6 +151,116 @@ $$
 x^3, y^3, x^2y, xy^2, x^2z, x^2, y^2z, y^2, xyz, xy, xz^2, xz, x, yz^2, yz, y, z^3, z^2, z, 1.
 $$
 
-이 계수 행렬을 $A$라고 하자. 여기서 Gauss-Jordan elimination을 통해, 다음 sparsity pattern이 된다. 여기서 두 행은 마저 eliminate하지 않아도 된다.
+이 계수 행렬을 $A$라고 하자. 여기서 Gauss-Jordan elimination을 통해, 다음 sparsity pattern이 된다. 여기서 두 행은 마저 eliminate하지 않아도 된다. 
 
-그리고 다음 
+![nister 2003](essential-nister-2003.svg "Nistér's algorithm 2003")
+
+이제 z 를 따로 묶은 이유가 드러나는데, z를 기준으로 나머지 항을 elimination하기 위함이다.
+
+$$
+\begin{align*}
+(j) &\equiv (e)-z(g) \newline
+(k) &\equiv (f)-z(h) \newline
+(l) &\equiv (d)-x(h)+P(c)+zQ(e)+R(e)+S(g) \newline
+(m) &\equiv (c)-y(g)+L(d)+zM(f)+N(f)+O(h)
+\end{align*}
+$$
+
+자세히는 큰 의미가 없기 때문에 유도하지 않겠지만, 이렇게 하면 $(i), (j), (k), (l), (m)$ 다섯개의 항이 전부 $xyz$ 를 최고차항으로 묶이게 된다. 정확히는
+
+$$
+[n]=n\mathrm{th \ order \ polynomial \ of} \ z
+$$
+
+일 때,
+
+$$
+\begin{align*}
+(i) &= xy[1] + x[2] + y[2] + [3] \newline
+(j) &= xy[1] + x[3] + y[3] + [4] \newline
+(k) &= xy[1] + x[3] + y[3] + [4] \newline
+(l) &= xy[2] + x[3] + y[3] + [4] \newline
+(m) &= xy[2] + x[3] + y[3] + [4]
+\end{align*}
+$$
+
+으로 정의 가능하다. 이에 대해선 손으로 해보면 금방 보일 수 있다. 결과적으로 $(i)$ 는 차수가 가장 낮고, 조금 더 고차항으로 만들어진 $(l)$과 $(m)$은 조금 더 높은 차수의 항을 갖는다. 여기서 $(i) (j) (k) (l)$ 로 행렬 $B$를 만들고, $(i) (j) (k) (m)$ 으로 행렬 $C$를 만들자. (아래 수식에서 엄밀히는 $(i) (j) (k) (l)$이 아닌데, 적당히 계수를 분리한 term을 그냥 그대로 퉁쳤다.)
+
+$$
+B\cdot \begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+=\begin{bmatrix}
+―& (i) & ―  \newline
+―& (j) & ―  \newline
+―& (k) & ―  \newline
+―& (l) & ―
+\end{bmatrix}
+\begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+= 0_{4 \times 1}
+$$
+
+$$
+C\cdot \begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+=\begin{bmatrix}
+―& (i) & ―  \newline
+―& (j) & ―  \newline
+―& (k) & ―  \newline
+―& (m) & ―
+\end{bmatrix}
+\begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+= 0_{4 \times 1}
+$$
+
+두 행렬 우측 영벡터가 존재한다. 결국 두 행렬 모두 degenerate case라서 determinant가 0이되며, 이 구속 조건에서 행렬 $B$와 $C$가 각각 $z$ term만으로 11차 다항식을 만들게 된다. 이 11차 다항식 두개를 각각 $(n)$,$(o)$ 라고 하자. 그리고 이 두 11차 다항식을 서로 빼면 10차 다항식 하나가 나온다. 이 다항식은 총 10개의 해를 가지며, 이 중 실근을 뽑으면 위의 $B$ 행렬을 재구성 할 수 있으며, 여기서 $x$와 $y$를 구할 수 있다. 이후 $x,y,z$를 구했으므로 $E$를 구할 수 있다. 즉, $E$는 10개까지의 가능한 해가 존재한다. 이 10차 다항식을 푸는 선택지에 대해선 조금 있다 다시 살펴보고, 이제 Nister의 2004년 버전 알고리즘을 보러 가자.
+
+### 2004 Version
+
+04년 버전은 $10\times 10$ 행렬을 사용한다. 정확히 왜 이렇게 된건지는 찾기가 좀 힘든데, $EE^ \mathsf{T} E - {1\over 2} \mathrm{trace}(E E ^ \mathsf{T}) E = 0$ 라는 constraint가 determinant가 0이라는 조건을 함의하기 때문에 명시적으로 determinant가 0인 조건을 추가할 필요가 없기 때문이다. 아마 수식 전개 상에서 이득이 있었어서 그러지 않나 싶기도 하다.
+
+하여튼, 앞서 살펴본 다항식 조건에 다음 조건을 추가한다.
+
+$$
+\mathrm{det}(E)=0
+$$
+
+그리고 이번에도 elimination을 끝까지 할 필요는 없고, 4줄을 남기고 다음 sparsity pattern을 가져간다. 앞서 $[n]$ 이 $z$만으로 이루어진 n차 polynomial이란 점을 충분히 설명했으므로, 이번엔 원문에 있는대로 간략히 가져가본다.
+
+![nister 2004](essential-nister-2004.svg "Nistér's algorithm 2004")
+
+우선 monomial ordering이 살짝 달라졌고, 수수식전개가 상당히 깔끔해졌다.
+
+$$
+\begin{align*}
+(k) &\equiv (e)-z(f) \newline
+(l) &\equiv (g)-z(h) \newline
+(m) &\equiv (i)-z(j)
+\end{align*}
+$$
+
+전개를 직접 해보면 상당히 깔끔하다. 우선 $(e)-(f), (g)-(h), (i)-(j)$ 의 구조로 알아보기도 쉽고, 곱하는 항이 $z$항 밖에 없기 때문에 z coefficient polynomial도 [3] [3] [4] 로 깔끔하다. 03년 수식은 손으로 해야만 했는데, 이번에는 머리로만 해도 된다. 여튼, 이번에는 B 행렬 하나만 만든다.
+
+$$
+B\cdot \begin{bmatrix}
+x \newline y \newline 1
+\end{bmatrix}
+=\begin{bmatrix}
+―& (k) & ―  \newline
+―& (l) & ―  \newline
+―& (m) & ―
+\end{bmatrix}
+\begin{bmatrix}
+x \newline y \newline 1
+\end{bmatrix}
+= 0_{3 \times 1}
+$$
+
+마찬가지로 determinant가 0이라는 구속조건으로 식을 만들면 이번에는 polynomaial이 [3][3][4]이므로 행렬 하나만으로 10차 polynomial을 만들 수 있다.
+
+### Solving 10th order polynomial of z
