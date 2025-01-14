@@ -11,11 +11,15 @@
             {{ range $index, $value := . }}
                 {{ if $value.title }}
                     <li id="reference-{{$index}}">
-                        {{ $value.title }}
+                        &nbsp;
+                        {{ if $value.authors }}
+                            <i>{{ $value.authors }}</i>, 
+                        {{ end }}
+                        "{{ $value.title }}"
                         {{ if $value.link }}
                             [<a href="$value.link"><i> {{ $value.link }} </i></a>]
                         {{ else if $value.doi }}
-                            [<a href="doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
+                            [<a href="http://doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
                         {{ end }}
                     </li>
                 {{ end }}

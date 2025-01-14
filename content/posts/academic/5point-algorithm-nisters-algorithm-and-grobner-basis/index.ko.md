@@ -8,8 +8,12 @@ summary = ""
 
 isCJKLanguage = true
 
-tags = ["5point algorithm", "essential matrix", "Gröbner basis", "mathematics", "multiple view geometry",]
+tags = ["5point algorithm", "essential matrix", "Gröbner basis", "mathematics", "multiple view geometry", "Sturm's theorem",]
 categories = ["academic"]
+
+references = [
+    {title = "USING STURM SEQUENCES TO BRACKET REAL ROOTS OF POLYNOMIAL EQUATIONS", authors = "D. G. Hook, P. R. McAree", doi = "10.1016/B978-0-08-050753-8.50089-9"},
+]
 
 +++
 
@@ -263,4 +267,26 @@ $$
 
 마찬가지로 determinant가 0이라는 구속조건으로 식을 만들면 이번에는 polynomaial이 [3][3][4]이므로 행렬 하나만으로 10차 polynomial을 만들 수 있다.
 
-### Solving 10th order polynomial of z
+## Solving 10th order polynomial of z
+
+### Sturm's theorem
+
+Sturm's theorem(슈툼 정리라고 부르겠다. 스트룸, 스툼, 등등. )은 일변수 다항식의 실근 개수를 정해진 영역에서 셀 수 있는 방법이다. 우선 **Sturm sequence**에 대해 정의하겠다. 일변수 다항식 $p(x)$ 에 대해,
+
+$$
+p_0(x)=p(x) \newline
+p_1(x)=p'(x)
+$$
+
+그리고 이후
+
+$$
+p_{n+1}(x)=-\mathrm{mod}(p_{n-1}(x),p_n(x)) \newline
+\text{i.e. }  p_{n-1}(x)=(ax+b)p_n(x)-p_{n+1}(x)
+$$
+
+이렇게 재귀적으로 항들을 생성 가능하며, 마지막 0항이 나왔을 때 생성을 종료한다.
+
+이제 Sturm sequence에 대해,
+
+
