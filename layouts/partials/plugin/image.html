@@ -15,10 +15,6 @@
     {{ end }}
 {{- end -}}
 
-<script>
-    console.log("{{ $MediaSubType }}")
-</script>
-
 {{- $small := .SrcSmall | default $src -}}
 {{- with dict "Path" .SrcSmall "Resources" .Resources | partial "function/resource.html" -}}
     {{- $small = .RelPermalink -}}

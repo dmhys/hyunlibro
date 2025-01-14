@@ -1,6 +1,31 @@
 {{- $params := .Scratch.Get "params" -}}
 
 <div class="post-footer" id="post-footer">
+    {{ if .Params.references }}
+    <div class="post-references">
+        <hr>
+        <h5>{{ T "references"}}</h5>
+        <div class="references">
+            <ol>
+            {{ with .Params.references }}
+            {{ range $index, $value := . }}
+                {{ if $value.title }}
+                    <li id="reference-{{$index}}">
+                        {{ $value.title }}
+                        {{ if $value.link }}
+                            [<a href="$value.link"><i> {{ $value.link }} </i></a>]
+                        {{ else if $value.doi }}
+                            [<a href="doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
+                        {{ end }}
+                    </li>
+                {{ end }}
+            {{ end }}
+            {{ end }}
+            </ol>
+        </div>
+    </div>
+    {{ end }}
+
     <div class="post-info">
         <div class="post-info-line">
             <div class="post-info-mod">
