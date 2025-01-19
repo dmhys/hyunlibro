@@ -551,7 +551,7 @@ $$
 
 ##### 2005 Version
 
-![Stewénius 2004](essential-Stewénius-2005.svg "Stewénius's algorithm 2005")
+![Stewénius 2004](essential-Stewenius-2005.svg "Stewénius's algorithm 2005")
 
 전 두 방식과는 다르게, 완전히 elimination을 진행한다. 이 떄, (a)부터 (j) 까지 10개의 항을 보면 Leading term에 대해 서로가 서로를 나눌 수 없고, 완벽하게 Gröbner basis를 이룬 다는 것을 볼 수 있다. 결과적으로 이 몫환을 벡터 공간으로 살펴보면 monomial basis $\lbrace x^2,xy,xz,y^2,yz,z^2,x,y,z,1 \rbrace$ 로 Normal form을 나타낼 수 있다. 
 
