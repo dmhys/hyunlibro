@@ -1,0 +1,62 @@
+\documentclass[border=10pt,tikz]{standalone}
+\usetikzlibrary{positioning}
+\usepackage{tikz-3dplot}
+
+\colorlet{darkgreen}{green!50!black}
+\colorlet{darkred}{red!80!black}
+\tikzset{camera/.pic={
+    \draw[line width=1.6pt] (-1,1.5)--(1,1.5);
+    \draw[] (0,0)--(-1,1.5);
+    \draw[] (0,0)--(1,1.5);
+    \fill[black] (0,0) circle(2pt);
+}}
+
+\begin{document}
+\begin{tikzpicture}[scale=1,line width=0.8pt, font=\LARGE]
+
+\begin{scope}[]
+    \draw[] (0,0)--(8,0);
+    \node at(0,-2) {$R_1, t$};
+    \pic at(2,0) {camera};
+    \pic[rotate=45] at(6,0) {camera};
+    
+    \draw[darkgreen] (2,0)--(2,4);
+    \draw[darkgreen] (6,0)--(2,4);
+    \fill[black] (2,4) circle(3pt);
+\end{scope}[]
+
+\begin{scope}[xshift=300pt]
+    \draw[] (0,0)--(8,0);
+    \node at(0,-2) {$R_1, -t$};
+    \pic[rotate=45] at(2,0) {camera};
+    \pic at(6,0) {camera};
+    
+    \draw[darkred] (0.5,1.5)--(6,-4);
+    \draw[darkred] (6,2)--(6,-4);
+    \fill[black] (6,-4) circle(3pt);
+\end{scope}[]
+
+\begin{scope}[yshift=-200pt]
+    \draw[] (0,0)--(8,0);
+    \node at(0,-2) {$R_2, -t$};
+    \pic at(6,0) {camera};
+    \pic[rotate=135] at(2,0) {camera};
+    
+    \draw[darkred] (0.5,-1.5)--(6,4);
+    \draw[darkgreen] (6,0)--(6,4);
+    \fill[black] (6,4) circle(3pt);
+\end{scope}[]
+
+\begin{scope}[xshift=300pt, yshift=-200pt]
+    \draw[] (0,0)--(8,0);
+    \node at(0,-2) {$R_2, t$};
+    \pic at(2,0) {camera};
+    \pic[rotate=135] at(6,0) {camera};
+    
+    \draw[darkred] (2,2)--(2,-4);
+    \draw[darkgreen] (6,0)--(2,-4);
+    \fill[black] (2,-4) circle(3pt);
+\end{scope}[]
+
+\end{tikzpicture}
+\end{document}

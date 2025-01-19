@@ -185,6 +185,11 @@
 
       .post-tags {
         padding: 0;
+        text-align: right;
+
+        a {
+          display: inline-block;
+        }
 
         @include link(true, true);
       }

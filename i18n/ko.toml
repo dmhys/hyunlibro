@@ -140,6 +140,9 @@ other = "홈"
 other = "Read More"
 # === posts/single.html ===
 
+[references]
+other = "참고문헌"
+
 # === 404.html ===
 [pageNotFound]
 other = "Page not found"
