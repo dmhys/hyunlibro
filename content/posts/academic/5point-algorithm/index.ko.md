@@ -1,14 +1,14 @@
 +++
-date = 2025-01-08T16:06:03+09:00
-lastmod = 2025-01-13T02:36:59+09:00
-draft = true
+date = 2025-01-19T20:54:26+09:00
+lastmod = ''
+draft = false
 
 title = "5-point algorithm"
 summary = ""
 
 isCJKLanguage = true
 
-tags = ["5point algorithm", "chierality", "essential matrix", "mathematics", "multiple view geometry",]
+tags = ["5point algorithm", "chierality", "essential matrix", "Gröbner basis", "mathematics", "multiple view geometry",]
 categories = ["academic"]
 
 references = [
@@ -38,6 +38,7 @@ Essential matrix 는 비록 그 태생적인 약점(rotation only, small baselin
 ![Epipolar geometry](epipolar-geometry.svg "Epipolar geometry")
 
 Epipolar constraint를 만족한다는 것은, 다음 그림에서 세 벡터가 같은 평면에 위치한다는 것이다.
+
 1. $\mathrm{x'}$
 2. $t$
 3. $R\mathrm{x}$
@@ -177,7 +178,6 @@ $$
 
 ### Making coefficient matrix
 
-
 우선 Nistér의 방법 뿐만이 아니라, 5-point algorithm을 풀려면 기본적으로 필요한 부분까지 유도해보자. 이 뒤에 $x,y,z$ 등을 쓸일이 있어서, 대응되는 point를 $q$로 표현하겠다.
 
 $$
@@ -234,7 +234,7 @@ $$
 \tilde E = x \tilde X + y \tilde Y + z \tilde Z + w \tilde W
 $$
 
-다만 scale factor로 인해서 $w=1$ 로 두어도 무방하다. 
+다만 scale factor로 인해서 $w=1$ 로 두어도 무방하다. 그리고 앞으로도 대부분 $w=1$로 수식을 전개하는데, 여기서 $w$가 너무 작아지면 scale term으로 인한 수치적 불안정이 존재한다는 것을 적어둔다. 심지어는 $w=0$이라면 문제가 생긴다. 다만 큰 문제가 되는 상황을 자주 보진 못했다.
 
 ### Handling polynomials
 
@@ -252,7 +252,7 @@ $$
 
 이렇게 표현하면 point쌍의 계수 행렬 분해로 얻어진 $X,Y,Z,W$의 span 중, Essential matrix의 필요 충분 조건 구속을 이용하여 $x, y, z$ 의 해를 찾는것, 이것이 5-point 문제라고 볼 수 있다.
 
-위의 식들로 E=0을 전개하자면 아래와 같아진다.
+위의 식들로 $E=0$을 전개하자면 아래와 같아진다.
 
 $$
 (xX+yY+zZ+W)
@@ -302,9 +302,9 @@ $$
 
 ## Nistér's algorithm
 
-Nistér's algorithm은 세 가지 변종이 있다. $9\times20$ 행렬을 사용하는 2003년 버전, $10\times20$ 행렬을 사용하는 2004년 버전, 그리고 상당히 손으로 푼 앞 두가지 방법과 달리, 추후 Gröbner basis를 사용하여 general하게 된 마지막 버전이 있다. 다만 이 버전이 Gröbner basis를 직접 사용하는 것은 아니며, 이에 대해선 또 한번 05년 버전과 06년 버전이 살짝 다르다. 우선 앞 두개에서 2003년 버전에 비해 2004년 버전이 훨씬 논문이 더 풍성하한데, 구글링 했을 때 일반적으로 나오는 버전이 03년 버전이며, 03년 버전과 04년 버전은 완전히 동일한 제목을 가지고 있다. 03년 버전은 *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-CVPR-2003* 이며, 04년 버전은 *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-T-PAMI* 이다. 마지막 버전은 따로 논문 발표가 되진 않았으나, 학회 자료 등으로 남아있고, 함께 연구한 Stewenius의 Ph.D thesis에 조금 더 자료가 있다.
+Nistér's algorithm은 세 가지 변종이 있다. $9\times20$ 행렬을 사용하는 2003년 버전, $10\times20$ 행렬을 사용하는 2004년 버전, 그리고 상당히 손으로 푼 앞 두가지 방법과 달리, 추후 Gröbner basis를 사용하여 general하게 된 마지막 버전이 있다. 이 마지막 버전은 Stewénius에 의해 소개되었다고 보는 것이 맞겠지만, 우선 연장선상에 있어서 여기에 묶었다. 다만 이 버전이 Gröbner basis를 직접 사용하는 것은 아니며, 이에 대해선 또 한번 05년 버전과 06년 버전이 살짝 다르다. 
 
-살펴보겠지만 $9\times20$ 행렬과 $10\times20$ 행렬을 사용하는 것은 의미적으로 차이가 없어야하는데, 10개의 행렬을 사용하면 행렬의 모양이 다루기 편해진다. 이에 대해선 어디에도 왜 이렇게 바꾸었다 하는 claim이 딱히 없다.
+우선 앞 두개에서 2003년 버전에 비해 2004년 버전이 훨씬 논문이 더 풍성한데, 구글링 했을 때 일반적으로 나오는 버전이 03년 버전이며, 03년 버전과 04년 버전은 완전히 동일한 제목을 가지고 있다. 03년 버전은 *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-CVPR-2003* 이며, 04년 버전은 *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-T-PAMI* 이다. 마지막 버전은 따로 논문 발표가 되진 않았으나, 학회 자료 등으로 남아있고, Stewénius의 Ph.D thesis에 조금 더 자료가 있다.
 
 ### 2003 Version
 
@@ -385,7 +385,7 @@ $$
 
 ### 2004 Version
 
-04년 버전은 $10\times 10$ 행렬을 사용한다. 정확히 왜 이렇게 된건지는 찾기가 좀 힘든데, $EE^ \mathsf{T} E - {1\over 2} \mathrm{trace}(E E ^ \mathsf{T}) E = 0$ 라는 constraint가 determinant가 0이라는 조건을 함의하기 때문에 명시적으로 determinant가 0인 조건을 추가할 필요가 없기 때문이다. 아마 수식 전개 상에서 이득이 있었어서 그러지 않나 싶기도 하다.
+04년 버전은 $10\times 10$ 행렬을 사용한다. 정확히 왜 이렇게 된건지는 찾기가 좀 힘든데, 물론 $10\times 10$ 행렬이 이후에 살펴볼 다른 방식에서 훨씬 다루기 편하게 해주는건 차치하고서라도, 여기서는 어떤 동기로 이걸 이렇게 살펴봤는진 잘 모르겠다. 다루기 편하게 하는것 외엔, $EE^ \mathsf{T} E - {1\over 2} \mathrm{trace}(E E ^ \mathsf{T}) E = 0$ 라는 constraint가 determinant가 0이라는 조건을 함의하기 때문에 명시적으로 determinant가 0인 조건을 추가할 필요가 없다. 여기서 살펴볼 버전에서 $10\times 10$ 크기의 중요성보다, 추후의 버전들에서의 $10\times 10$ 크기의 중요성이 훨씬 커지게 된다.
 
 하여튼, 앞서 살펴본 다항식 조건에 다음 조건을 추가한다.
 
@@ -397,7 +397,7 @@ $$
 
 ![nister 2004](essential-nister-2004.svg "Nistér's algorithm 2004")
 
-우선 monomial ordering이 살짝 달라졌고, 수수식전개가 상당히 깔끔해졌다.
+우선 monomial ordering이 살짝 달라졌고, 수식전개가 상당히 깔끔해졌다.
 
 $$
 \begin{align*}
@@ -407,7 +407,7 @@ $$
 \end{align*}
 $$
 
-전개를 직접 해보면 상당히 깔끔하다. 우선 $(e)-(f), (g)-(h), (i)-(j)$ 의 구조로 알아보기도 쉽고, 곱하는 항이 $z$항 밖에 없기 때문에 z coefficient polynomial도 [3] [3] [4] 로 깔끔하다. 03년 수식은 손으로 해야만 했는데, 이번에는 머리로만 해도 된다. 여튼, 이번에는 B 행렬 하나만 만든다.
+전개를 직접 해보면 상당히 깔끔하다. 우선 $(e)-(f), (g)-(h), (i)-(j)$ 의 구조로 알아보기도 쉽고, 곱하는 항이 $z$항 밖에 없기 때문에 z coefficient polynomial도 [3] [3] [4] 로 깔끔하다. 03년 수식은 손으로 해야만 했는데, 이번에는 머리로만 해도 된다. 여튼, 이번에는 $B$ 행렬 하나만 만든다.
 
 $$
 B\cdot \begin{bmatrix}
@@ -523,7 +523,7 @@ $$
 
 #### Companion matrix
 
-반면 이 10차 다항식을 푸는 더 편리한 방법은 Companion matrix를 이용하는 것이다. Monic polynomial (Leading constant가 1인 polynomial) $p(x) = x_n + c_{n-1}x^{n-1} + \cdots + c_1x + c_0$ 에 대해, Companion matrix는 다음과 같이 정의 가능하다.
+반면 이 10차 다항식을 푸는 더 편리한 방법은 Companion matrix를 이용하는 것이다. Monic polynomial (Leading monomial의 계수가 1인 polynomial) $p(x) = x_n + c_{n-1}x^{n-1} + \cdots + c_1x + c_0$ 에 대해, Companion matrix는 다음과 같이 정의 가능하다.
 
 $$
 C(p) = 
@@ -545,30 +545,122 @@ $$
 
 ### Gröbner basis
 
-매트릭스 그림
+이제 05년과 06년에 나온 방식에 대해 설명해보자. 이후로는 Gröbner basis에 대한 이해가 필수에 가깝다. 이에 대해선 글을 하나 써놨다. 이 내용을 읽고 와야 이해가 될 것이다.
 
-groebner 설명 대체
+[다항식 해법을 위한 그뢰브너 기저](../../academic/solving-polynomials-using-grobner-basis)
 
-solve 과정에 대해 Maple 이었나 코드 두개 어째서 solve되는지 설명
+##### 2005 Version
 
+![Stewénius 2004](essential-Stewénius-2005.svg "Stewénius's algorithm 2005")
 
-[링크 테스트](../../cpp/be-cautious-when-creating-cpp-template-functions)
+전 두 방식과는 다르게, 완전히 elimination을 진행한다. 이 떄, (a)부터 (j) 까지 10개의 항을 보면 Leading term에 대해 서로가 서로를 나눌 수 없고, 완벽하게 Gröbner basis를 이룬 다는 것을 볼 수 있다. 결과적으로 이 몫환을 벡터 공간으로 살펴보면 monomial basis $\lbrace x^2,xy,xz,y^2,yz,z^2,x,y,z,1 \rbrace$ 로 Normal form을 나타낼 수 있다. 
 
+이 계수행렬 $M$을 완벽히 소거한 결과가 
+
+$$
+M = [I_{10 \times 10} | B_{10 \times 10}] \\ \;\\
+B=\begin{bmatrix}
+―& \mathrm{b}_1 & ―  \\
+―& \vdots & ―  \\
+―& \mathrm{b}_{10} & ―
+\end{bmatrix}
+$$
+
+로 주어진다고 하고, 이제 $x$에 대한 action matrix $M_x$를 만들어보자. 위 행렬은 action matrix를 만들기 좋은 순서로 이루어져있다. $\mathrm{x} = [x^2,xy,xz,y^2,yz,z^2,x,y,z,1]^\mathsf{T}$ 에 대해
+
+$$
+\begin{align*}
+x \cdot x^2 &= -\mathrm{b}_1  \mathrm{x} \\
+x \cdot xy &= -\mathrm{b}_2  \mathrm{x} \\
+x \cdot xz &= -\mathrm{b}_3  \mathrm{x} \\
+x \cdot y^2 &= -\mathrm{b}_4  \mathrm{x} \\
+x \cdot yz &= -\mathrm{b}_5  \mathrm{x} \\
+x \cdot z^2 &= -\mathrm{b}_6  \mathrm{x} \\
+x \cdot x &= x^2 \\
+x \cdot y &= xy \\
+x \cdot z &= xz \\
+x \cdot 1 &= x
+\end{align*}
+$$
+
+따라서 action matrix는
+
+$$
+M_x[1:6,:] =-\begin{bmatrix}
+―& \mathrm{b}_1 & ―  \\
+―& \vdots & ―  \\
+―& \mathrm{b}_{6} & ―
+\end{bmatrix}
+\\\;\\
+M_x[7:10,:] = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+로 표현 가능하다. 여기서 eigenvalue가 $x$의 여러 해가 된다.
+
+##### 2006 Version
+
+크게 차이는 나지 않는다. 원문에선 GrLex ordering을 사용한다고 해놓고, 실제로는 Graded reverse ordering을 사용했다는 차이가 있긴하다. 어차피 큰 차이는 없다. 여튼, 수식은 다음 순서대로 정렬된다.
+
+$$
+x^3, x^2y,xy^2,y^3,x^2z, xyz, y^2z,xz^2, yz^2,z^3, x^2,xy,y^2,xz,yz,z^2,x,y,z,1
+$$
+
+결과적으로 action matrix의 구성이 살짝 다르다.
+
+$$
+M_x[1:6,:] =-\begin{bmatrix}
+―& \mathrm{b}_1 & ―  \\
+―& \mathrm{b}_2 & ―  \\
+―& \mathrm{b}_3 & ―  \\
+―& \mathrm{b}_5 & ―  \\
+―& \mathrm{b}_6 & ―  \\
+―& \mathrm{b}_8 & ― 
+\end{bmatrix}
+\\\;\\
+M_x[7:10,:] = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+여기선 제공된 코드가 조금 바뀐다.
+
+```matlab
+[V,D] = eig(At);
+SOLS = V(7:9,:)./(ones(3,1)*V(10,:));
+```
+
+Eigenvector의 1에 해당하는 성분을 기준으로 normalize한 $x,y,z$ 성분을 해로 사용하는 듯하다.
 
 ## Hongdong Li's Method
 
-사실 대다수 식은 다 같음
+사실 여기서 이걸 그렇게 크게 다룰 필요까진 없을 것 같긴한데, Hongdong Li의 방법은 resultant 방법에 기반한다. 왜냐하면 resultant 행렬을 $10\times 10$으로 이쁘게 정의할 수 있기 때문인데, 자세한 내용은 생략하고 방법만 간략히 적어두도록 한다.
 
-결국은 또 10*20행렬을 어떻게 푸는지에 대한 문제
+$$
+x^3,x^2y,x^2z,xy^2,xyz,xz^2,y^3,y^2z,yz^2,z^3,x^2,xy,xz,y^2,yz,z^2,x,y,z,1
+$$
 
-이것도 마찬가지로 아래 링크 참고 하라고 하기.
+에 대해, $z$를 상수취급해보자. 이를 Hidden variable method라고 부른다. $z$만으로 이루어진 n차 다항식을 $[n]$으로 표현하면, 위 다항식에 대해 새로운 vector space와 monomial basis를 정의 가능하다. 원문은 이런 ordering이 아니었지만, 큰 상관은 없어 GrLex order를 사용하였다.
 
-[링크]()
+$$
+f_i=
+\begin{bmatrix}
+[0] & [0] & [0] & [0] & [1] & [1] & [1] & [2] & [2] & [3]
+\end{bmatrix}
+\mathrm{x}\\\;\\
+\text{where } \mathrm{x} = 
+\begin{bmatrix}
+x^3 & x^2y & xy^2 & y^3 & x^2 & xy & y^2 & x & y & 1
+\end{bmatrix}^\mathsf{T}
+$$
 
-specific한 부분 찾기
+그러면 다항식 10개를 이용하여 이 새로운 vector space의 기저 $\mathrm{x}$에 대해 각 10개의 계수를 만들어 줄 수 있으며, 따라서 이번에도 $10\times 10$ 행렬이 생긴다. 자세한 것은 생략하겠지만, resultant의 성질에 의해 이 새로운 행렬의 determinant가 0이 되어야 하며, 이 determinant로 $z$로 이루어진 10차 polynomial이 생긴다.
 
-## Implementation 살펴보기
-
-### Colmap
-
-### Opencv
+이 방법은 위에서 살펴본 Nistér의 방법과 수치적으로 큰 차이가 존재하지 않는다.

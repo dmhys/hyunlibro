@@ -1,15 +1,21 @@
 +++
-date = 2025-01-08T16:06:03+09:00
-lastmod = 2025-01-13T02:36:59+09:00
-draft = true
+date = 2025-01-19T20:54:26+09:00
+lastmod = ''
+draft = false
 
 title = "5-point algorithm"
 summary = ""
 
 isCJKLanguage = false
 
-tags = ["5point algorithm", "chierality", "essential matrix", "mathematics", "multiple view geometry",]
+tags = ["5point algorithm", "chierality", "essential matrix", "Gröbner basis", "mathematics", "multiple view geometry",]
 categories = ["academic"]
+
+references = [
+    {title = "USING STURM SEQUENCES TO BRACKET REAL ROOTS OF POLYNOMIAL EQUATIONS", authors = "D. G. Hook, P. R. McAree", doi = "10.1016/B978-0-08-050753-8.50089-9"},
+    {title = "Gröbner Basis Methods for Minimal Problems in Computer Vision", authors = "Henrik Stewénius"},
+    {title = "Recent Developments on Direct Relative Orientation", authors = "H.Stewénius,  C.Engels, D.Nistér"}
+]
 
 +++
 
@@ -164,4 +170,494 @@ At this point, we have to deal with the cheirality problem in projective geometr
 
 The figure below illustrates these four possible combinations of $R$ and $t$. In the image, positive depth is shown in green, and negative depth in red. There’s really no purely geometric way to resolve this ambiguity outright. Instead, you can perform triangulation using the points with each $R$, $t$ option and check whether the depths in both images are positive. For instance, in COLMAP, it computes depths for the given points and checks whether there’s at least one point whose depth is positive in both images and below some `max_depth`. If such a point exists, that configuration is considered valid.
 
-[링크 테스트](../../cpp/be-cautious-when-creating-cpp-template-functions)
+## Formulation of 5-point algorithm
+
+### Making coefficient matrix
+
+Before diving into Nistér’s method specifically, let’s derive the core components needed to solve the 5-point algorithm in general. We will be using points $x,y,z$ later. So for clarity, let each pair of corresponding points be denoted by $q$.
+
+$$
+q'^\mathsf{T} E q = 0
+$$
+
+$$
+q'=\begin{bmatrix} q_1' \newline q_2' \newline q_3' \end{bmatrix} ,
+q=\begin{bmatrix} q_1 \newline q_2 \newline q_3 \end{bmatrix}, 
+E=\begin{bmatrix}
+e_{11} & e_{12} & e_{13} \newline
+e_{21} & e_{22} & e_{23} \newline
+e_{31} & e_{32} & e_{33}
+\end{bmatrix}
+$$
+
+We can vectorize this matrix, refered as DLT algorithm which commonly mentioned in cv field. 
+
+$$
+\begin{align*}
+\tilde q &= \begin{bmatrix}
+q_1q_1' & q_2q_1' & q_3q_1' & 
+q_1q_2' & q_2q_2' & q_3q_2' & 
+q_1q_3' & q_2q_3' & q_3q_3'
+\end{bmatrix}^\mathsf{T}
+\newline
+\tilde E &= \begin{bmatrix}
+e_{11} & e_{12} & e_{13} & 
+e_{21} & e_{22} & e_{23} & 
+e_{31} & e_{32} & e_{33}
+\end{bmatrix}^\mathsf{T}
+\end{align*}
+$$
+
+Each of the five pairs of points becomes its own $\tilde q$​. By stacking these vectors, we obtain the following result.
+
+$$
+M=\begin{bmatrix}
+― & q_1 & ― \newline
+― & q_2 & ― \newline
+― & q_3 & ― \newline
+― & q_4 & ― \newline
+― & q_5 & ―
+\end{bmatrix}_{5\times 9}
+$$
+
+$$
+M_{5\times 9} \tilde E_{9\times 1} = 0_{5 \times 1}
+$$
+
+Here, the coefficient matrix $M$ naturally has rank 5, and the remaining four right singular vectors span the right null space. Let us call these vectors $\tilde X, \tilde Y, \tilde Z, \tilde W$. Then the following relation is established.
+
+$$
+\tilde E = x \tilde X + y \tilde Y + z \tilde Z + w \tilde W
+$$
+
+Because of the scale factor, it is acceptable to set $w=1$. In fact, from this point onward, most expressions will be developed under the assumption $w=1$. However, note that if $w$ becomes too small, there can be numerical instability due to the scale factor. And if $w=0$, it will cause a problem. That said, we have not often encountered a situation where this becomes a major issue.
+
+### Handling polynomials
+
+Our objective is to find an Essential Matrix within this null space, that satisfies the necessary and sufficient conditions of the Essential matrix, which is 
+
+$$
+EE^ \mathsf{T} E - {1\over 2} \mathrm{trace}(E E ^ \mathsf{T}) E = 0
+$$
+
+Let us revert the above vectorized form back into $E$.
+
+$$
+E = x X + y Y + z Z + W
+$$
+
+By expressing it this way, one can view the 5-point problem as finding solutions for $x, y, z$ under the necessary and sufficient constraints of the Essential matrix, from among the span of $X,Y,Z,W$ obtained through the decomposition of the point-pair coefficient matrix.
+
+Expanding $E=0$ from the above equations leads to what follows below.
+
+$$
+(xX+yY+zZ+W)
+\cdot
+(xX^ \mathsf{T}+yY^ \mathsf{T}+zZ^ \mathsf{T}+W^ \mathsf{T})
+\cdot
+(xX+yY+zZ+W)
+\newline
+-{1\over 2} \mathrm{trace} (
+(xX+yY+zZ+W)
+\cdot
+(xX^ \mathsf{T}+yY^ \mathsf{T}+zZ^ \mathsf{T}+W^ \mathsf{T})
+)
+\cdot
+\newline
+(xX+yY+zZ+W) = 0
+$$
+
+It is quite difficult for us to manually expand these expressions, because they appear as follows.
+
+$$
+z_{11} y_{22} w_{33} - z_{11} w_{23} y_{32} + z_{11} w_{22} y_{33} -
+z_{11} y_{23} w_{32} + w_{11} y_{22} z_{33} + w_{11} z_{22} y_{33} - \newline
+w_{11} y_{23} z_{32} - w_{11} z_{23} y_{32} - y_{11} w_{23} z_{32} +
+y_{11} z_{22} w_{33} - y_{11} z_{23} w_{32} + y_{11} w_{22} z_{33} + \newline
+y_{31} z_{12} w_{23} + y_{31} w_{12} z_{23} - y_{31} z_{22} w_{13} -
+y_{31} w_{22} z_{13} + z_{31} y_{12} w_{23} + z_{31} w_{12} y_{23} - \newline
+z_{31} y_{22} w_{13} - z_{31} w_{22} y_{13} + w_{31} y_{12} z_{23} +
+w_{31} z_{12} y_{23} - w_{31} y_{22} z_{13} - w_{31} z_{22} y_{13} + \newline
+z_{21} y_{32} w_{13} - z_{21} y_{12} w_{33} - z_{21} w_{12} y_{33} +
+w_{21} y_{32} z_{13} + w_{21} z_{32} y_{13} - w_{21} y_{12} z_{33} - \newline
+w_{21} z_{12} y_{33} - y_{21} w_{12} z_{33} - y_{21} z_{12} w_{33} +
+y_{21} w_{32} z_{13} + y_{21} z_{32} w_{13} + z_{21} w_{32} y_{13}
+$$
+
+I do not want this blog post to reach 2,000 lines merely from writing out polynomial expansions only, and in the first place, it is nearly impossible for a human to expand them all by hand, so I will omit them here. These three cubic terms produce a monomial basis; let us list them in graded lexical order. (In the paper, a different ordering is used.)
+
+$$
+x^3, x^2y, x^2z, xy^2, xyz, xz^2,
+y^3,y^2z,yz^2,z^3,
+x^2,xy,xz,
+y^2,yz,z^2,
+x,y,z,1
+$$
+
+We end up with nine equations, each composed of 20 terms above, and from them we can form a $ 9 \times 20 $ matrix. The partially expanded expression mentioned earlier was just one element of that matrix. Although the $ 9 \times 20 $ matrix can later change in some approaches, here we will begin by looking at Nistér’s original algorithm.
+
+## Nistér's algorithm
+
+Nistér’s algorithm has three variants. There is a 2003 version that uses a $9\times20$ matrix, a 2004 version that uses a $10\times20$ matrix, and—unlike the first two, which were essentially worked in ad hoc manner—a later version that employs Gröbner basis in a more general manner. Strictly speaking, this final version is often attributed to Stewénius, but we include it here in the same family for continuity. However, it does not directly employ Gröbner bases, and there are also slight differences between the 2005 and 2006 versions in this respect.
+
+Among the first two, the 2004 version is much more detailed in its paper, but the 2003 version is typically the one you find when you do a quick Google search, since both share the same title. The 2003 version is *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-CVPR-2003*, and the 2004 version is  *D.Nister, An efficient solution to the five-point relative pose problem, IEEE-T-PAMI*. The final version was never published as a standalone paper, but it can be found in conference materials, and additional information appears in Stewénius’s Ph.D. thesis.
+
+### 2003 Version
+
+In the 2003 version, the matrix is generated using the following monomial ordering:
+
+$$
+x^3, y^3, x^2y, xy^2, x^2z, x^2, y^2z, y^2, xyz, xy, xz^2, xz, x, yz^2, yz, y, z^3, z^2, z, 1.
+$$
+
+Let us call this coefficient matrix $A$. Through Gauss-Jordan elimination, one obtains a specific sparsity pattern; at that point, the last two rows need not be further eliminated. 
+
+![nister 2003](essential-nister-2003.svg "Nistér's algorithm 2003")
+
+The reason we have singled out $z$ becomes clear here: we are using $z$ to help eliminate the other terms based on it.
+
+$$
+\begin{align*}
+(j) &\equiv (e)-z(g) \newline
+(k) &\equiv (f)-z(h) \newline
+(l) &\equiv (d)-x(h)+P(c)+zQ(e)+R(e)+S(g) \newline
+(m) &\equiv (c)-y(g)+L(d)+zM(f)+N(f)+O(h)
+\end{align*}
+$$
+
+The details are not particularly meaningful, so we will not derive them here, but with this approach, the five terms $(i), (j), (k), (l), (m)$ all share $xyz$ as their highest-degree term. Concretely, with given definition
+
+$$
+[n]=n\mathrm{th \ order \ polynomial \ of} \ z
+$$
+
+then, we can define polynomials as follows :
+
+$$
+\begin{align*}
+(i) &= xy[1] + x[2] + y[2] + [3] \newline
+(j) &= xy[1] + x[3] + y[3] + [4] \newline
+(k) &= xy[1] + x[3] + y[3] + [4] \newline
+(l) &= xy[2] + x[3] + y[3] + [4] \newline
+(m) &= xy[2] + x[3] + y[3] + [4]
+\end{align*}
+$$
+
+It is easy to verify this by hand. As a result, $(i)$ is the lowest degree, and $(l)$ and $(m)$ involve terms of slightly higher degree has slight higher degree also. Next, we form matrix $B$ from $(i) (j) (k) (l)$ and matrix $C$ from $(i) (j) (k) (m)$. (Strictly speaking, in the expressions below, they are not exactly $(i) (j) (k) (l)$, but we are loosely grouping the relevant terms for convenience.)
+
+$$
+B\cdot \begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+=\begin{bmatrix}
+―& (i) & ―  \newline
+―& (j) & ―  \newline
+―& (k) & ―  \newline
+―& (l) & ―
+\end{bmatrix}
+\begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+= 0_{4 \times 1}
+$$
+
+$$
+C\cdot \begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+=\begin{bmatrix}
+―& (i) & ―  \newline
+―& (j) & ―  \newline
+―& (k) & ―  \newline
+―& (m) & ―
+\end{bmatrix}
+\begin{bmatrix}
+xy \newline x \newline y \newline 1
+\end{bmatrix}
+= 0_{4 \times 1}
+$$
+
+Both matrices have a right null vector. In other words, they degenerate—each having a determinant of zero—and from these constraints, each one produces an 11th-degree polynomial in zz. Let us call these polynomials $(n)$ and $(o)$. Subtracting one 11th-degree polynomial from the other yields a single 10th-degree polynomial. This polynomial can have up to 10 solutions, and from its real roots we can reconstruct the matrix $B$, thus solving for $x$ and $y$. Then, having $x,y,z$, we can solve for the Essential matrix $E$. Hence, up to 10 candidate solutions for $E$ exist. We will revisit how to solve this 10th-degree polynomial shortly. Now, let us move on to Nistér’s 2004 version of the algorithm.
+
+### 2004 Version
+
+The 2004 version uses a $10\times 10$ matrix. It is somewhat unclear exactly why this was done, though of course, having a $10\times 10$ not only makes things easier to handle but also proves very convenient in other methods either. However, it is not obvious what specific motivation led to exploring this approach here. Aside from making it easier to handle, there is no need to explicitly add a zero determinant constraint, since the constraint $EE^ \mathsf{T} E - {1\over 2} \mathrm{trace}(E E ^ \mathsf{T}) E = 0$ already constrains zero determinant condition. In the version we will look at here, the importance of the $10\times 10$ matrix itself is somewhat minor, but it becomes far more crucial in subsequent variants.
+
+Regardless, we add the following condition to the polynomial constraints we examined earlier:
+
+$$
+\mathrm{det}(E)=0
+$$
+
+Again, we do not need to perform elimination all the way. We stop with four rows left this time, giving us a certain sparsity pattern. Since we have already explained that $[n]$ denotes an n-degree polynomial in $z$, let us simply follow the original text’s structure here:
+
+![nister 2004](essential-nister-2004.svg "Nistér's algorithm 2004")
+
+First, note that the monomial ordering has changed slightly, and the polynomial expansion has become much cleaner. 
+
+$$
+\begin{align*}
+(k) &\equiv (e)-z(f) \newline
+(l) &\equiv (g)-z(h) \newline
+(m) &\equiv (i)-z(j)
+\end{align*}
+$$
+
+Indeed, if you attempt the expansion by hand, you will find it quite tidy. The structure $(e)-(f), (g)-(h), (i)-(j)$ is straightforward to see, and since the only terms being multiplied involve $z$, the resulting z-coefficient polynomials also line up neatly as [3] [3] [4]. In contrast to the 2003 version, which had to be done largely by hand, this version can even be understood with a mental calculation. In any case, this time we form only one matrix which is $B$.
+
+$$
+B\cdot \begin{bmatrix}
+x \newline y \newline 1
+\end{bmatrix}
+=\begin{bmatrix}
+―& (k) & ―  \newline
+―& (l) & ―  \newline
+―& (m) & ―
+\end{bmatrix}
+\begin{bmatrix}
+x \newline y \newline 1
+\end{bmatrix}
+= 0_{3 \times 1}
+$$
+
+Likewise, if we create an equation from the constraint which is zero determinant, we end up with polynomials of degrees [3][3][4]. Thus, we can obtain a single 10th-degree polynomial from just this one matrix.
+
+### Solving 10th degree polynomial of z
+
+#### Sturm's theorem
+
+Sturm’s theorem is a method for counting the number of real roots of a univariate polynomial within a specified interval. First, let us define the Sturm sequence. For a univariate polynomial $p(x)$,
+
+$$
+p_0(x)=p(x) \newline
+p_1(x)=p'(x)
+$$
+
+Then we recursively define followings.
+
+$$
+p_{n+1}(x)=-\mathrm{mod}(p_{n-1}(x),p_n(x)) \newline
+\text{i.e. }  p_{n-1}(x)=(ax+b)p_n(x)-p_{n+1}(x)
+$$
+
+We generate these terms until one of them becomes zero, at which point we stop.
+
+Next, for a given Sturm sequence, we define
+
+$$
+V(a) = \text{number of sign changes in the sequence } p_0(a),\cdots,p_{n}(a)
+$$
+
+Sturm’s theorem is as follows.
+
+> #### Sturm's theorem
+> The number of distinct real roots of $f(x)$ in the interval $[a,b]$ is given by $V(a)-V(b)$.
+
+---
+
+##### Example
+
+For $f(x) = x^3 + 6x^2 + 12x + 9$,
+
+$$
+\begin{align*}
+f_0(x) & = x^3 + 6x^2 + 15x + 6 \newline
+f_1(x) & = 3x^2 + 12x + 15
+\end{align*}
+$$
+
+$f_2(x)$:
+
+$$
+\begin{align*}
+f_0(x) & = {1\over 3}(x+2)(3x^2 + 12x + 15) + (2x -4) \newline
+f_2(x) & = -2x + 4
+\end{align*}
+$$
+
+$f_3(x)$:
+
+$$
+\begin{align*}
+f_1(x) & = (-{3\over 2}x - 9)(-2x + 4) + 51\newline
+f_3(x) & = -51
+\end{align*}
+$$
+
+Also, though the exact quotient is not specified here, $f_4(x)$ becomes 0.
+
+$$
+\begin{align*}
+f_0(x) & = x^3 + 6x^2 + 15x + 6 \newline
+f_1(x) & = 3x^2 + 12x + 15 \newline
+f_2(x) & = -2x + 4 \newline
+f_3(x) & = -51
+\end{align*}
+$$
+
+Now, over the interval $(-\infty,+\infty)$,
+
+$$
+\begin{align*}
+V(\infty) & \to (+\ +\ -\ -) \newline
+V(-\infty) & \to (-\ +\ +\ -) \newline
+\end{align*}
+$$
+
+$$
+V(-\infty)-V(\infty) = 2-1 = 1
+$$
+
+Therefore, the polynomial has exactly one distinct real root.
+
+---
+
+In any case, one can numerically find the solution using Sturm’s theorem in conjunction with a form of root polishing. Nistér mentions using a simple 30-step bisection to find the root. One might ask how we get a rough idea of where the root is located—this is where the following theorem (Cauchy’s Bound) gets handy.
+
+> #### Cauchy’s Bound
+> Suppose $f(x) = a_nx^n + a_{n-1} x^{n-1} + \cdots + a_1x + a_0$ is a polynomial of degree $n$ with $n \ge 1$. Let $M$ be the largest of the numbers: ${\lvert{a_0 \over a_n}\rvert, \lvert{a_1 \over a_n}\rvert , \cdots, \lvert{a_{n-1} \over a_n}\rvert }$.Then all the real zeros of $f$ lie in in the interval $[−(M+1),M+1]$.
+
+#### Companion matrix
+
+On the other hand, a more convenient way to solve this 10th-degree polynomial is by using a companion matrix. For a monic polynomial(coefficient of leading monomial is 1) $p(x) = x_n + c_{n-1}x^{n-1} + \cdots + c_1x + c_0$​, the companion matrix can be defined as follows:
+
+$$
+C(p) = 
+\begin{bmatrix}
+0 & 0 & \cdots & 0 & -c_0 \newline
+1 & 0 & \cdots & 0 & -c_1 \newline
+\vdots & \vdots & \ddots & \vdots & \vdots \newline
+0 & 0 & \cdots & 1 & -c_{n-1}
+\end{bmatrix}
+$$
+
+A key property of this companion matrix is that the original polynomial $p(x)$ and the characteristic polynomial of the matrix are the same. In other words,
+
+$$
+\det(xI-C(p))=p(x)
+$$
+
+Since we want to find the roots of $p(x)=0$, and $p(x)$ is the characteristic polynomial of the companion matrix, the roots of $p(x)=0$ are exactly the eigenvalues of the companion matrix. In this way, we convert a polynomial-solving problem into one in linear algebra. Because there are many well-developed methods and implementations for solving linear systems and eigenvalue problems, using a companion matrix makes the task of finding the polynomial’s roots much easier.
+
+### Gröbner basis
+
+Now, let us explain the methods introduced in 2005 and 2006. From this point on, an understanding of Gröbner bases is practically essential. I have written a separate post on that topic, which you will need to read to fully understand this material.
+
+[Solving polynomials using Gröbner basis](../../academic/solving-polynomials-using-grobner-basis)
+
+##### 2005 Version
+
+![stewenius 2004](essential-stewenius-2005.svg "Stewenius's algorithm 2005")
+
+Unlike the previous two approaches, here we carry out complete elimination. Looking at the ten expressions from (a) through (j), none of them can divide any other with respect to the leading term; consequently, they form a perfect Gröbner basis. As a result, if we consider the quotient ring as a vector space, we can express the normal form using the monomial basis $\lbrace x^2,xy,xz,y^2,yz,z^2,x,y,z,1 \rbrace$.
+
+Let us say that the coefficient matrix MM is completely reduced through this process, yielding
+
+$$
+M = [I_{10 \times 10} | B_{10 \times 10}] \\ \;\\
+B=\begin{bmatrix}
+―& \mathrm{b}_1 & ―  \\
+―& \vdots & ―  \\
+―& \mathrm{b}_{10} & ―
+\end{bmatrix}
+$$
+
+Next, we construct the action matrix $M_x$​. The matrix above is arranged in a way that makes it convenient to build this action matrix. Assuming $\mathrm{x} = [x^2,xy,xz,y^2,yz,z^2,x,y,z,1]^\mathsf{T}$,
+
+$$
+\begin{align*}
+x \cdot x^2 &= -\mathrm{b}_1  \mathrm{x} \\
+x \cdot xy &= -\mathrm{b}_2  \mathrm{x} \\
+x \cdot xz &= -\mathrm{b}_3  \mathrm{x} \\
+x \cdot y^2 &= -\mathrm{b}_4  \mathrm{x} \\
+x \cdot yz &= -\mathrm{b}_5  \mathrm{x} \\
+x \cdot z^2 &= -\mathrm{b}_6  \mathrm{x} \\
+x \cdot x &= x^2 \\
+x \cdot y &= xy \\
+x \cdot z &= xz \\
+x \cdot 1 &= x
+\end{align*}
+$$
+
+Therefore action matrix $M_x$ can be written as
+
+$$
+M_x[1:6,:] =-\begin{bmatrix}
+―& \mathrm{b}_1 & ―  \\
+―& \vdots & ―  \\
+―& \mathrm{b}_{6} & ―
+\end{bmatrix}
+\\\;\\
+M_x[7:10,:] = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+The eigenvalues of this action matrix correspond to the various solutions for $x$.
+
+##### 2006 Version
+
+There are no major differences here compared to the previous method. The original text mentions the use of a GrLex (graded lexicographic) ordering, but in practice, it uses a graded reverse lexicographic ordering. This does not make a significant difference anyway. The expressions are arranged in the following order.
+
+$$
+x^3, x^2y,xy^2,y^3,x^2z, xyz, y^2z,xz^2, yz^2,z^3, x^2,xy,y^2,xz,yz,z^2,x,y,z,1
+$$
+
+As a result, the configuration of the action matrix is slightly different.
+
+$$
+M_x[1:6,:] =-\begin{bmatrix}
+―& \mathrm{b}_1 & ―  \\
+―& \mathrm{b}_2 & ―  \\
+―& \mathrm{b}_3 & ―  \\
+―& \mathrm{b}_5 & ―  \\
+―& \mathrm{b}_6 & ―  \\
+―& \mathrm{b}_8 & ― 
+\end{bmatrix}
+\\\;\\
+M_x[7:10,:] = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+In this version, the provided code is also slightly modified.
+
+```matlab
+[V,D] = eig(At);
+SOLS = V(7:9,:)./(ones(3,1)*V(10,:));
+```
+It appears that the solutions for $x,y,z$ are obtained by normalizing the eigenvector with respect to the component corresponding to 1.
+
+## Hongdong Li's Method
+
+Let's just briefly look into Hongdong Li’s approach is based on the concept of resultants. This is because one can neatly define a $10\times 10$ resultant matrix, although the detailed steps are omitted. We will just outline the general idea.
+
+Consider the following set of monomials:
+
+$$
+x^3,x^2y,x^2z,xy^2,xyz,xz^2,y^3,y^2z,yz^2,z^3,x^2,xy,xz,y^2,yz,z^2,x,y,z,1
+$$
+
+Let us treat $z$ as a constant. This is called the hidden variable method. An n-th degree polynomial consits of $z$ can be denoted by [n]. With respect to the above monomials, we can define a new vector space and a corresponding monomial basis. Although the original text uses a different ordering, it is not particularly crucial; we use a GrLex ordering here.
+
+$$
+f_i=
+\begin{bmatrix}
+[0] & [0] & [0] & [0] & [1] & [1] & [1] & [2] & [2] & [3]
+\end{bmatrix}
+\mathrm{x}\\\;\\
+\text{where } \mathrm{x} = 
+\begin{bmatrix}
+x^3 & x^2y & xy^2 & y^3 & x^2 & xy & y^2 & x & y & 1
+\end{bmatrix}^\mathsf{T}
+$$
+
+From the 10 polynomials in our system, we can form the coefficients for each of the 10 basis elements in the new vector space $\mathrm{x}$, giving rise to yet another $10\times 10$ matrix. Without going into detail, by the property of resultants, the determinant of this new matrix must be zero, and from this condition we obtain a 10th-degree polynomial in $z$.
+
+Numerically, this method does not differ significantly from Nistér’s approach discussed earlier.

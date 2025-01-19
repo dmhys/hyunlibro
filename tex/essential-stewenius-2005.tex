@@ -1,0 +1,64 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{tikz}
+\usepackage{colortbl}
+\usetikzlibrary{matrix,positioning}
+
+
+\begin{document}
+
+\tikzset{ 
+table/.style={
+  matrix of math nodes,
+  row sep=-\pgflinewidth,
+  column sep=-\pgflinewidth,
+  nodes={align=center},
+  text width=20pt,
+  text depth=7pt,
+  text height=15pt,
+  nodes in empty cells,
+  }
+}
+
+\pgfdeclarelayer{bg}    % declare background layer
+\pgfsetlayers{bg,main}  % set the order of the layers (main is the standard layer)
+
+\begin{tikzpicture}
+\matrix (m) [table] {
+A & x^3 & x^2y & x^2z & xy^2 & xyz & xz^2 & y^3 & y^2z & yz^2 & z^3 & x^2 & xy & xz & y^2 & yz & z^2 & x & y & z & 1 \\
+(a) & 1 & & & & & & & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(b) & & 1 & & & & & & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(c) & & & 1 & & & & & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(d) & & & & 1 & & & & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(e) & & & & & 1 & & & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(f) & & & & & & 1 & & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(g) & & & & & & & 1 & & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(h) & & & & & & & & 1 & & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(i) & & & & & & & & & 1 & & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+(j) & & & & & & & & & & 1 & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & \cdot \\
+};
+
+\draw[black, thick] (m-1-1.south west) -- (m-1-21.south east);
+\draw[black, thick] (m-1-1.north east) -- (m-11-1.south east);
+
+\begin{pgfonlayer}{bg}
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-2-2.north west) rectangle (m-2-2.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-3-3.north west) rectangle (m-3-3.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-4-4.north west) rectangle (m-4-4.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-5-5.north west) rectangle (m-5-5.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-6-6.north west) rectangle (m-6-6.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-7-7.north west) rectangle (m-7-7.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-8-8.north west) rectangle (m-8-8.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-9-9.north west) rectangle (m-9-9.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-10-10.north west) rectangle (m-10-10.south east);
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-11-11.north west) rectangle (m-11-11.south east);
+
+\fill[cyan!40] ([xshift=0.75pt, yshift=-0.75pt] m-2-12.north west) rectangle (m-11-21.south east);
+
+\end{pgfonlayer}
+
+% \begin{scope}[shorten >= 10pt,shorten <= 10pt]
+% \draw[red, thick] (m-4-2.north west) -- (m-4-8.north east) -- (m-4-8.south east) -- (m-4-2.south west) -- cycle;
+% \end{scope}
+
+\end{tikzpicture}
+\end{document}
