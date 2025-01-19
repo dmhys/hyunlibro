@@ -75,6 +75,13 @@ enableEmoji = true
         leftSingleQuote = "'"
         rightSingleQuote = "'"
 
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)']]
+
+
   # Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
   [markup.highlight]
     # false is a necessary configuration (https://github.com/Fastbyte01/KeepIt/issues/158)

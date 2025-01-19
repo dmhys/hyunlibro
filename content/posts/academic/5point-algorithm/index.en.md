@@ -1,9 +1,9 @@
 +++
 date = 2025-01-08T16:06:03+09:00
 lastmod = 2025-01-13T02:36:59+09:00
-draft = false
+draft = true
 
-title = "5-point algorithm(1) - Essential matrix brief recap"
+title = "5-point algorithm"
 summary = ""
 
 isCJKLanguage = false
@@ -163,3 +163,5 @@ At this point, we have to deal with the cheirality problem in projective geometr
 ![Essential cheirality](essential-cheirality.svg "4 Possible solutions of Essential matrix decompose")
 
 The figure below illustrates these four possible combinations of $R$ and $t$. In the image, positive depth is shown in green, and negative depth in red. There’s really no purely geometric way to resolve this ambiguity outright. Instead, you can perform triangulation using the points with each $R$, $t$ option and check whether the depths in both images are positive. For instance, in COLMAP, it computes depths for the given points and checks whether there’s at least one point whose depth is positive in both images and below some `max_depth`. If such a point exists, that configuration is considered valid.
+
+[링크 테스트](../../cpp/be-cautious-when-creating-cpp-template-functions)
