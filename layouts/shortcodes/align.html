@@ -1,0 +1,7 @@
+{{ $align := .Get "align" | default "right" }}
+{{ $text := .Get "text" }}
+
+{{ if eq $align "right" "center"}}
+    <div style="text-align: {{$align}}">  {{$text}} </div>
+{{ else }}
+{{ end }}
