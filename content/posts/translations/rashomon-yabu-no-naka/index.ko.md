@@ -1,7 +1,7 @@
 +++
-date = 2025-01-20T19:58:43+09:00
+date = 2025-01-24T00:09:59+09:00
 lastmod = ""
-draft = true
+draft = false
 
 title = "아쿠타가와 류노스케 - 라쇼 문(라쇼몽), 덤불 속"
 summary = ""
