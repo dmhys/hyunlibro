@@ -209,7 +209,6 @@ enableEmoji = true
     # KaTeX mathematical formulas config (KaTeX https://katex.org/)
     [params.page.math]
       enable = true
-    # Mapbox GL JS config (Mapbox GL JS https://docs.mapbox.com/mapbox-gl-js)
 
     [params.page.share]
       enable = true
