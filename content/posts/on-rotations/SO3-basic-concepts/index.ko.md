@@ -1,6 +1,6 @@
 +++
 date = 2024-12-24T17:33:15+09:00
-lastmod = 2025-01-07T00:33:41+09:00
+lastmod = 2025-03-21T14:11:41+09:00
 draft = false
 
 title = "SO3(1) - Basic concepts"
@@ -18,9 +18,9 @@ categories = ["on rotations"]
 2D Toy example로 2차원에서 돌아다니는 로봇의 위치에 대해 기술해본다고 하자. 여기서의 기술은 $pos_x,$ $pos_y,$ $\theta$ 3자유도로 이루어질 수 있다. 이제 이 로봇의 좌표에서 바라본 물체의 위치를 $x_{local} ,$ $y_{local}$ 로 표현하면 **로봇의 pose를 감안한** 위치가 된다. (첨자를 많이 쓰기 싫어서 $x$, $y$ 등으로 표현하였다.) 이 로봇이 바라본 위치를 로봇의 pose를 나타낸 글로벌 좌표계에서 본다고 하면,
 
 $$
-x_{global} = \cos \theta \\ x_{local} - \sin \theta \\ y_{local} + pos_x
+x_{global} = \cos \theta \ x_{local} - \sin \theta \ y_{local} + pos_x
 \newline
-y_{global} = \sin \theta \\ x_{local} - \cos \theta \\ y_{local} + pos_y
+y_{global} = \sin \theta \ x_{local} - \cos \theta \ y_{local} + pos_y
 $$
 
 익숙한 사람은 행렬 연산으로 나타내야한다고 생각을 했을 수 있다. 맞다. 이를 다음과 같이 행렬로 나타내면 훨씬 보기 편해진다.

@@ -1,6 +1,6 @@
 +++
 date = 2024-12-24T17:33:15+09:00
-lastmod = 2025-01-07T00:33:41+09:00
+lastmod = 2025-03-21T14:11:41+09:00
 draft = false
 
 title = "SO3(1) - Basic concepts"
@@ -18,9 +18,9 @@ categories = ["on rotations"]
 Let's consider a 2D toy example. Suppose we are going to describe a robot moving in two dimensions. The description here can consist of three degrees of freedom: $pos_x,$ $pos_y,$ and $\theta$.  Then, if we express the position of an object as seen from the robot's coordinate system as $x_{local} ,$ $y_{local} ,$ it represents the **position from the robot's perspective**.  (I expressed them as $x$, $y$, etc., to avoid using too many subscripts.) If we view the position seen by the robot from the global coordinate system representing the robot's pose,
 
 $$
-x_{global} = \cos \theta \\ x_{local} - \sin \theta \\ y_{local} + pos_x
+x_{global} = \cos \theta \ x_{local} - \sin \theta \ y_{local} + pos_x
 \newline
-y_{global} = \sin \theta \\ x_{local} - \cos \theta \\ y_{local} + pos_y
+y_{global} = \sin \theta \ x_{local} - \cos \theta \ y_{local} + pos_y
 $$
 
 Someone familiar with this might think that it should be expressed using matrix operations. That's correct. Representing it with matrices as follows makes it much easier to visualize.
