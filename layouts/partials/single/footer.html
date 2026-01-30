@@ -17,7 +17,7 @@
                         {{ end }}
                         "{{ $value.title }}"
                         {{ if $value.link }}
-                            [<a href="$value.link"><i> {{ $value.link }} </i></a>]
+                            [<a href="{{$value.link}}"><i> {{ $value.link }} </i></a>]
                         {{ else if $value.doi }}
                             [<a href="http://doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
                         {{ end }}
