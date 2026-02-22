@@ -20,6 +20,8 @@
                             [<a href="{{$value.link}}"><i> {{ $value.link }} </i></a>]
                         {{ else if $value.doi }}
                             [<a href="http://doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
+                        {{ else if $value.isbn }}
+                            [<a href="https://www.worldcat.org/isbn/{{ replace $value.isbn "-" "" }}"><i> ISBN:{{ $value.isbn }} </i></a>]
                         {{ end }}
                     </li>
                 {{ end }}

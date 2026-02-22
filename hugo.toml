@@ -81,6 +81,9 @@ enableEmoji = true
           block = [['\[', '\]'], ['$$', '$$']]
           inline = [['\(', '\)']]
 
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
 
   # Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
   [markup.highlight]

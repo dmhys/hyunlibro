@@ -580,7 +580,9 @@ var Theme = /*#__PURE__*/function () {
         $toc.style.visibility = 'visible';
         var $tocLinkElements = $tocCore.querySelectorAll('a:first-child');
         var $tocLiElements = $tocCore.getElementsByTagName('li');
-        var $headerLinkElements = document.getElementsByClassName('headerLink');
+        var $headerLinkElements = Array.from($tocLinkElements).map(function(link) {
+          return document.getElementById(link.getAttribute('href').slice(1));
+        }).filter(Boolean);
         var headerIsFixed = document.body.getAttribute('data-header-desktop') !== 'normal';
         var headerHeight = document.getElementById('header-desktop').offsetHeight;
         var TOP_SPACING = 20 + (headerIsFixed ? headerHeight : 0);
@@ -619,13 +621,10 @@ var Theme = /*#__PURE__*/function () {
             var nextTop = $headerLinkElements[i + 1].getBoundingClientRect().top;
 
             if (i == 0 && thisTop > INDEX_SPACING || thisTop <= INDEX_SPACING && nextTop > INDEX_SPACING) {
-              activeTocIndex = i-1;
+              activeTocIndex = i;
               break;
             }
           }
-
-          if (activeTocIndex < 0)
-            activeTocIndex = 0;
 
           $tocLinkElements[activeTocIndex].classList.add('active');
           var $parent = $tocLinkElements[activeTocIndex].parentElement;
