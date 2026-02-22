@@ -10,7 +10,7 @@
             {{ with .Params.references }}
             {{ range $index, $value := . }}
                 {{ if $value.title }}
-                    <li id="reference-{{$index}}">
+                    <li id="reference-{{add $index 1}}">
                         &nbsp;
                         {{ if $value.authors }}
                             <i>{{ $value.authors }}</i>, 
