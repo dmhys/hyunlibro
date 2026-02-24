@@ -15,41 +15,48 @@ categories = []
 
 # Changhyun Jee
 
-_3D Vision Engineer_
+*3D Vision Engineer*
 
 &nbsp;
 
-If I don’t have any reason to dislike something, I generally end up liking it.
+I'll probably like it, if there's no reason not to.
 
-I’m always open to trying new things.
+Open mind, always. Lately it's been pottery.
 
 &nbsp;
 
-Rather than calling it broad but shallow, I’d say that even if it’s shallow, it’s still wide.
+Shallow, maybe — but I'd rather call it wide.
 
-Lately, I’ve been getting into specialty coffee and flight simulations.
+I try to keep a simple rule —
+
+to write only what hasn't been written.
+
+&nbsp;
+
+A while back, somewhere overseas, 
+
+I sang at a roadside burger place.
+
+They gave me a coupon with no expiration date.
+
+I promised I'd return.
 
 &nbsp;
 
 ### Keyword
 
-__Academic__
+**Academic**
 
-- Multiview Geometry
-
-- LiDAR Algorithms
+- Geometry & Reconstruction
 
 - Visual / LiDAR SLAM
 
-- NeRF/Gaussian Splatting
+- Neural Rendering
 
+**Coding**
 
-__Coading__
-
-- Experties in C++
+- Expertise in C++
 
 - WASM
 
 - OpenGL
-
-- python
