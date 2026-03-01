@@ -10,7 +10,7 @@
             {{ with .Params.references }}
             {{ range $index, $value := . }}
                 {{ if $value.title }}
-                    <li id="reference-{{$index}}">
+                    <li id="reference-{{add $index 1}}">
                         &nbsp;
                         {{ if $value.authors }}
                             <i>{{ $value.authors }}</i>, 
@@ -20,6 +20,8 @@
                             [<a href="{{$value.link}}"><i> {{ $value.link }} </i></a>]
                         {{ else if $value.doi }}
                             [<a href="http://doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
+                        {{ else if $value.isbn }}
+                            [<a href="https://www.worldcat.org/isbn/{{ replace $value.isbn "-" "" }}"><i> ISBN:{{ $value.isbn }} </i></a>]
                         {{ end }}
                     </li>
                 {{ end }}

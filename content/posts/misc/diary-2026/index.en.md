@@ -1,0 +1,40 @@
++++
+date = 2026-03-02T01:28:22+09:00
+lastmod = 2026-03-02T02:14:54+09:00
+draft = false
+
+title = "diary, 2026"
+summary = ""
+
+isCJKLanguage = true
+
+tags = ["diary",]
+categories = ["essays"]
+
++++
+
+### Jan
+
+**1**
+
+*Creativity is a perturbation at the boundary.*
+
+&nbsp;
+
+**2 - A Philosophy of Translation**
+
+One cannot guarantee that the time required for translation will necessarily be less than the time the author spent creating the work. A translator must command the target language better than the source language. Translation is the task of interpreting the author's intent to the fullest extent and reconstructing it in another language. Calling the transfer of textual meaning "translation" is only valid for texts whose sole purpose is information delivery. If one merely transfers the literal meaning in a literary work, that is interpretation — or more disparagingly, substitution. Of course, the literal meaning should remain as identical as possible.
+
+Yet if such a translation reaches the reader in a different color, and the reader becomes conscious of that color, doesn't the effort to respect the original paradoxically end up distancing itself from the original? Then, as a translator, which should one choose: the certainty of meaning-loss, or the possibility of leaving one's fingerprints on someone else's work?
+
+&nbsp;
+
+### Feb
+
+**1**
+
+*Much of human conflict arises from the pressure created by the inherent information loss in the process of reducing a spectrum to a classification problem.*
+
+**2**
+
+*Trends have a torus structure.*

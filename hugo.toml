@@ -81,6 +81,9 @@ enableEmoji = true
           block = [['\[', '\]'], ['$$', '$$']]
           inline = [['\(', '\)']]
 
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
 
   # Syntax Highlighting (https://gohugo.io/content-management/syntax-highlighting)
   [markup.highlight]
@@ -95,7 +98,7 @@ enableEmoji = true
   defaultTheme = "auto"
   fingerprint = "sha256"
   title = "Hyun.Libro"
-  description = "3D vision Library."
+  description = "Exploring worlds with mechanisms."
 
   [params.header]
     [params.header.title]
