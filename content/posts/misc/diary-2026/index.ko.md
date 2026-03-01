@@ -9,7 +9,7 @@ summary = ""
 isCJKLanguage = true
 
 tags = ["diary",]
-categories = ["essays"]
+categories = ["misc"]
 
 +++
 

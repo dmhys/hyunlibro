@@ -1,7 +1,8 @@
 +++
 date = 2026-02-01T11:00:00+09:00
 lastmod = 2026-02-19T12:36:00+09:00
-draft = true
+draft = false
+hiddenFromHomePage = true
 
 title = "노예의 나라, 미국"
 summary = ""
