@@ -130,6 +130,57 @@ references = [
     {title = "Land and the roots of African-American poverty", link = "https://aeon.co/ideas/land-and-the-roots-of-african-american-poverty"},
     # 59 southern homestead
     {title = "Forty acres and a mule", link = "https://en.wikipedia.org/wiki/Forty_acres_and_a_mule"},
+    # 60 Democracy in america - public domain
+    {title = "DEMOCRACY IN AMERICA", authors = "Alexis De Tocqueville, Henry Reeve", link = "https://www.gutenberg.org/cache/epub/815/pg815-images.html"},
+    # 61 메사추세츠 철도 논쟁
+    {title = "Jim Crow Railroads in Massachusetts", authors = "Louis Ruchames", doi = "10.2307/2710298"},
+    # 62 1788 Massachusetts 
+    {title = "1788 Warning Out of Negro Inhabitants", link = "https://marbleheadmuseum.org/1788-warning-out/"},
+    # 63 pennsylvania
+    {title = "Constitution of the Commonwealth of Pennsylvania – 1838", link = "https://www.paconstitution.org/texts-of-the-constitution/1838-2/"},
+    # 64 1807 New Jersy
+    {title = "Electoral Reform Enrolled Law", link = "https://www.amrevmuseum.org/virtualexhibits/when-women-lost-the-vote-a-revolutionary-story/pages/electoral-reform-enrolled-law"},
+    # 65 
+    {title = "CONSTITUTION OF CONNECTICUT. 1818.*", link = "https://www.cga.ct.gov/asp/content/constitutions/1818_Constitution.pdf"},
+    # 66
+    {title = "THE SECOND CONSTITUTION OF NEW YORK, 1821.", link = "https://history.nycourts.gov/wp-content/uploads/2018/11/Publications_1821-NY-Constitution.pdf"},
+    # 67 ohio - 당시 의회 speech 자료
+    {title = "The black laws! : speech of Hon. B.W. Arnett of Greene County, and Hon. J.A. Brown of Cuyahoga County, in the Ohio House of Representatives, March 10, 1886", link = "https://www.loc.gov/item/91898104/"},
+    # 68 ohio
+    {title = "HISTORY OF THE EDUCATIONAL LEGISLATION IN OHIO FROM 1803 TO 1850.", authors = "EDWARD A. MILLER", link = "https://resources.ohiohistory.org/ohj/search/display.php?page=1&ipp=20&searchterm=crawford&vol=27&pages=1-271"},
+    # 69 oregon lash law
+    {title = "Black Exclusion Laws in Oregon", link = "https://www.oregonencyclopedia.org/articles/exclusion_laws/"},
+    # 70 1819 illinois
+    {title = "Laws of the state of Illinois enacted by the General Assembly 1819", link = "https://hdl.handle.net/2027/mdp.35112103448090"},
+    # 71 1848 illinois
+    {title = "Illinois Constitution of 1848", link = "https://en.wikisource.org/wiki/Illinois_Constitution_of_1848"},
+    # 72 1853 illinois
+    {title = "An Act to Prevent the Immigration of Free Negroes into this State (1853)", link = "https://teachinglegalhistory.unl.edu/s/oer/item/1842"},
+    # 73 lincoln 발언 with douglass
+    {title = "Collected Works of Abraham Lincoln. Volume 3 [Aug. 21, 1858-Mar. 4, 1860].", link = "https://quod.lib.umich.edu/l/lincoln/lincoln3/1:20?rgn=div1;view=fulltext"},
+    # 74 Mississippi Black Codes
+    {title = "Mississippi Black Codes", link = "https://teachinglegalhistory.unl.edu/s/oer/item/2089"},
+    # 75 South Carolina black codes
+    {title = "Black Codes (1865)", link = "https://constitutioncenter.org/the-constitution/historic-document-library/detail/mississippi-south-carolina-black-codes-1865"},
+    # 76 Louisiana black codes
+    {title = "Reconstruction in Louisiana: Black Codes of 1865", link = "https://lasc.libguides.com/black-codes"},
+    # 77 south carolina black codes2
+    {title = "8. South Carolina's 'Black Code'", link = "https://ldhi.library.cofc.edu/exhibits/show/after_slavery_educator/unit_three_documents/document_eight"},
+    # 78 mississippi black codes 2
+    {title = "Black Codes of Mississippi", link = "https://teachingamericanhistory.org/document/black-codes-of-mississippi/"},
+    # 79 chinese labor
+    {title = "The Story of Chinese Laborers and the Reconstruction South", link = "https://tnmuseum.org/Stories/posts/the-story-of-chinese-laborers-and-the-reconstruction-south"},
+    # 80 The Mississippi Chinese
+    {title = "The Mississippi Chinese: Between Black and White", authors = "James W. Loewen", isbn = " 0881333123"},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
+    {title = "", link = ""},
     {title = "", link = ""},
     {title = "", link = ""},
     {title = "", link = ""},
@@ -142,7 +193,6 @@ references = [
 ]
 
 +++
-
 
 !["alex jeffrey pretti"](alex-jeffrey-pretti.jpg "ICE 단속 현장의 Alex Pretti")
 
@@ -193,7 +243,7 @@ references = [
 >
 > *이것이 인디아스로 간 그리스도인들 때문에 하느님과 우리 신앙이 얻은 명성과 명예다.*
 >
-> {{<alignr>}} — Bartolomé de las Casas, Historia de las Indias" {{</alignr>}}
+> {{<alignr>}} — Bartolomé de las Casas, "Historia de las Indias" {{</alignr>}}
 > 
 
 라스 카사스는 노예가 풍부한 그의 엔코미엔다를 포기하였다. 라스 카사스만 충격받은 것이 아니었다. 인디오들에 대한 착취를 멈춰야한다는 목소리는 커져가고 있었다. 1537년 교황 바오로 3세가, 원주민이 이성적 인간이며 영혼이 있다고 선언하였다. 또, 1542년, 신법이 통과되어 엔코미엔다 제도가 제한되었다. 
@@ -377,7 +427,7 @@ Marie Jenkins Schwartz에 따르면, {{<ref 32>}} 출산한 여성에겐 추가 
 
 ---           
 
-#### Trivia
+#### Trivia - 금융 상품으로써의 노예
 
 이 당시 노예는 금융상품으로도 기능했다. 노예 담보대출이 성행했으며, 구매한 노예를 담보로 새 노예를 구매하는 레버리지 전략이 시장에서 통용되었다. 수요가 많았으니 채권이 뉴욕, 런던, 암스테르담, 파리 등 대도시에서 팔렸다. 목화의 무한한 수요는 무한한 노예의 수요를 불렀고, 이는 또 무한한 토지의 수요를 불렀다. 목화, 노예, 토지의 가격이 전부 상승했고, 노예는 어느새 중복 담보로 제공되며 엄청난 레버리지를 불러일으켰다. 우상향하는 가격은 시장의 경계심을 무너뜨렸다. 
 
@@ -562,7 +612,7 @@ Marie Jenkins Schwartz에 따르면, {{<ref 32>}} 출산한 여성에겐 추가 
 
 불만은 거기서 멈추지 않았다. 우선 경제 시스템상 문제가 있었는데, 통상 규제권은 연방에게 있었으며 관세에 대한 의견이 달랐다. 북부는 보호관세를 원했는데, 남부는 원치 않았다. 1832년 South Carolina가 관세 위헌선언으로 무효화 시도(nullification)를 했으나, 우선 진압되고 1833년 타협 관세로 해당 갈등은 우선 봉합되었다. 그 후 버지니아에서 노예 반란이 일어나서, 남부에선 노예제에 대한 어떤 비판도 '반란 선동'으로 간주하기 시작했다. 앞서 나온 Gag Rule인데, 반노예 청원을 자동 보류하여 논의 자체를 금지시키는 법안이었다. 어찌 통과는 되었지만, 반발은 당연히 격렬했고 1844년, 북부 민주당의 이탈로 폐지되었다. 민주당의 내홍이 점차 커져가고 있었다.
 
-그리고 남부의 영토가 너무 늘어나기 시작했다. 텍사스가 공화국으로 독립 후 미국에게 병합을 추진했다. 거대 노예주가 추가되며 균형이 파괴되기 시작했다. 멕시코 전쟁으로 인해 얻은 영토도 주로 남부주였다. Wilmot 조항을 통해 자유주로 만드려 했으나 상원에서 저지당했다. 더 이상의 노예주를 막기 위한 이념으로 Free Soil당이 창당되었다. 그들의 슬로건은 *'자유로운 땅, 자유로운 발언, 자유로운 노동, 자유로운 인간 Free soil, Free speech, Free labor, Free Men'* 이었다. 부디 나이브한 착각은 하지 않길 바란다. David Wilmot이 직접 밝힌 동기는 아래와 같으니.
+그리고 남부의 영토가 너무 늘어나기 시작했다. 텍사스가 공화국으로 독립 후 미국에게 병합을 추진했다. 거대 노예주가 추가되며 균형이 파괴되기 시작했다. 멕시코 전쟁으로 인해 얻은 영토도 주로 남부주였다. Wilmot 조항을 통해 자유주로 만드려 했으나 상원에서 저지당했다. 더 이상의 노예주를 막기 위한 이념으로 Free Soil당이 창당되었다. 그들의 슬로건은 *'자유로운 땅, 자유로운 발언, 자유로운 노동, 자유로운 인간 Free soil, Free speech, Free labor, Free Men'* 이었다. 그 '자유'가 누구의 자유인지는 David Wilmot이 직접 밝힌 바 있다.
 
 >
 > *I plead the cause and the rights of white freemen [and] I would preserve to free white labor a fair country, a rich inheritance, where the sons of toil, of my own race and own color, can live without the disgrace which association with negro slavery brings upon free labor.* {{<ref 40>}}
@@ -642,23 +692,23 @@ Marie Jenkins Schwartz에 따르면, {{<ref 32>}} 출산한 여성에겐 추가 
 
 이 때 생산성의 감소는 수치로 볼 수 있다.(이하 수치 {{<ref 53>}} 참고) 1860-61년 목화 생산량은 3,849,469베일(약 70만톤)이었다. 전후 1866-67년 생산량이 2,097,254베일(약 38만톤)으로 최저점을 찍는다. 무려 생산량의 46%가 감소했다. 그러나 고작 4년 후인 1870-71년, 목화 생산량은 4,362,317베일(약 79만톤)로 오히려 최대치를 갱신한다. **누군가 일했기 때문이다.** 누가, 왜 일했을까?
 
-### 흑인들의 땅
+### 흑인들의 선택지
 
 자, 다시 해방의 순간으로 돌아가보자. 흑인들에게 어떤 선택지가 있었을까? 
 
-**서부 개척**
+#### 서부 개척
 
 이 당시 미국은 서부로 끊임없이 확장하고 있었다. 땅이 아마 전 세계에서 가장 풍족한 나라였을 것이다. 그러면 흑인들도 해방되고 땅을 찾기 어렵지 않았을 것이다 — 하는 주장은 전혀 성립하지 않았다.
 
 미국이 확장하던 땅은 전부 서부였다. 주로 당시 서부 개척민은 1862년에 발효된 Homestead Act를 이용했는데, 5년간 거주와 경작을 하면 65헥타르를 무상으로 얻을 수 있는 법안이었다. 무상으로 얻을 수 있다는 건 돈이 안든다는 말이 아니다. 서부까지 이동하고, 첫해에 개간할 장비들과 건축자재 비용, 1년치 식량, 종자를 전부 부담 가능한 초기자본이 있어야 한다는 소리였다. 무일푼으로 해방된 사람들에게 그런 것이 가능할 리가 없었다. 그리고 행정 비용과 행정 절차도 있었는데, 교육 받지 못한 상황에서 행정 절차를 정상으로 밟기란 상당히 어려운 일이었다. 흑인들이 대량으로 서부로 이주를 시도한건 1879년이 되어서 였다. (그리고 잘 안되었다. [Exodusters 참고](https://en.wikipedia.org/wiki/Exodusters))
 
-**토지 구매**
+#### 토지 구매
 
 마침 그 당시, 노예제 해제 이후 있는 땅에서도 일손이 부족하기 때문에, 새 땅의 가격은 상당히 저렴해졌었다. 땅값이 폭락한 이 상황이라면, 자기가 농사지을 땅 정도는 마련하기 쉬웠을 것이다. 그러한가? 이미 앞서 말했듯이, 해방후 한푼도 없었다. 그럼 은행이 있지않은가? 흑인에겐 신용이 없었다. 흑인에게 돈을 빌려주는 은행은 없었다. 
 
 자, 어떻게 돈을 모았다고 해보자. 당시 백인 소유주들은 땅을 흑인에게 파는것을 상당히 꺼려했다. 어느정도냐면, 흑인이 에이커당 10$에 구매한다는 것을 거부하고 백인에게 절반 가격에 팔았을 정도였다. {{<ref 55>}} 자, 정말 어떻게 어떻게 구했다고 하자. 흑인 토지 소유주는 KKK단의 가장 직접적인 린치 대상이었다. 1871년 청문회 자료{{<ref 56>}}에 정말 많은 자료가 있으며, 당시 수많은 흑인 살해사건중 유죄 판결은 단 한건도 없었다.{{<ref 57>}}
 
-**정부 지원**
+#### 정부 지원
 
 자, 그럼 정부는 어떤 지원을 했을까? 실제로 남북전쟁이 진행중이던 때, 흑인지도자들에게 무엇을 원하냐 물어본 적이 있었다. 당연히 그들은 자유민이 되기 위한 땅을 원했다.
 
@@ -668,38 +718,219 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 
 물론 서부 homestead act에 비하면 이동의 비용이 없었지만, 장비, 건축자재비용 등 초기비용은 당연히 들어갔다. 그렇다고 이동의 비용이 아예없던것도 아니다. 많은 주들은 토지 사무소(land office)가 하나만 있었기 때문에, 왕복만 몇 주 정도 걸려 서류를 작성해야 하는 경우가 흔했다. {{<ref 58>}} 물론, 서류의 분실 등이 이상하게 잦은 것도 문제였다. 총 신청은 67,600건. 최종으로 인정된 사유지는 27,800건이었다. 이 중 흑인은 추정치에 따라 다르나, 1000~5500건 사이로 여겨진다. 남부의 흑인은 400만이었다.
 
-### 다른 선택지
+#### 다른 선택지
 
-자, 그럼 다른 일자리는 어떨까?
+보는 바와같이, 땅을 실제로 얻을 수 있었던 흑인은 전체 흑인에 비하면 아주 극소수였다. 그러면 땅이 필요없는 선택지는 어떨까. 도시에 가서 일자리를 찾거나. 당시 남부 상위 10개 도시 전체인구는 약 40만이 채 되지않았다. 해방흑인은 400만이었다. 애초에 1차 산업 기준으로 돌아가던 남부는 그들을 수용할 준비가 전혀 되지않아있었다. 일자리가 없었다.
 
-도시 일자리를 찾아서
-북부를 찾아서
+그러면 자유를 위해 싸워준 북부가 있지 않은가? 개척의 경우엔 자본이 필요하지만, 노동자의 경우 어떻게 일자리만 얻으면 어느정도 살아갈 수 있으니 개척보단 도시 노동자가 더 나을것이다. 게다가 이미 북부는 산업화되었기 때문에, 일자리 기반이 더 풍부할 것이다. 북부로 가는 것이 좋은 선택일 것이다.
 
-이렇게 세개로 크게 나누고
+**아니다. 전혀 그렇지 않다.**
 
-땅을 찾아서는 또 나누자면
+### Black Laws
 
-전부 실패
-도시일자리->전부실패
+아직 전쟁 전, 프랑스의 귀족 토크빌은 민주주의가 작동하는 사회에 대해 구경하기 위해 미국에 갔고,(사실 프랑스 정부가 미국의 감옥 제도를 조사하라고 보낸것이지만, 개인의 흥미는 민주주의에 있었다.) *'미국의 민주주의(De la démocratie en Amérique)'* 라는 책에서 다음 글을 썼다.
 
-북부로 가면 어떨까? 이것도 불가능이었다. 
-Black codes
-Black laws로 시작.
+>
+> *On the contrary, the prejudice of the race appears to be stronger in the States which have abolished slavery, than in those where it still exists; and nowhere is it so intolerant as in those States where servitude has never been known.*
+>
+> *노예제를 폐지한 주 보다 아직 존속하는 주에서 인종에 대한 편견이 더 강하게 나타난다. 그리고 노예제가 한 번도 존재한 적 없는 주에서 가장 강하다.*
+>
+> {{<alignr>}} — DEMOCRACY IN AMERICA by Alexis De Tocqueville, translated by Henry Reeve{{<ref 60>}}{{</alignr>}}
+>
 
+과연 프랑스인이 분위기를 잘못 읽은 것일까? 매사추세츠에선 1830년대 철도회사들이 흑인 분리 정책을 도입했다. 1840년대 초, 폐지론자들이 이에 저항했고, 법안이 청원되었다. 이 때, 백인 승객 그룹이 반대 청원을 제출한다. {{<ref 61>}} 아, 그러면 법이 흑인들을 보호했지만, 시민들은 인종차별적이었구나.
+
+**이것도 아니다.**
+
+**Massachusetts**
+
+- 1788, 시민이 아닌 흑인은 2개월 이상 체류 금지{{<ref 62>}}
+
+**Pennsylvania**
+
+- 1838, Pennsylvania Constitution of 1838, 흑인 투표권 박탈{{<ref 63>}}
+
+**New Jersey**
+
+- 1807, Electoral Reform Enrolled Law, 흑인과 여성 투표권 박탈{{<ref 64>}}
+
+**Connecticut**
+
+- 1818, Constitution OF Connecticut. 1818, 흑인과 여성 투표권 박탈{{<ref 65>}}
+
+**New York**
+
+- 1821, THE SECOND CONSTITUTION OF NEW YORK, 1821. 흑인의 참정은 재산을 요구(250$){{<ref 66>}}
+
+**Ohio**
+
+- 1804, An Act to Regulate Black and Mulatto Persons, 흑인의 자유 증명서 의무화{{<ref 67>}}
+- 1807, 위 법의 개정안으로{{<ref 67>}}
+  - 백인 관련 사건 증언 금지
+  - 500$ 보증금 의무, 백인 토지소유자 보증인 2명, 입주 20일 이내 확보
+- 1836, 공립학교 법 개편으로 백인 아이만 허용{{<ref 68>}}
+  - *(1836년에 문서화, 1838년에 Samuel Lewis의 교육감 임명으로 시행된 것으로 보인다.)*
+
+**Oregon**
+
+- 1844, Peter Burnett's lash law. 흑인이 거주시 퇴거할때까지 6달에 한번 20-39회 채찍질(45년에 폐지){{<ref 69>}}
+- 1849, Exclusion Law, 흑인 40일 내 퇴거 의무(기존 거주자 제외){{<ref 69>}}
+- 1857, 오레곤에서 **흑인 거주, 재산 소유, 계약체결 금지**{{<ref 69>}}
+
+**Illinois**
+
+- 1819, An Act Respecting Negroes, Mulattoes, Servants and Slaves, 흑인의 자유 증명서 의무화{{<ref 70>}}
+- 1825~1835, 학교 재원법에서 'white' 명시 (*여러 source에 거쳐있기 때문에 ref생략)
+- 1848, Illinois Constitution of 1848, 흑인 이주 금지 및 노예 해방 금지 {{<ref 71>}}
+- 1853, An Act to Prevent the Immigration of Free Negroes into this State, 위 헌법의 시행법.{{<ref 72>}}
+  - 흑인 10일 이상 체류금지
+  - 벌금을 내지 못하면 공개 경매로 매각, 노예 노동
+  - 흑인을 법정에서 노예라고 주장 후 입증 절차 시행
+
+여기 작성한 법들이 그 주의 모든 법인 것은 아니다. 1차 사료 접근 용이성에 따라 몇몇 법들은 생략했으나, 주로 공립학교 접근 금지, 법정에서 증언 금지, 참정권 박탈 등은 공통적으로 입법된 사례가 많다. 몇몇 법들은 남북전쟁 이후 이념적 추진력을 얻어 폐지된 경우도 있으나, 오레곤의 경우 처럼 헌법 조항이 1900년대 넘어서 까지 간 경우도 있다. 
+
+이렇게 북부에서 흑인들에 대한 인종 맞춤 법을 *Black Laws* 라고 하는데, 흑인, 흑백 혼혈, 주에 따라선 인디언까지 포함시켰다. 핵심은 하나다. **오지 마라.** 이 '오지 마라'의 경우 오리건이나 인디애나처럼 아예 헌법에 오지 말라고 박아둔 경우도 있고, 법률로 금지한 경우도 있었다. 혹은 오하이오와 같이 500$의 보증금, 백인 토지소유주 2명 보증처럼 도저히 당대 흑인이 맞추기 어려운 조건을 통해, 금지는 아니지만 실질적 금지로 작용 가능한 법률을 입법한 경우도 많았다.
+
+>
+> *I am not, nor ever have been in favor of bringing about in any way the social and political equality of the white and black races, [applause]---that I am not nor ever have been in favor of making voters or jurors of negroes, nor of qualifying them to hold office, nor to intermarry with white people; and I will say in addition to this that there is a physical difference between the white and black races which I believe will for ever forbid the two races living together on terms of social and political equality.*
+>
+> *저는 백인과 흑인의 사회적, 정치적 평등을 어떤 방식으로든 실현하는 것에 단 한번도 찬성한 적이 없습니다.[환호] 저는 흑인을 유권자나 배심원으로 만드는 것에도, 그들에게 공직을 맡을 자격을 부여하는 것에도, 백인과 흑인을 혼인하게 하는 것에도 찬성한 적이 없으며, 지금도 찬성하지 않습니다. 그리고 덧붙이건대, 백인과 흑인 인종간엔 신체 차이가 존재하며, 이 차이로 두 인종이 사회적, 정치적 평등의 조건 위에서 함께 살아가는 것은 영원히 불가능하리라고 믿습니다.*
+>
+> {{<alignr>}} — 에이브러햄 링컨, 스티븐 A.더글라스와의 4차 토론회(일리노이)에서{{<ref 73>}} {{</alignr>}}
+>
+
+---
+
+#### Trivia - 링컨의 사상 변화
+
+사실 링컨을 저렇게 인용한 건 비겁하긴 한데, 정적과 치열하게 토론하던 맥락에서 나온 발언이기 때문이다. 다만 링컨은 진지하게 식민지 건설과 흑인 이주를 통한 흑백 인종 분리를 추진했다. 이에 대한 맥락을 더 알아보고 싶다면 1862년 백악관 흑인 대표단 면담 기록을 찾아보면 좋을것이다.(실제로 실행했고, 실패했다.) 다만 그도 남북전쟁 과정에서 흑인과의 접촉이 늘어나고, Frederick Douglass — 위에 몇번 인용한 당대 흑인 지식인 — 와 같은 사람과 만나면서 그 후 생각이 달라지긴 했다는 증거가 나온다. 특히 남북전쟁 말기, 군 복무 흑인과 엘리트들에겐 투표권을 주자는 발언을 했다.
+
+그러나 링컨의 개인 발언이나 사상보다 더 중요한 것은, 그가 공개 토론회에서 정치적 계산을 통해 **유권자의 마음**을 위해 위의 발언을 했다는 점이다. 1차 토론회에선 평등을 실현할 *의도*가 없다고 했었고, 평등은 *아마도 영원히* 불가능하다고 했다. 4차 토론회에선 *단 한번도(not, nor ever have been)* 평등 실현에 찬성한 적이 없다고, 평등은 *영원히* 불가능할것이라고 했다. 유권자의 온도에 따라 그의 대응이 달라진 것이다.
+
+---
 
 ### Black Codes
 
-#### Trivia
+북부의 법적 언어는 명확했다. '오지 마라.' 남부 주 의회의 언어는 무엇이었을까? 전쟁이 끝나고, 1865년 남부 주 의회가 재소집 되었다. 인원은 거의 동일했고, 39대 연방의회가 12월 4일에 소집되기 전까지 유효했다. 그들은 의회가 바뀌기 전에 연쇄적으로 입법을 쏟아낸다. 
+
+---
+
+#### 계약에 묶이다
+
+우선 노동계약이 필수가 되었다. 사우스 캐롤라이나에선 명시적으로 유색인종을 'servant', 그리고 계약자를 'master'라고 법제화했다.{{<ref 75>}} 노동 이탈은 불가능했다. 누구든 이탈자를 체포해 고용주에게 돌려보낼수 있었다.{{<ref 74>}} 1864년의 루이지애나 군령에는 이미 임금이 정해져있었으며, 사우스 캐롤라이나에선 노동량에 따른 임금이 계약시 정해지도록 되어있었다. {{<ref 77>}} 또한, 노동 계약에서 이탈하면 '합당한 이유'없이는 해당 연도의 임금이 전액 몰수되었다. {{<ref 74>}} 계약 위반이나 불복종시, 판사가 업무에 복귀시킬 권한을 가졌다. {{<ref 75>}} 심지어는 고용주의 허가 없이 부지를 이탈하는 것 자체가 위반인 경우가 있었다. {{<ref 77>}}
+
+#### 더 나은곳에서 노동할 수 없다
+
+그럼에도 다른 노동을 하기란 어려웠다. 우선 south carolina에선 농업/하인등 전통적으로 흑인이 하던 일 외의 일을 하려면 연간 면허료가 $10~100정도 필요했다. {{<ref 77>}} 농업을 하기위해선 땅이 필요했는데, 토지 임대 또한 불법이었다. {{<ref 74>}} 또한 고용주가 계약 상태인 다른 흑인에게 더 나은 조건을 제시하는 것 자체가 범죄였다. {{<ref 78>}}
+
+#### 다음 세대도 똑같다
+
+루이지애나와 미시시피의 경우인데, 그 두 주는 수습(Apprentice) 제도를 운영했다. 미시시피 기준으로 보자면,{{<ref 78>}} 고아, 혹은 부모가 *부양 능력이 없다*고 판단되는 없는 아동을 *적절한 사람* — *원래 소유주를 우선하는* — 에게 수습으로 배치하게 했다. 성인이 될 때까지 배치했며, 체벌권을 가졌고, 도주시 체포가 가능했다. 누군가가 수습을 유인하거나, 숨겨주거나, 밥을 주거나,음식이나 의류를 주는 행위는 경범죄였다. 
+
+#### 일을 해라
+
+그뿐만 아니라, 이 당시 노동은 선택사항이 아니었다. 남부 주들에선 부랑법(Vagrancy Act)들이 일반적으로 발효되었는데, 구체적으로 미시시피의 경우를 보자면 부랑자, 거지들에겐 벌금을 물렸다. 흑인들의 경우는 더 나아가 일을 안하고 있으면 부랑자로 취급했고, '불법적으로' 흑인들이 모이는것도 금지했다. 고정 거주지나 고용이 없는 자도 불법이었다. 사우스 캐롤라이나의 경우엔 한술 더 떴는데, 심지어는 땅을 가지고 있어도 생활 수준이 부족하다고 판단되면 부랑자로 취급되었다.{{<ref 77>}} 미시시피의 경우 부랑자가 되면 벌금이 $150 부과되었다.
+
+여기서 더 촘촘하게 걸러내기 위해, 흑인들에겐 인두세가 부과되었다. 당연히, 이 세금을 미납하는 것 또한 부랑자였다. 벌금을 내지 않으면 *'기존 고용주'*에게 넘겨진다. 
+
+---
+
+결국 북부의 언어는 **'오지 마라'** 였던 것처럼, 남부의 언어는 **'가지 마라'**, **'일을 해라'** 로 볼 수 있다. 당시 선택지를 다시 한번 종합해서 보자면, 서부 개척을 못하고, 토지 구매도 못하고, 정부 지원도 못 받고, 도시로 갈 순 없는 상태에서, 계약에 묶여, 더 나은 조건은 제공 받지 못하는 상황에서 다음 세대까지 이어지는 노동의 굴레에 묶인 것이다.
+
+여기서 선택지라고 할지, 마지막 종착지가 나온다. 흑인들은 돈이 없었다. 당연히 $150에 달하는 벌금을 낼 수 있을리가 없다. 일을 안하고 벌금이 부과되었는데, **벌금을 내지 못한다면 어떤 일이 벌어지는가?** 
+
+---
+
+#### Trivia - Sinners로 보는 1932년 미시시피
+
+!["sinners"](sinners.webp "Sinners by Ryan.K.Coogler")
+
+2025년에 개봉한 라이언 쿠글러의 영화, 씨너스는 1932년의 미시시피를 배경으로 삼고 있다. 노예제 폐지 후 50년이 넘게 지난 남부를 배경으로 하는 이 영화에서, 이 글에서 설명하는 모습들의 미래가 어떻게 되었는지 볼 수 있다.
+
+사실 남북전쟁 종전 직후 노동 수급은 남부의 커다란 고민이었고, 결국 중국인들을 노동자로 모집했다. 추론에 따라 다르긴 한데, 최소 500명 이상의 중국인들이 이 시기에 남부로 왔다. 이에 대한 글은 {{<ref 79>}}를 통해 더 자세히 볼 수 있다.
+
+&nbsp;
+
+!["sinners bo chow"](sinners_bo_chow.jpg "From the movie 'Sinners' © Warner Bros<br>작중 중국인 보&그레이스 차우는 잡화상을 운영한다.")
+
+다만 중국인들도 비인간적인 목화 노역은 하기 싫어했고, 결국 대다수가 이탈했다. 1880년 인구조사를 통해 1870년과 1880년의 남부 주 중국인 숫자를 알 수 있는데, 1870년의 남부 중국인 인구 총합이 고작 216명이었다. (1880년엔 938명으로 늘어난다.) 미시시피 델타에서 중국인들은 주로 잡화상을 운영했다. 이유에 대한 추론으론 여러가지가 있지만, 개인적으로는 '백인은 흑인을 상대하지 않았으며, 흑인은 자본이 없었다'{{<ref 80>}}는 주장이 설득력 있게 다가온다.
+
+사실 위에서 설명한 남부의 편법 black codes는 대다수가 39대 연방의회 시기때 무효화된다.(1867 Reconstruction Acts) 누가봐도 — 심지어 본인들도 걱정하는 기록을 남겼을 정도로 — 얼치기 통과된 법들이 많았기 때문이다. 다만 문자 그대로의 무효화는 아니다. 인종 중립적이지만, 흑인은 만족시키기 어려운 조건을 통한 입법과, 선택적인 법 집행이 합쳐져 언제든 비슷한 강도로 적용 가능했다고 볼 수 있다.
+
+또, 법적으론 그랬지만 실제론 다른 구조로 농장 경제가 이동했다. 남부의 농장은 소작 구조로 돌아갔다. 순수한 소작 구조였다면 이탈 가능성이 충분히 있었겠지만, 실제론 몇가지 안전장치가 있었다. 대표적인 것이 빚이다. 소작농에게 필요한 도구나 생활 물품들을 빚을 주고 선납금으로 제공하는 구조였다. 결과적으로 정산의 시기에 높은 이자를 붙였으며, 정산이 투명한지도 몰랐다. 결국은 빚이라는 법제화된 새로운 방법으로 쇠사슬은 유지 되었다.
+
+&nbsp;
+
+!["sinners smoke and stack"](sinners_smoke_and_stack.jpg "From the movie 'Sinners' © Warner Bros<br>작중 주요 등장인물 스모크와 스택 형제")
+
+또한 이 당시 악습으로 **농장 화폐**라는 것이 도입되었다. 일의 댓가중 일부, 혹은 전부를 농장 화폐로 지급했는데, 당연히 법정화폐가 아니기에, 농장 밖에선 쓸 수 없었다. 작중에서도 그 모습을 볼 수 있다. 주요 등장인물인 스모크와 스택 형제는 흑인들이 가져온 농장 화폐를 받아줘야 하는지, 거부해야 하는지를 두고 작중 최초로 갈등한다.
+
+---
 
 ## 죄수 임대
 
 ### New South
 
+New South
+- King cotton의 허상
+- 산업 수요
+- 노동력이 필요한데, 어디서 가져오지?
+
 ### 수정헌법 13조의 의미
+
+수정헌법 13조의 의미
+- 노예 예비 해방선언의 전문
+- 수정헌법 13조의 전문
+- convict leasing의 시작
+
+
+**"일을 해라" (Black Codes 섹션)**에는 직접적 노동 강제 메커니즘만:
+
+Vagrancy Section 2: 고용 없으면 vagrant
+Section 6-7: 인두세 미납 = prima facie vagrant → hire out (고용주 우선권)
+Vagrancy Section 5: 벌금 미납 5일 → hire out (고용주 우선권)
+Section 3: 공무원 집행 의무 (안 하면 벌금)
+SC XCVI: 토지 소유자도 "적절한 생활 유지" 못 하면 vagrant
+
+이것만으로도 "일 안 하면 어떻게 되는가"의 파이프라인은 완성된다.
+Convict leasing 섹션에서:
+
+Penal Code Section 2의 포괄적 범죄화 ("insulting gestures", "seditious speeches", 포괄 조항)
+Penal Code Section 4: 노예 시절 형법 재시행
+Penal Code Section 5: 경범죄 벌금 미납 → 공개 경매 hire out
+Pig laws (1876~)
+인종중립 재포장
 
 ### 죄수임대의 경제성
 
+죄수임대의 경제적 부분
+- 원래 유지보수 하려면 재산이 소모됨. 아껴써야함. 그러나 임대물이기 때문에 극한까지 써도됨.
+    "One Dies, Get Another" - 역사가 Matthew Mancini의 책 제목
+- 노예 breeder가 벌던 돈을 주 정부가 가져가는 구조가 됨. 앨라배마는 1898년 주 전체 세수의 73%가 죄수임대에서 나옴
+- 남부만 썼는가? 북부도 썼음. US Steel의 전신 TCI는 테네시주 전체의 교도소 인구를 연 101,000달러에 임대.
+- 북부의 자본가들이 이 시스템을 활용함
+- 결과적으로 노예가 더 적은 리스크(외주화)로 전국에 퍼짐
+- 노동자들의 협상력 약화
+
 ### 죄수임대 폐지흐름
+
+
+죄수임대 폐지 흐름
+- 경제성이 너무 좋았음. 주 정부가 자기들이 직접 하기 시작.
+- 주 차원의 노예제 운용
+- 노동자들은 노동자 나름대로 불만이 컸음. 지금 이민자 반대와 같은 느낌으로. (노동자 반란과 파업)
+- 기업가들은 기업가 나름대로 공급을 받는 기업과 못 받는 기업 사이 알력이 존재.
+- 이 세가지 흐름으로 죄수임대는 폐지됨. 죄수 노동만이 남았음.
+- 그러나 노동 수요가 부족했으면 과연 폐지했을까? 노동이 부족해지면 어떻게 되는 것인가?
+
+## 덧붙임
+### 수감자 노동
+  - 결과적으로 노예 임대는 폐지되었음.
+  - 그러나 수감자 노동은 폐지되지않음. 다만 민간과 직접경쟁하는 포지션에서 다소 바뀌었을 뿐.
+  - 1900~1950년대 죄수들을 사슬로 묶어 공공도로를 건설하기도했음. (Chain Gang) 
+  - 미국 교도소 노동은 현재에도 존재함. 미국 국방부가 최대 규모 고객임. 알게 모르게 경제 수혜를 받음. 다만 이 글에서 더 깊게 다룰것은 아님.
+
+
 
 1.노예 해방과 목화 생산량의 감소 : 흑인들이 떠났다. 생산량이 줄어들었다. 그러나 1870년대에는 회복한다. 왜? -> 누군가 노동을 했으니까.
 

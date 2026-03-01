@@ -98,7 +98,7 @@ enableEmoji = true
   defaultTheme = "auto"
   fingerprint = "sha256"
   title = "Hyun.Libro"
-  description = "3D vision Library."
+  description = "Exploring worlds with mechanisms."
 
   [params.header]
     [params.header.title]
