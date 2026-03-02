@@ -173,9 +173,12 @@ references = [
     {title = "The Story of Chinese Laborers and the Reconstruction South", link = "https://tnmuseum.org/Stories/posts/the-story-of-chinese-laborers-and-the-reconstruction-south"},
     # 80 The Mississippi Chinese
     {title = "The Mississippi Chinese: Between Black and White", authors = "James W. Loewen", isbn = " 0881333123"},
-    {title = "", link = ""},
-    {title = "", link = ""},
-    {title = "", link = ""},
+    # 81 mud mill speach
+    {title = "Selections from the letters and speeches of the Hon. James H. Hammond, of South Carolina.", link = "https://www.loc.gov/item/17030838/"},
+    # 82 King Cotton
+    {title = "Cotton and the Civil War", link = "https://www.mshistorynow.mdah.ms.gov/issue/cotton-and-the-civil-war"},
+    # 83 king cotton2
+    {title = "King Cotton: Monarch or Pretender? The State of the Market for Raw Cotton on the Eve of the American Civil War", authors = "David G. Surdam", link = "http://www.jstor.org/stable/2599694"},
     {title = "", link = ""},
     {title = "", link = ""},
     {title = "", link = ""},
@@ -691,7 +694,9 @@ Marie Jenkins Schwartz에 따르면, {{<ref 32>}} 출산한 여성에겐 추가 
 
 당연히, 노동 투입이 감소되었다. 아이들, 여성들이 빠진데다가 남성들도 gang labor를 거부했기 때문이었다. 노동 투입량은 거의 1/3로{{<ref 53>}} 줄어들었다. Planter들은 불만이 넘쳐났다. 실제로 노예 해방국에 여성들도 일을 시켜야한다고 편지를 보내는 일도 존재했다.{{<ref 52>}} 전쟁 이전인 1859년과 1866년을 비교하면, 1인당 작물 생산량이 71.3% 하락했다.{{<ref 53>}}
 
-이 때 생산성의 감소는 수치로 볼 수 있다.(이하 수치 {{<ref 53>}} 참고) 1860-61년 목화 생산량은 3,849,469베일(약 70만톤)이었다. 전후 1866-67년 생산량이 2,097,254베일(약 38만톤)으로 최저점을 찍는다. 무려 생산량의 46%가 감소했다. 그러나 고작 4년 후인 1870-71년, 목화 생산량은 4,362,317베일(약 79만톤)로 오히려 최대치를 갱신한다. **누군가 일했기 때문이다.** 누가, 왜 일했을까?
+이 때 생산성의 감소는 수치로 볼 수 있다.(이하 수치 {{<ref 53>}} 참고) 1860-61년 목화 생산량은 3,849,469베일(약 83만톤)이었다. 전후 1866-67년 생산량이 2,097,254베일(약 42만톤)으로 최저점을 찍는다. 무려 생산량의 46%가 감소했다. 그러나 고작 4년 후인 1870-71년, 목화 생산량은 4,362,317베일(약 87만톤)로 오히려 최대치를 갱신한다. **누군가 일했기 때문이다.** 누가, 왜 일했을까?
+
+(*당시 bale의 무게가 왔다갔다 했기 때문에 metric ton환산이 오락가락 할 수있다. 현대 USDA bale은 480파운드인데, 당시는 400~500파운드 사이였으며, 단위 환산에는 베일당 평균 중량 자료를 찾을 수 있는 경우에 적용시켜 환산했다. 몇몇 논문에선 400lb 베일을 사용하므로, 환산이 극단적으로 차이날 수 있음에 유의를 바란다.)
 
 ### 흑인들의 선택지
 
@@ -872,10 +877,34 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 
 ### New South
 
-New South
-- King cotton의 허상
+#### King Cotton의 허상
+
+사실 남북전쟁의 배경에는 정치적 갈등 말고도, 당연히 군사적 계산이 있었다. 북부는 군사 인구, 산업에서 앞서고, 해군력도 앞서고 있었다. 그렇다면 남부의 계산은 어디에 있었을까.
+
+>
+> *No power on earth dares to make war upon it. Cotton is king.*
+>
+> *감히 목화에 전쟁을 걸 수 있는 자는 지구상에 없다. 목화가 왕이다.*
+>
+> {{<alignr>}} — South Carolina 연방 상원위원 James Henry Hammond, 1858 연방 상원연설에서{{<ref 81>}} {{</alignr>}}
+>
+
+*Mud-sill speeach*로 유명한 연설의 일부이다.(사회의 진흙 받침 — mud sill — 이 되기 적합한 인종을 남부는 가지고 있다는 주장을 했다.) 이 연설에서 당시 *'Cotton is King'* 이라는 남부의 인식이 북부의 의원들이 있는 자리에서 대놓고 드러났다. 실제로 이미 전에 살펴봤듯이, 당시 목화의 경제 규모가 어마무시했기 때문에 아예 근거가 없진 않았다. 남북 갈등이 아무리 진행되어도, 심지어 전쟁이 일어나도 목화의 최대 수입국인 영국이 남부의 편을 들거란 계산이었다.
+
+다만 그들이 계산하지 못한건 영국의 물류 공급망 다변화였다. 남부는 실제로 감산을 위해 목화 250만 베일을 불태우기도 했다.{{<ref 82>}} 그러나 당연히도 영국은 바보가 아니었고, 미국의 불안한 정세에 대비하여 남북 전쟁 전까지 거의 100만 베일의 목화를 비축했다.
+
+1861년, 링컨이 해상봉쇄를 했다. 남부의 수출은 거의 차단되었다. 남부가 기대하던 '목화 기근'은 1862년 말까지 오지 않았다. 그리고 '목화 기근'이 왔을때, 공급망은 빠르게 글로벌화 되었다. 1860년 유럽에선 미국산 면화를 304만베일(약 55.2만톤) 소비했다. 바로 다음해, 33.7만 베일(약 6.1만톤)로 소비량이 폭삭 줄어든다.{{<ref 83>}}
+
+!["imports of raw cotton into great britain"](imports_of_raw_cotton_into_great_britain.png "영국의 목화 수입량<br>From King Cotton: Monarch or Pretender?")
+
+그래프에서 보이듯이, 사실 전후에 다시 미국산 목화를 수입하긴 했다. 금방 다시 회복되었다. 그러나 전쟁 전과는 하나가 달랐다. **순진하게 믿어왔던 대체 불가능성에 대한 낙관론이 박살났다.**
+
+#### Reconstruction & New South
+
 - 산업 수요
 - 노동력이 필요한데, 어디서 가져오지?
+
+여기부터 시작하자.
 
 ### 수정헌법 13조의 의미
 
