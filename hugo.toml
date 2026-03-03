@@ -32,6 +32,12 @@ enableEmoji = true
     languageName = "English"
     title = "Hyun.Libro"
     weight = 2
+  [languages.ja]
+    disabled = false
+    languageCode = "ja-JP"
+    languageName = "Japanese"
+    title = "Hyun.Libro"
+    weight = 3
 
 # Menu config =======================================================
 [menu]

@@ -1,0 +1,201 @@
+# Translations for Japanese
+# https://gohugo.io/content-management/multilingual/#translation-of-strings
+
+# === baseof ==
+[backToTop]
+other = "トップへ"
+
+[viewComments]
+other = "コメントを見る"
+# === baseof ==
+
+# === Post ===
+[posts]
+other = "記事"
+# === Post ===
+
+# === Taxonomy ===
+[allSome]
+other = "すべての {{ .Some }}"
+
+[tag]
+other = "Tag"
+
+[tags]
+other = "タグ"
+
+[category]
+other = "Category"
+
+[categories]
+other = "カテゴリー"
+# === Taxonomy ===
+
+# === Pagination ===
+[more]
+other = "More"
+# === Pagination ===
+
+# === partials/header.html ===
+[selectLanguage]
+other = "言語"
+
+[switchTheme]
+other = "Switch Theme"
+# === partials/header.html ===
+
+# === partials/footer.html ===
+[poweredBySome]
+other = "Powered by {{ .Hugo }}"
+# === partials/footer.html ===
+
+# === partials/comment.html ===
+[valineLang]
+other = "ja"
+
+[valinePlaceholder]
+other = "Your comment ..."
+
+[facebookLanguageCode]
+other = "ja_JP"
+# === partials/comment.html ===
+
+# === partials/assets.html ===
+[search]
+other = "検索"
+
+[searchPlaceholder]
+other = "検索..."
+
+[clear]
+other = "Clear"
+
+[cancel]
+other = "Cancel"
+
+[noResultsFound]
+other = "検索結果が見つかりませんでした。"
+
+[lunrLanguageCode]
+other = "ja"
+
+[lunrLanguageLib]
+other = "lib/lunr/lunr.ja.js"
+
+[copyToClipboard]
+other = "クリップボードにコピー"
+
+[cookieconsentMessage]
+other = "This website uses Cookies to improve your experience."
+
+[cookieconsentDismiss]
+other = "Got it!"
+
+[cookieconsentLink]
+other = "Learn more"
+# === partials/assets.html ===
+
+# === partials/plugin/share.html ===
+[shareOn]
+other = "Share on"
+# === partials/plugin/share.html ===
+
+# === posts/single.html ===
+[contents]
+other = "目次"
+
+[publishedOnDate]
+other = "{{ .Date }} に公開"
+
+[includedInCategories]
+other = "カテゴリー: {{ .Categories }}"
+
+[wordCount]
+one = "One word"
+other = "{{ .Count }} words"
+
+[readingTime]
+one = "One minute"
+other = "約 {{ .Count }}分"
+
+[views]
+other = "views"
+
+[author]
+other = "Author"
+
+[updatedOnDate]
+other = "{{ .Date }} に更新"
+
+[readMarkdown]
+other = "Read Markdown"
+
+[back]
+other = "戻る"
+
+[home]
+other = "ホーム"
+
+[readMore]
+other = "続きを読む"
+# === posts/single.html ===
+
+[references]
+other = "参考文献"
+
+# === 404.html ===
+[pageNotFound]
+other = "Page not found"
+
+[pageNotFoundText]
+other = "お探しのページは見つかりませんでした。"
+# === 404.html ===
+
+# === shortcodes/admonition.html ===
+[note]
+other = "Note"
+
+[abstract]
+other = "Abstract"
+
+[info]
+other = "Info"
+
+[tip]
+other = "Tip"
+
+[success]
+other = "Success"
+
+[question]
+other = "Question"
+
+[warning]
+other = "Warning"
+
+[failure]
+other = "Failure"
+
+[danger]
+other = "Danger"
+
+[bug]
+other = "Bug"
+
+[example]
+other = "Example"
+
+[quote]
+other = "Quote"
+# === shortcodes/admonition.html ===
+
+# === shortcodes/version.html ===
+[new]
+other = "NEW"
+
+[changed]
+other = "CHANGED"
+
+[deleted]
+other = "DELETED"
+# === shortcodes/version.html ===
