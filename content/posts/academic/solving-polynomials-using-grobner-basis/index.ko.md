@@ -8,8 +8,9 @@ summary = ""
 
 isCJKLanguage = true
 
-tags = ["algebraic geometry", "gröbner basis", "mathematics", "symbolic progamming",]
+tags = ["algebraic geometry", "gröbner basis", "mathematics", "symbolic programming",]
 categories = ["academic"]
+images = ["https://img.youtube.com/vi/XvblHJQvhQg/maxresdefault.jpg"]
 
 references = [
     {title = "Using Algebraic Geometry", authors = "D. A. Cox, J.Little, D. O'Shea", doi = "10.1007/b138611"},

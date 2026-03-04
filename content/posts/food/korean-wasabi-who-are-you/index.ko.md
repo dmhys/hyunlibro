@@ -10,6 +10,7 @@ isCJKLanguage = true
 
 tags = ["essay", "ingredients", "wasabi"]
 categories = ["food"]
+images = ["image5.jpg"]
 
 +++
 

@@ -10,6 +10,7 @@ isCJKLanguage = true
 
 tags = ["essay", "literature", "rashomon", "ryunosuke akutagawa", "yabunonaka"]
 categories = ["translations"]
+images = ["https://img.youtube.com/vi/qeBoPKOR4Q4/maxresdefault.jpg"]
 
 references = [
     {title = "羅城門 - Wikipedia", link = "https://ja.wikipedia.org/wiki/%E7%BE%85%E5%9F%8E%E9%96%80"},
