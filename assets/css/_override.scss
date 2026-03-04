@@ -1,5 +1,3 @@
-$global-font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-
 // color pallete
 $color-white: #ffffff;
 $color-cultured: #eeeeee;
@@ -13,32 +11,54 @@ $color-cerulean_frost: #6d98ba;
 $color-blue-green: #4699b8;
 $color-charcoal: #383f51;
 
+// ============================================
+// LIGHT THEME
+// ============================================
+
 $global-background-color: #ffffff;
 $header-background-color: #ffffff;
 
 $global-font-color: #161209;
 $global-link-color: #161209;
-$global-link-color-dark: #a9a9b3;
+$global-font-secondary-color: #717178;
 
-// link
-$global-link-hover-color: #4699b8;
-$single-link-color: #4699b8;
-$single-link-hover-color: #F87575;
-$pagination-link-color: #4699b8;
+$global-link-hover-color: #1a85b0;
+$single-link-color: #1a85b0;
+$single-link-hover-color: #d94444;
+$pagination-link-color: #1a85b0;
 
+// ============================================
+// DARK THEME
+// ============================================
+
+// backgrounds (warm dark tones)
+$global-background-color-dark: #2a2826;
+$header-background-color-dark: #262422;
+$search-background-color-dark: #3a3632;
+$table-background-color-dark: #2c2a27;
+$table-thead-color-dark: #242220;
+$code-background-color-dark: #2c2a27;
+
+// text (cool light tones)
+$global-font-color-dark: #c2c5ce;
+$global-link-color-dark: #c2c5ce;
+$global-font-secondary-color-dark: #8a8d95;
+
+// links (cool blue)
 $global-link-hover-color-dark: #55bde2;
 $single-link-color-dark: #55bde2;
 $single-link-hover-color-dark: #bdebfc;
 $pagination-link-color-dark: #55bde2;
 
-$header-background-color-dark: #252627;
+// ============================================
+// BORDERS & BLOCKQUOTES
+// ============================================
 
-// md custom colors
+$global-border-color: #d7d7d5;
+$global-border-color-dark: #4a4640;
+
 $indent-color: #383f51;
 $indent-color-dark: #383f51;
 
-$global-border-color: #d7d7d5;
-$global-border-color-dark: #383f51;
-
 $blockquote-color: #d7d7d5;
-$blockquote-color-dark: #383f51;
+$blockquote-color-dark: #4a4640;
