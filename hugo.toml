@@ -16,6 +16,9 @@ enableEmoji = true
   email = "dmhys@naver.com"
   link = ""
 
+[params.author]
+  name = "Changhyun Jee"
+
 # language settings =================================================
 [languages]
   [languages.ko]

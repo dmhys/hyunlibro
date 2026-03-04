@@ -16,7 +16,11 @@
     <link rel="manifest" href="/site.webmanifest">
 {{- end -}}
 
-<link rel="canonical" href="{{ .Permalink }}" />
+{{- if and .IsHome .Paginator -}}
+    <link rel="canonical" href="{{ .Paginator.URL | absURL }}" />
+{{- else -}}
+    <link rel="canonical" href="{{ .Permalink }}" />
+{{- end -}}
 {{- range .AllTranslations -}}
     <link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}" />
 {{- end -}}
