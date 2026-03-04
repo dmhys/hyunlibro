@@ -28,18 +28,18 @@
       padding: 0.05rem 0;
 
       a {
-        color: $single-link-color;
+        color: $global-font-color;
         text-decoration: none;
 
         &:hover {
-          color: $single-link-hover-color;
+          color: $single-link-color;
         }
 
         [theme=dark] & {
-          color: $single-link-color-dark;
+          color: $global-font-color-dark;
 
           &:hover {
-            color: $single-link-hover-color-dark;
+            color: $single-link-color-dark;
           }
         }
       }
