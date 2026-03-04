@@ -16,8 +16,12 @@
     <link rel="manifest" href="/site.webmanifest">
 {{- end -}}
 
-{{- if and .IsHome .Paginator -}}
-    <link rel="canonical" href="{{ .Paginator.URL | absURL }}" />
+{{- if .IsHome -}}
+    {{- /* Initialize paginator with filtered pages (must match index.html filter) */ -}}
+    {{- $pages := where .Site.RegularPages "Type" "posts" -}}
+    {{- $pages = where $pages "Params.hiddenfromhomepage" "!=" true -}}
+    {{- $paginator := .Paginate $pages (.Site.Params.home.posts.paginate | default .Site.Params.paginate | default 10) -}}
+    <link rel="canonical" href="{{ $paginator.URL | absURL }}" />
 {{- else -}}
     <link rel="canonical" href="{{ .Permalink }}" />
 {{- end -}}
