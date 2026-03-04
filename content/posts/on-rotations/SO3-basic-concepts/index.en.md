@@ -5,11 +5,14 @@ draft = false
 
 title = "SO3(1) - Basic concepts"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 
 tags = ["mathematics", "rotation", "SO3",]
 categories = ["on rotations"]
+series = "On Rotations"
+series_weight = 2
 
 +++
 

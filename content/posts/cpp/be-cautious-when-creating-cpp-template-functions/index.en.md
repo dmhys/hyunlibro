@@ -4,6 +4,7 @@ draft = false
 
 title = "Be cautious when creating c++ template functions"
 summary = "When creating C++ template functions, the type-specified version must always be declared before the template version."
+description = ""
 
 tags = ["template meta programming"]
 categories = ["c++"]

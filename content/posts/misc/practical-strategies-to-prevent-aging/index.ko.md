@@ -5,6 +5,7 @@ draft = true
 
 title = "노화 방지를 위한 실천적 전략들(1) - 왜 늙는가?"
 summary = "죽음을 유예하기"
+description = ""
 
 isCJKLanguage = true
 

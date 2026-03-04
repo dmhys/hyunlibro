@@ -5,6 +5,7 @@ draft = false
 
 title = "평등에 대한 단상"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

@@ -5,6 +5,7 @@ draft = true
 
 title = "Nation of Slaves, America"
 summary = ""
+description = ""
 
 tags = ["america", "economy", "essay", "nation of slaves"]
 categories = ["essays"]

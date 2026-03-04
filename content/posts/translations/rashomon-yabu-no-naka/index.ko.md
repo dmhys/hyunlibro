@@ -5,6 +5,7 @@ draft = false
 
 title = "아쿠타가와 류노스케 - 라쇼 문(라쇼몽), 덤불 속"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

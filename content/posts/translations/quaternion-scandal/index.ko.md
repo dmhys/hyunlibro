@@ -5,6 +5,7 @@ draft = false
 
 title = "Hamilton, Rodrigues, 그리고 사원수 스캔들"
 summary = "19세기의 가장 중요한 수학적 발명 중 하나인 사원수는 어떻게 잘못 되었나"
+description = ""
 
 isCJKLanguage = true
 

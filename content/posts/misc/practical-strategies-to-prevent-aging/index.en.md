@@ -5,6 +5,7 @@ draft = true
 
 title = "Practical Strategies to Prevent Aging (1) - Why Do We Age?"
 summary = "Deferring death"
+description = ""
 
 tags = ["essay", "anti aging", "health"]
 categories = ["misc"]

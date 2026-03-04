@@ -5,6 +5,7 @@ draft = false
 
 title = "diary, 2026"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 

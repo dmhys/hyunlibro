@@ -5,6 +5,7 @@ draft = false
 
 title = "Solving polynomials using Gröbner basis"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 

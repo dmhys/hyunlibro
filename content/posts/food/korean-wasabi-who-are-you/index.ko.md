@@ -5,6 +5,7 @@ draft = false
 
 title = "한국 와사비(참고추냉이), 정체가 뭐냐"
 summary = "이 모든 골계의 역사"
+description = ""
 
 isCJKLanguage = true
 

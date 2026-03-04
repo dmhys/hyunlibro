@@ -5,6 +5,7 @@ draft = false
 
 title = "How fast is Atomic compared to mutex?"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 

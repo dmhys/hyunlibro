@@ -5,6 +5,7 @@ draft = false
 
 title = "Fast inverse square root and modern methods"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 

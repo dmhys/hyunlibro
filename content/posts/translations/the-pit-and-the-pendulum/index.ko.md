@@ -5,6 +5,7 @@ draft = true
 
 title = "에드거 앨런 포 - 구덩이와 진자"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

@@ -5,6 +5,7 @@ draft = false
 
 title = "Musings on Equality"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 

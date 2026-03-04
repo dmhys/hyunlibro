@@ -4,6 +4,7 @@ draft = false
 
 title = "C++ template 함수 만들 때 주의점 ( 무한루프 )"
 summary = "C++ Template 함수를 만들 땐 언제나 type specified version이 template version위에 선언되어야 한다."
+description = ""
 
 isCJKLanguage = true
 

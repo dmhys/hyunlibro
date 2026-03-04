@@ -5,6 +5,7 @@ draft = false
 
 title = "일기, 2026"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

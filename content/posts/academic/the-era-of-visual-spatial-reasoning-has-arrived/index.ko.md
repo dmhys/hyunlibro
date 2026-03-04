@@ -5,6 +5,7 @@ draft = true
 
 title = "공간 시각 지능의 시대가 다가왔다"
 summary = "SFM 필드에서의 공간 시각 지능의 부상"
+description = ""
 
 isCJKLanguage = true
 

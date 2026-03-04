@@ -5,11 +5,14 @@ draft = false
 
 title = "Introduction"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 
 tags = ["mathematics",]
 categories = ["on rotations"]
+series = "On Rotations"
+series_weight = 1
 
 +++
 

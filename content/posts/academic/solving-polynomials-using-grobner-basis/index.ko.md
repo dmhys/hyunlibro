@@ -5,6 +5,7 @@ draft = false
 
 title = "다항식 해법을 위한 그뢰브너 기저"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

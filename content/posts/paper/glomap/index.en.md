@@ -5,6 +5,7 @@ draft = true
 
 title = "GLOMAP"
 summary = "Revisiting colmap"
+description = ""
 
 isCJKLanguage = true
 

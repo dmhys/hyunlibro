@@ -6,6 +6,7 @@ hiddenFromHomePage = true
 
 title = "노예의 나라, 미국"
 summary = ""
+description = "ICE의 시민권자 총격 사건으로 본 미국 노동 착취 구조와 이민 정책의 역사"
 
 isCJKLanguage = true
 

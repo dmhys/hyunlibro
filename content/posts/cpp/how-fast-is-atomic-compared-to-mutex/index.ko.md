@@ -5,6 +5,7 @@ draft = false
 
 title = "Atomic 이 mutex보다 얼마나 빠를까?"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

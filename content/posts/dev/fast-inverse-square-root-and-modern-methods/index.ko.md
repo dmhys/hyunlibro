@@ -5,6 +5,7 @@ draft = false
 
 title = "고속 역제곱근과 그 후 구현체들"
 summary = ""
+description = ""
 
 isCJKLanguage = true
 

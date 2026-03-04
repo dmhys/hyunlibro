@@ -5,10 +5,13 @@ draft = true
 
 title = "SO3(2) - Basic parameterizations"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 
 tags = ["mathematics", "rotation", "SO3",]
 categories = ["on rotations"]
+series = "On Rotations"
+series_weight = 3
 
 +++

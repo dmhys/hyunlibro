@@ -5,6 +5,7 @@ draft = false
 
 title = "5-point algorithm"
 summary = ""
+description = ""
 
 isCJKLanguage = false
 
