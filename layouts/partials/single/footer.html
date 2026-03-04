@@ -1,19 +1,20 @@
 {{- $params := .Scratch.Get "params" -}}
 
 <div class="post-footer" id="post-footer">
-    {{ if .Params.references }}
+    {{- if .Params.references -}}
     <div class="post-references">
         <hr>
         <h5>{{ T "references"}}</h5>
         <div class="references">
             <ol>
-            {{ with .Params.references }}
-            {{ range $index, $value := . }}
-                {{ if $value.title }}
+            {{- if reflect.IsSlice .Params.references -}}
+                {{- /* List-based references */ -}}
+                {{- range $index, $value := .Params.references -}}
+                    {{- if $value.title -}}
                     <li id="reference-{{add $index 1}}">
                         &nbsp;
                         {{ if $value.authors }}
-                            <i>{{ $value.authors }}</i>, 
+                            <i>{{ $value.authors }}</i>,
                         {{ end }}
                         "{{ $value.title }}"
                         {{ if $value.link }}
@@ -24,13 +25,38 @@
                             [<a href="https://www.worldcat.org/isbn/{{ replace $value.isbn "-" "" }}"><i> ISBN:{{ $value.isbn }} </i></a>]
                         {{ end }}
                     </li>
-                {{ end }}
-            {{ end }}
-            {{ end }}
+                    {{- end -}}
+                {{- end -}}
+            {{- else if reflect.IsMap .Params.references -}}
+                {{- /* Dict-based references */ -}}
+                {{- $refs := .Params.references -}}
+                {{- $keys := slice -}}
+                {{- range $k, $v := $refs -}}
+                    {{- $keys = $keys | append $k -}}
+                {{- end -}}
+                {{- $keys = sort $keys -}}
+                {{- range $keys -}}
+                    {{- $value := index $refs . -}}
+                    <li id="ref-{{ . }}">
+                        &nbsp;
+                        {{ if $value.authors }}
+                            <i>{{ $value.authors }}</i>,
+                        {{ end }}
+                        "{{ $value.title }}"
+                        {{ if $value.link }}
+                            [<a href="{{$value.link}}"><i> {{ $value.link }} </i></a>]
+                        {{ else if $value.doi }}
+                            [<a href="http://doi.org/{{ $value.doi }}"><i> doi:{{ $value.doi }} </i></a>]
+                        {{ else if $value.isbn }}
+                            [<a href="https://www.worldcat.org/isbn/{{ replace $value.isbn "-" "" }}"><i> ISBN:{{ $value.isbn }} </i></a>]
+                        {{ end }}
+                    </li>
+                {{- end -}}
+            {{- end -}}
             </ol>
         </div>
     </div>
-    {{ end }}
+    {{- end -}}
 
     <div class="post-info">
         <div class="post-info-line">
