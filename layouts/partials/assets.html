@@ -150,13 +150,13 @@
 {{- end -}}
 
 {{- /* Plotly */ -}}
-{{- if (.Scratch.Get "this").plotly -}}
+{{- if or (.Scratch.Get "this").plotly (findRE "Plotly\\.newPlot" .Content) -}}
     {{- $source := $cdn.plotly | default "lib/plotly/plotly.min.js" -}}
     {{- dict "Source" $source "Fingerprint" $fingerprint | dict "Scratch" .Scratch "Data" | partial "scratch/script.html" -}}
 {{- end -}}
 
 {{- /* d3 */ -}}
-{{- if (.Scratch.Get "this").d3 -}}
+{{- if or (.Scratch.Get "this").d3 (findRE "d3-canvas" .Content) -}}
     {{- $source := $cdn.d3 | default "lib/d3/d3.v7.min.js" -}}
     {{- dict "Source" $source "Fingerprint" $fingerprint | dict "Scratch" .Scratch "Data" | partial "scratch/script.html" -}}
     {{- $source := "lib/d3/d3-simple-slider.min.js" -}}
@@ -215,12 +215,22 @@
     {{- delimit . "\n" | dict "Content" | dict "Scratch" $.Scratch "Data" | partial "scratch/script.html" -}}
 {{- end -}}
 
+{{- $seenStyles := slice -}}
 {{- range (.Scratch.Get "this").style -}}
-    {{- partial "plugin/style.html" . -}}
+    {{- $key := .Source | default .Content | default "" -}}
+    {{- if not (in $seenStyles $key) -}}
+        {{- partial "plugin/style.html" . -}}
+        {{- $seenStyles = $seenStyles | append $key -}}
+    {{- end -}}
 {{- end -}}
 
+{{- $seenScripts := slice -}}
 {{- range (.Scratch.Get "this").script -}}
-    {{- partial "plugin/script.html" . -}}
+    {{- $key := .Source | default .Content | default "" -}}
+    {{- if not (in $seenScripts $key) -}}
+        {{- partial "plugin/script.html" . -}}
+        {{- $seenScripts = $seenScripts | append $key -}}
+    {{- end -}}
 {{- end -}}
 
 {{- partial "plugin/analytics.html" . -}}

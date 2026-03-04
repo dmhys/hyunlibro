@@ -1,0 +1,52 @@
+.post-series {
+  margin: 1rem 0 1rem;
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-left: 3px solid $single-link-color;
+  font-size: 1rem;
+  line-height: 1.7;
+
+  [theme=dark] & {
+    border-left-color: $single-link-color-dark;
+  }
+
+  .series-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+    color: $global-font-color;
+
+    [theme=dark] & {
+      color: $global-font-color-dark;
+    }
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 1.25rem;
+
+    li {
+      padding: 0.05rem 0;
+
+      a {
+        color: $single-link-color;
+        text-decoration: none;
+
+        &:hover {
+          color: $single-link-hover-color;
+        }
+
+        [theme=dark] & {
+          color: $single-link-color-dark;
+
+          &:hover {
+            color: $single-link-hover-color-dark;
+          }
+        }
+      }
+
+      &.active {
+        font-weight: bold;
+      }
+    }
+  }
+}

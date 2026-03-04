@@ -1,6 +1,6 @@
 +++
 date = 2025-01-19T20:54:26+09:00
-lastmod = ''
+lastmod = 2026-03-04T16:19:15+09:00
 draft = false
 
 title = "5-point algorithm"
@@ -451,8 +451,11 @@ $$
 
 Sturm’s theorem is as follows.
 
-> #### Sturm's theorem
+>
+> **Sturm's theorem**
+> 
 > The number of distinct real roots of $f(x)$ in the interval $[a,b]$ is given by $V(a)-V(b)$.
+> 
 
 ---
 

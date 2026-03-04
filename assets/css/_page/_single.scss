@@ -112,7 +112,7 @@
 
     h1,
     h2 {
-      margin: 3rem 0 1rem;
+      margin: 2rem 0 1rem;
     }
 
     >p{
@@ -311,7 +311,6 @@
     @import "../_partial/_single/bilibili";
     @import "../_partial/_single/plotly";
     @import "../_partial/_single/d3";
-
     hr {
       margin: 1.25rem 0;
       position: relative;
@@ -351,6 +350,7 @@
     }
   }
 
+  @import "../_partial/_single/series";
   @import "../_partial/_single/footer";
   @import "../_partial/_single/comment";
 }

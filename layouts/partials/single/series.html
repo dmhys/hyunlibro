@@ -1,0 +1,28 @@
+{{- with .Params.series -}}
+    {{- $series := . -}}
+    {{- $currentPage := $ -}}
+    {{- $pages := where (where $.Site.RegularPages "Params.series" $series) "Lang" $.Lang -}}
+    {{- $hasWeight := false -}}
+    {{- range $pages -}}
+        {{- if .Params.series_weight -}}{{- $hasWeight = true -}}{{- end -}}
+    {{- end -}}
+    {{- if $hasWeight -}}
+        {{- $pages = sort $pages "Params.series_weight" -}}
+    {{- else -}}
+        {{- $pages = sort $pages "Date" -}}
+    {{- end -}}
+    {{- if gt (len $pages) 1 -}}
+        <nav class="post-series">
+            <div class="series-title">{{ $series }}</div>
+            <ol>
+                {{- range $pages -}}
+                    {{- if eq .Permalink $currentPage.Permalink -}}
+                        <li class="active"><span>{{ .Title }}</span></li>
+                    {{- else -}}
+                        <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+                    {{- end -}}
+                {{- end -}}
+            </ol>
+        </nav>
+    {{- end -}}
+{{- end -}}
