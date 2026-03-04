@@ -34,7 +34,7 @@ categories = ["misc"]
 
 **2**
 
-Probability is a lack of information.
+*Probability is a lack of information.*
 
 &nbsp;
 
@@ -48,10 +48,18 @@ Yet if such a translation reaches the reader in a different color, and the reade
 
 **1**
 
-Most of what appears irrational in the world — especially the more you move from the micro to the macro level — is not irrationality at all, but merely a difference in cost functions.
+*Most of what appears irrational in the world — especially the more you move from the micro to the macro level — is not irrationality at all, but merely a difference in cost functions.*
 
 &nbsp;
 
 **2**
 
-Decoding is trivial when representation is good enough.
+*Decoding is trivial when representation is good enough.*
+
+&nbsp;
+
+**3 - About Languages**
+
+1. Languages have a lower bound on complexity, imposed by the demands of meaning transmission.
+2. Yet the total complexity of languages varies considerably.
+3. Thought does not merely shape language; language, in turn, shapes thought.  That is, certain patterns of speech extend their influence to non-linguistic cognition as well.

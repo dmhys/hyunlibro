@@ -60,4 +60,12 @@ categories = ["misc"]
 
 **2**
 
-*Representation이 충분히 좋으면 decoding은 trivial하다. *
+*Representation이 충분히 좋으면 decoding은 trivial하다.*
+
+&nbsp;
+
+**3 - 언어에 대해**
+
+1. 언어의 복잡성에는 의미 전달의 필요에 따른 하한선이 존재한다. 
+2. 그러나 언어별 총 복잡성은 다르다.
+3. 사고가 언어를 만들 뿐만 아니라, 언어가 사고를 만든다. 다시 말해, 어떤 발화 패턴이 비언어적 인지까지 영향을 미친다.
