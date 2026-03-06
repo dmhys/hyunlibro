@@ -370,49 +370,82 @@ title = "The Rise and Fall of the Great Powers: Economic Change and Military Con
 authors = "Paul Kennedy"
 isbn = "0679720197"
 
-# [references.henry_grady_new_south]
-# title = "Henry Grady on the New South (1886)"
-# link = "https://www.americanyawp.com/reader/18-industrial-america/henry-grady-on-the-new-south-1886/"
+[references.henry_grady_new_south]
+title = "Henry Grady Sells the \"New South\""
+link = "https://historymatters.gmu.edu/d/5745/"
+
+[references.birmingham]
+title = "History of Sloss Furnaces"
+link = "https://www.slossfurnaces.org/history"
+
+[references.encyclopedia_new_south]
+title = "The New South"
+link = "https://www.encyclopedia.com/history/encyclopedias-almanacs-transcripts-and-maps/new-south"
+
+[references.origins_new_south]
+title = "Origins of the New South, 1877–1913: A History of the South"
+authors = "C. Vann Woodward"
+isbn = "0807100196"
 
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
 # [references.]
-# title = 
-# link = 
+# title = ""
+# link = ""
+
+# [references.]
+# title = ""
+# link = ""
+
+# [references.]
+# title = ""
+# link = ""
 
 +++
 
@@ -430,9 +463,9 @@ isbn = "0679720197"
 
 그건 이들이 받게 되는 재판이 **'민사'** 재판이기 때문이다. 형사 재판이 아니기 때문에, 미란다 원칙 고지가 필요 없다. 국선 변호인도 지원되지 않으며, 자비로 변호사를 구해야한다. 배심원 재판도 없다. 판사 한 명이 결정한다. 증거 기준도 낮다. 소급 적용 금지 원칙도, 시효도 없다.{{<ref immigration_council>}} 본질적으로 우리가 만들어낸 현대 법 체계의 보호와 절차가 그들에게 적용되지 않는다. 1893년 대법원에선{{<ref fong_yue_ting>}}, 추방은 형벌이 아니라 '체류를 허용하지 않는 행정 조치'이기 때문에, '배심재판권, 불합리한 수색/압수 금지, 잔혹하고 비정상적인 처벌을 금지하는 조항도 적용되지 않는다'고 판결했다.
 
-이건 실수가 아니다. 정교한 디자인이다. 이 시스템에는 역사가 있다. 저임금 무권리 노동자를 양산하고 처분하기 위해 시행착오를 거쳐 온 역사이다. 이 역사는 미국의 탄생과 그 연원을 같이 한다. 
+이건 실수가 아니다. 정교한 디자인이다. 이 시스템에는 역사가 있다. 저임금 무권리 노동자를 양산하고 처분하기 위해 시행착오를 거쳐 온 역사이다. 점차 도덕성의 부담은 줄어들고, 처분의 용이성은 증대되었다. 이 역사는, 미국의 탄생과 그 연원을 같이 한다. 
 
-이것은 노예에서 시작해, 죄수 임대를 거쳐 오늘날의 이민 노동까지 이어지는, 미국의 **시스템 최적화**에 대한 이야기다.
+**이것은 노예에서 시작해 죄수 임대를 거쳐 오늘날의 이민 노동까지 이어지는, 미국의 시스템 최적화에 대한 이야기다.**
 
 &nbsp;
 
@@ -1037,8 +1070,6 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 
 북부의 법적 언어는 명확했다. '오지 마라.' 남부 주 의회의 언어는 무엇이었을까? 전쟁이 끝나고, 1865년 남부 주 의회가 재소집 되었다. 인원은 거의 동일했고, 39대 연방의회가 12월 4일에 소집되기 전까지 유효했다. 그들은 의회가 바뀌기 전에 연쇄적으로 입법을 쏟아낸다. 
 
----
-
 #### 계약에 묶이다
 
 우선 노동계약이 필수가 되었다. 사우스 캐롤라이나에선 명시적으로 유색인종을 'servant', 그리고 계약자를 'master'라고 법제화했다.{{<ref south_carolina_black_codes>}} 노동 이탈은 불가능했다. 누구든 이탈자를 체포해 고용주에게 돌려보낼수 있었다.{{<ref mississippi_black_codes>}} 1864년의 루이지애나 군령에는 이미 임금이 정해져있었으며, 사우스 캐롤라이나에선 노동량에 따른 임금이 계약시 정해지도록 되어있었다. {{<ref south_carolina_black_codes2>}} 또한, 노동 계약에서 이탈하면 '합당한 이유'없이는 해당 연도의 임금이 전액 몰수되었다. {{<ref mississippi_black_codes>}} 계약 위반이나 불복종시, 판사가 업무에 복귀시킬 권한을 가졌다. {{<ref south_carolina_black_codes>}} 심지어는 고용주의 허가 없이 부지를 이탈하는 것 자체가 위반인 경우가 있었다. {{<ref south_carolina_black_codes2>}}
@@ -1049,15 +1080,15 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 
 #### 다음 세대도 똑같다
 
-루이지애나와 미시시피의 경우인데, 그 두 주는 수습(Apprentice) 제도를 운영했다. 미시시피 기준으로 보자면,{{<ref mississippi_black_codes2>}} 고아, 혹은 부모가 *부양 능력이 없다*고 판단되는 없는 아동을 *적절한 사람* — *원래 소유주를 우선하는* — 에게 수습으로 배치하게 했다. 성인이 될 때까지 배치했며, 체벌권을 가졌고, 도주시 체포가 가능했다. 누군가가 수습을 유인하거나, 숨겨주거나, 밥을 주거나,음식이나 의류를 주는 행위는 경범죄였다. 
+루이지애나와 미시시피의 경우인데, 그 두 주는 수습(Apprentice) 제도를 운영했다. 미시시피 기준으로 보자면,{{<ref mississippi_black_codes2>}} 고아, 혹은 부모가 *부양 능력이 없다*고 판단되는 아동을 *적절한 사람* — *원래 소유주를 우선하는* — 에게 수습으로 배치하게 했다. 성인이 될 때까지 배치했며, 체벌권을 가졌고, 도주시 체포가 가능했다. 누군가가 수습을 유인하거나, 숨겨주거나, 밥을 주거나, 음식이나 의류를 주는 행위는 경범죄였다. 
 
 #### 일을 해라
 
 그뿐만 아니라, 이 당시 노동은 선택사항이 아니었다. 남부 주들에선 부랑법(Vagrancy Act)들이 일반적으로 발효되었는데, 구체적으로 미시시피의 경우를 보자면 부랑자, 거지들에겐 벌금을 물렸다. 흑인들의 경우는 더 나아가 일을 안하고 있으면 부랑자로 취급했고, '불법적으로' 흑인들이 모이는것도 금지했다. 고정 거주지나 고용이 없는 자도 불법이었다. 사우스 캐롤라이나의 경우엔 한술 더 떴는데, 심지어는 땅을 가지고 있어도 생활 수준이 부족하다고 판단되면 부랑자로 취급되었다.{{<ref south_carolina_black_codes2>}} 미시시피의 경우 부랑자가 되면 벌금이 $150 부과되었다.
 
-여기서 더 촘촘하게 걸러내기 위해, 흑인들에겐 인두세가 부과되었다. 당연히, 이 세금을 미납하는 것 또한 부랑자였다. 벌금을 내지 않으면 *'기존 고용주'*에게 넘겨진다. 
+여기서 더 촘촘하게 걸러내기 위해, 흑인들에겐 인두세가 부과되었다. 당연히, 이 세금을 미납하는 것 또한 부랑자였다. 벌금을 내지 않으면 *'기존 고용주'* 에게 넘겨진다. 
 
----
+&nbsp;
 
 결국 북부의 언어는 **'오지 마라'** 였던 것처럼, 남부의 언어는 **'가지 마라'**, **'일을 해라'** 로 볼 수 있다. 당시 선택지를 다시 한번 종합해서 보자면, 서부 개척을 못하고, 토지 구매도 못하고, 정부 지원도 못 받고, 도시로 갈 순 없는 상태에서, 계약에 묶여, 더 나은 조건은 제공 받지 못하는 상황에서 다음 세대까지 이어지는 노동의 굴레에 묶인 것이다.
 
@@ -1091,11 +1122,11 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 
 ---
 
+&nbsp;
+
 ## 죄수 임대
 
-### New South
-
-#### King Cotton의 허상
+### King Cotton의 허상
 
 사실 남북전쟁의 배경에는 정치적 갈등 말고도, 당연히 군사적 계산이 있었다. 북부는 군사 인구, 산업에서 앞서고, 해군력도 앞서고 있었다. 그렇다면 남부의 계산은 어디에 있었을까.
 
@@ -1117,7 +1148,9 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 
 그래프에서 보이듯이, 사실 전후에 다시 미국산 목화를 수입하긴 했다. 금방 다시 회복되었다. 그러나 전쟁 전과는 하나가 달랐다. **순진하게 믿어왔던 대체 불가능성에 대한 낙관론이 박살났다.**
 
-#### New South
+&nbsp;
+
+### New South
 
 사실 1860년대, 남부와 북부는 비교를 하는 것이 민망할 정도로 산업규모에 차이가 났다. 1860년 기준으로 북부의 산업규모를 남부에 비교하자면 다음과 같다. {{<ref economy_south>}}
 
@@ -1128,12 +1161,29 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 - 철도 : **연방 71%가 북부**
 - 은행 : **연방 87%가 북부**
 
-즉, 앞에서 말한 미국 수출의 60%가 목화라는 것은 틀린건 아니었지만, 그것이 즉 남부의 우위라는건 환상이었다. 이 당시 미국의 경제 구조가 재밌는데, 미국은 1860년 당시 **세계 3위의**{{<ref rise_fall_great_powers>}} **산업 역량**을 이미 달성했음에도 불구하고, 내수시장이 크며 수출을 그렇게 크게 하지않았다. 결과적으로 **미국인들은 자신들 국가가 농업 국가인줄 알았다.** 토마스 제퍼슨이 *농업 공화국(agrarian republic)* 을 제창한 이래로, 인식과 산업 현실은 점차 괴리되어갔고, 이런 정체성이 없어진건 1900년이 넘어서였다. 결과적으로 남부가 착각 할 만도 했다. 심지어 국부론의 프레임웍은 사실 대중들의 인식에 아직 통합되지 않았을 때였다. 중상주의,중농주의 관점에서 보자면 힘은 농업과 수출이고, 그 힘은 남부에 있었다. 당시 그러나 남북 전쟁 후에 그들은 서서히 새 시대의 규칙을 깨달았다. 
+즉, 앞에서 말한 미국 수출의 60%가 목화라는 것은 틀린건 아니었지만, 그것이 즉 남부의 우위라는건 환상이었다. 이 당시 미국의 경제 구조가 재밌는데, 미국은 1860년 당시 **세계 3위의**{{<ref rise_fall_great_powers>}} **산업 역량**을 이미 달성했음에도 불구하고, 내수시장이 크며 수출을 그렇게 크게 하지않았다. 결과적으로 **미국인들은 자신들 국가가 농업 국가인줄 알았다.** 토마스 제퍼슨이 *농업 공화국(agrarian republic)* 을 제창한 이래로, 인식과 산업 현실은 점차 괴리되어갔고, 이런 정체성이 없어진건 1900년이 넘어서였다. 결과적으로 남부가 착각 할 만도 했다. 심지어 국부론의 프레임웍은 사실 대중들의 인식에 아직 통합되지 않았을 때였다. 중상주의,중농주의 관점에서 보자면 힘은 농업과 수출이고, 그 힘은 남부에 있었다. 그러나 남북 전쟁 후에 그들은 서서히 새 시대의 규칙을 깨달았다. 
 
 >
-> henry grady 일화 적을 차례
+> *I attended a funeral once in Pickens county in my State.(omitted) and yet a little tombstone they put above him was from Vermont. They buried him in the heart of a pine forest, and yet the pine coffin was imported from Cincinnati. They buried him within touch of an iron mine, and yet the nails in his coffin and the iron in the shovel that dug his grave were imported from Pittsburg. They buried him by the side of the best sheep-grazing country on the earth, and yet the wool in the coffin bands and the coffin bands themselves were brought from the North. The South didn’t furnish a thing on earth for that funeral but the corpse and the hole in the ground. There they put him away and the clods rattled down on his coffin, and they buried him in a New York coat and a Boston pair of shoes and a pair of breeches from Chicago and a shirt from Cincinnati, leaving him nothing to carry into the next world with him to remind him of the country in which he lived, and for which he fought for four years, but the chill of blood in his veins and the marrow in his bones.{{<ref henry_grady_new_south>}}*
 >
+> *한번은 제 주의 피켄스 카운티에서 장례식에 참석한 적이 있습니다. [중략] 그의 위에 버몬트산 묘비를 올렸습니다. 소나무 숲 한 가운데 묻었는데도, 소나무 관은 신시내티에서 수입한 것이었습니다. 철광산이 닿을 듯이 가까운 곳이었는데, 그를 묻은 삽과 그의 관에 못을 박은 못은 피츠버그에서 수입했습니다. 지상 최고의 양 목축지 옆에 묻었는데, 관을 감싼 양모와 양모 띠 자체마저 북부에서 가져온 것이었습니다. 남부가 그 장례식에 제공한 것이라곤 그저 시체와 구덩이 뿐이었습니다. 그렇게 그를 흙덩이 속에 묻었습니다. 뉴욕산 코트를 입히고, 보스턴산 구두를 신기고, 시카고산 바지를 입히고, 신시내티산 셔츠를 입힌채. 그가 살았던, 그가 4년간 위해서 싸웠던 나라를 떠올릴 수 있는 것이라곤, 혈관 속의 차가운 피와 뼛속의 골수밖에 남기지 않은채.*
+> 
+> {{<alignr>}} — Henry W. Grady {{</alignr>}}
 >
+
+남부인들은 산업화의 필요성을 체감했다. **실제로 산업화가 일어나기 시작했다.** 철도가 깔렸다. 앨라배마의 철도 교차점에 1871년 버밍엄이 건설되었다. 버밍엄의 선철 생산량은 1880년대 68,995에서 706,629영톤(gross ton)으로 치솟았다.{{<ref birmingham>}} 철도가 깔렸고, 1880년대에 철도 마일리지가 16,605마일에서 39,108 마일로 급증했다.{{<ref encyclopedia_new_south>}} 피에몬트에는 면직공장이, 사우스 캐롤라이나에선 인광석 및 비료 산업이, 담배 생산은 기계화되었다. 점차 노동수요가 생겨나기 시작했다. 
+
+남부의 산업화가 노동 수요를 촉발시켰지만, 반대로 노동 공급이 있었기 때문에 남부의 산업화를 촉진 시켰다. 남부엔 노동 공급이 있었다. **그것도 노예보다 값싼 노동력이.**
+
+---
+
+#### Trivia
+
+Henry W. Grady는 피켄스 카운티 장례식 일화를 여러번 사용하였다. 남부인들의 인식전환을 위해? 아니, 북부인들의 투자를 유치하기 위해, 북부에서 사용했다. 저 일화는 전부 북부에서 사용했다. 다시 한 번 저 일화를 읽어본다면, 교묘하게 남부의 인식을 천혜의 자원을 가진 곳으로 포장하는 것을 볼 수 있을 것이다. 그래서 북부 자본이 실제로 남부 산업화의 시동을 걸었지만, 이에 대해서 북부의 사실상 식민지화 라고 비판하는 학자들이 존재한다. {{<ref origins_new_south>}} 남부 지배 엘리트가 중앙 정치 권력에의 편입을 위한 북부 자본과의 결합을 시도했고, 그 결과 남부는 종속적 경제로 재편되었다는 것이다.
+
+---
+
+&nbsp;
 
 ### 수정헌법 13조의 의미
 
@@ -1142,16 +1192,6 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 - 수정헌법 13조의 전문
 - convict leasing의 시작
 
-
-**"일을 해라" (Black Codes 섹션)**에는 직접적 노동 강제 메커니즘만:
-
-Vagrancy Section 2: 고용 없으면 vagrant
-Section 6-7: 인두세 미납 = prima facie vagrant → hire out (고용주 우선권)
-Vagrancy Section 5: 벌금 미납 5일 → hire out (고용주 우선권)
-Section 3: 공무원 집행 의무 (안 하면 벌금)
-SC XCVI: 토지 소유자도 "적절한 생활 유지" 못 하면 vagrant
-
-이것만으로도 "일 안 하면 어떻게 되는가"의 파이프라인은 완성된다.
 Convict leasing 섹션에서:
 
 Penal Code Section 2의 포괄적 범죄화 ("insulting gestures", "seditious speeches", 포괄 조항)
@@ -1173,7 +1213,6 @@ Pig laws (1876~)
 
 ### 죄수임대 폐지흐름
 
-
 죄수임대 폐지 흐름
 - 경제성이 너무 좋았음. 주 정부가 자기들이 직접 하기 시작.
 - 주 차원의 노예제 운용
@@ -1188,113 +1227,6 @@ Pig laws (1876~)
   - 그러나 수감자 노동은 폐지되지않음. 다만 민간과 직접경쟁하는 포지션에서 다소 바뀌었을 뿐.
   - 1900~1950년대 죄수들을 사슬로 묶어 공공도로를 건설하기도했음. (Chain Gang) 
   - 미국 교도소 노동은 현재에도 존재함. 미국 국방부가 최대 규모 고객임. 알게 모르게 경제 수혜를 받음. 다만 이 글에서 더 깊게 다룰것은 아님.
-
-
-
-1.노예 해방과 목화 생산량의 감소 : 흑인들이 떠났다. 생산량이 줄어들었다. 그러나 1870년대에는 회복한다. 왜? -> 누군가 노동을 했으니까.
-
-2.흑인들의 선택지 : 전부 망함(경제적 원인)
-3.Black codes와 black laws
-3.1 trivia-sinners
-4.새로운 노동수요 - New South. 어디서 데려오지?
-5.수정헌법 13조의 의미와 죄수임대
-6.죄수임대의 경제적인 부분
-7.죄수임대의 폐지
-
-노예 해방과 목화 생산량의 감소
-- 흑인들은 자유를 찾아 떠났다. 아이들은 학교로, 여자들은 field labor에서 철수
-- 생산량: 1860년 5.3M bales → 1870년 3M bales (43% 하락)
-- 1870년대 회복
-- 어떻게?
-
-Black codes
-- 연간 노동계약법
-- Anti-Enticement Laws
-- Vagrancy Laws 
-- Apprenticeship Laws
-- 핵심: 일을 안하면 범죄임. 그런데 일할데가 농장밖에 없음.
-- 그러면 그냥 북부로 취업하면 어떨까?
-- 오지마라(Black laws) -> 차이는 노동수요
-
-- Trivia
-  - 여기서 법 말고도 남부 농장 경제종속 구조를 다루자
-  - 중국인 모집 시도
-  - 씨너스 얘기(이게 1930년대다.)
-
-New South
-- King cotton의 허상
-- 산업 수요
-- 노동력이 필요한데, 어디서 가져오지?
-
-수정헌법 13조의 의미
-- 노예 예비 해방선언의 전문
-- 수정헌법 13조의 전문
-- convict leasing의 시작
-
-죄수임대의 경제적 부분
-- 원래 유지보수 하려면 재산이 소모됨. 아껴써야함. 그러나 임대물이기 때문에 극한까지 써도됨.
-    "One Dies, Get Another" - 역사가 Matthew Mancini의 책 제목
-- 노예 breeder가 벌던 돈을 주 정부가 가져가는 구조가 됨. 앨라배마는 1898년 주 전체 세수의 73%가 죄수임대에서 나옴
-- 남부만 썼는가? 북부도 썼음. US Steel의 전신 TCI는 테네시주 전체의 교도소 인구를 연 101,000달러에 임대.
-- 북부의 자본가들이 이 시스템을 활용함
-- 결과적으로 노예가 더 적은 리스크(외주화)로 전국에 퍼짐
-- 노동자들의 협상력 약화
-
-죄수임대 폐지 흐름
-- 경제성이 너무 좋았음. 주 정부가 자기들이 직접 하기 시작.
-- 주 차원의 노예제 운용
-- 노동자들은 노동자 나름대로 불만이 컸음. 지금 이민자 반대와 같은 느낌으로. (노동자 반란과 파업)
-- 기업가들은 기업가 나름대로 공급을 받는 기업과 못 받는 기업 사이 알력이 존재.
-- 이 세가지 흐름으로 죄수임대는 폐지됨. 죄수 노동만이 남았음.
-- 그러나 노동 수요가 부족했으면 과연 폐지했을까? 노동이 부족해지면 어떻게 되는 것인가?
-
-
-
-- Trivia : 수감자 노동은 아직도 존재한다.
-  - 결과적으로 노예 임대는 폐지되었음.
-  - 그러나 수감자 노동은 폐지되지않음. 다만 민간과 직접경쟁하는 포지션에서 다소 바뀌었을 뿐.
-  - 1900~1950년대 죄수들을 사슬로 묶어 공공도로를 건설하기도했음. (Chain Gang) 
-  - 미국 교도소 노동은 현재에도 존재함. 미국 국방부가 최대 규모 고객임. 알게 모르게 경제 수혜를 받음. 다만 이 글에서 더 깊게 다룰것은 아님.
-
-
-
-
-죄수 임대
-- 남북전쟁은 산업의 구조를 바꾸지 않음.
-    - 전쟁은 순수하게 정치적인것. 인간의 재화구조를 바꾸는게 아님.
-    - 남북전쟁은 노예제를 폐지했지, 노예를 폐지하지않음
-    - 링컨의 노예에 대한 일관적이지 않은 태도를 조명.
-    - 즉, 노예는 경제구조의 지탱을 위해 필요했다.
-    - 13조의 예외조항 조명
-
-- 새로운 산업 - 죄수 임대(법리적 부분)
-    - 죄수 임대 시스템
-    - 그러나 어떻게 수급했을까? 흑인 = 죄수(Black Codes, 부랑죄)
-    - 어떤의미로 혁신적인 모델. 성인이 될때까지 먹이고 키우는것 필요없음. 알아서 큼.(경제성으로 전환 암시)
-    - 도덕적으로도 편리. "범죄자"에 대한 낙인이 정치부담을 약화시키는 구조.
-    
-- 죄수 임대의 경제적 조명(경제적 부분)
-    - 원래 유지보수 하려면 재산이 소모됨. 아껴써야함. 그러나 임대물이기 때문에 극한까지 써도됨.
-        "One Dies, Get Another" - 역사가 Matthew Mancini의 책 제목
-    - 노예 breeder가 벌던 돈을 주 정부가 가져가는 구조가 됨. 앨라배마는 1898년 주 전체 세수의 73%가 죄수임대에서 나옴
-    - 남부만 썼는가? 북부도 썼음. US Steel의 전신 TCI는 테네시주 전체의 교도소 인구를 연 101,000달러에 임대.
-    - 북부의 자본가들이 이 시스템을 활용함
-    - 결과적으로 노예가 더 적은 리스크(외주화)로 전국에 퍼짐
-    - 노동자들의 협상력 약화
-
-- 죄수임대 폐지 흐름
-    - 경제성이 너무 좋았음. 주 정부가 자기들이 직접 하기 시작.
-    - 주 차원의 노예제 운용
-    - 노동자들은 노동자 나름대로 불만이 컸음. 지금 이민자 반대와 같은 느낌으로. (노동자 반란과 파업)
-    - 기업가들은 기업가 나름대로 공급을 받는 기업과 못 받는 기업 사이 알력이 존재.
-    - 이 세가지 흐름으로 죄수임대는 폐지됨. 죄수 노동만이 남았음.
-
-- 수감자 노동은 아직도 존재한다.
-    - 결과적으로 노예 임대는 폐지되었음.
-    - 그러나 수감자 노동은 폐지되지않음. 다만 민간과 직접경쟁하는 포지션에서 다소 바뀌었을 뿐.
-    - 1900~1950년대 죄수들을 사슬로 묶어 공공도로를 건설하기도했음. (Chain Gang) 
-    - 미곡 교도소 노동은 현재에도 존재함. 미국 국방부가 최대 규모 고객임. 알게 모르게 경제 수혜를 받음. 다만 이 글에서 더 깊게 다룰것은 아님.
-
 
 
 <!-- 
