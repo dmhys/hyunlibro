@@ -1,6 +1,6 @@
 +++
 date = 2026-03-02T01:28:22+09:00
-lastmod = 2026-03-02T02:14:54+09:00
+lastmod = 2026-03-08T03:04:33+09:00
 draft = false
 
 title = "diary, 2026"
@@ -63,3 +63,9 @@ Yet if such a translation reaches the reader in a different color, and the reade
 1. Languages have a lower bound on complexity, imposed by the demands of meaning transmission.
 2. Yet the total complexity of languages varies considerably.
 3. Thought does not merely shape language; language, in turn, shapes thought.  That is, certain patterns of speech extend their influence to non-linguistic cognition as well.
+
+&nbsp;
+
+**4 - Misconception about religion**
+
+Contrary to the common belief that science and religion diverge along two axes — reason and faith — both can be said to operate through reason. The difference lies in the verifiability of the axioms that form their foundational framework. The distinction is whether the small number of foundational axioms are open to challenge or protected by faith. There is no hierarchy between the two in terms of internal coherence. Therefore, 'theology' can stand as a legitimate rational system.
