@@ -387,57 +387,61 @@ title = "Origins of the New South, 1877–1913: A History of the South"
 authors = "C. Vann Woodward"
 isbn = "0807100196"
 
-# [references.]
-# title = ""
-# link = ""
+[references.gdp_per_state]
+title = "GDP by State"
+link = "https://www.bea.gov/data/gdp/gdp-state"
 
-# [references.]
-# title = ""
-# link = ""
+[references.auburn_system]
+title = "Auburn System"
+link = "https://en.wikipedia.org/wiki/Auburn_system"
 
-# [references.]
-# title = ""
-# link = ""
+[references.offering_hope]
+title = "Offering Hope, the Connection between Auburn Theological Seminary & Auburn State Prison"
+authors = "John N. Miskell"
+link = "https://correctionhistory.org/auburn&osborne/miskell/html/seminary_contract.html"
 
-# [references.]
-# title = ""
-# link = ""
+[references.why_auburn]
+title = "Why Auburn? -- the Relationship between Auburn and the Prison"
+authors = "John N. Miskell"
+link = "https://www.correctionhistory.org/auburn&osborne/miskell/html/whyauburn_labor.html"
 
-# [references.]
-# title = ""
-# link = ""
+[references.economic_consequences]
+title = "Economic Consequences of the U.S. Convict Labor System"
+authors = "Michael Poyker"
+link = "https://www.anderson.ucla.edu/documents/areas/ctr/ziman/2018-09WP.pdf"
 
-# [references.]
-# title = ""
-# link = ""
+[references.penal_servitude_china]
+title = "tu 徒, penal servitude"
+link = "http://www.chinaknowledge.de/History/Terms/penal_tu.html"
 
-# [references.]
-# title = ""
-# link = ""
+[references.inmates_make_war]
+title = "Inmates Make War: Convict Labor at State Penitentiaries in the Antebellum and Civil War South, 1796-1865"
+authors = "Brett Josef Derbes"
+link = "https://etd.auburn.edu/bitstream/handle/10415/6443/Inmates%20Make%20War.pdf?sequence=2&isAllowed=y"
 
-# [references.]
-# title = ""
-# link = ""
+[references.rooted_in_slavery]
+title = "Rooted in Slavery: Prison Labor Exploitation"
+link = "https://reimaginerpe.org/node/856"
 
-# [references.]
-# title = ""
-# link = ""
+[references.alabama_penitentiary]
+title = "Alabama Penitentiary: Prison Labor before and after the Civil War (Teaching with Historic Places)"
+link = "https://www.nps.gov/articles/000/alabama-penitentiary-prison-labor-before-and-after-the-civil-war-teaching-with-historic-places.htm"
 
-# [references.]
-# title = ""
-# link = ""
+[references.convict_leasing]
+title = "Convict Leasing and Chain Gangs "
+link = "https://mississippiencyclopedia.org/entries/convict-leasing-and-chain-gangs/"
 
-# [references.]
-# title = ""
-# link = ""
+[references.georgia_1876]
+title = "Acts and resolutions of the General Assembly of the state of Georgia, passed at the regular session of January, 1876. Thomas B. Irwin, compiler [volume 1]"
+link = "https://dlg.usg.edu/record/dlg_zlgl_48730589#metadata"
 
-# [references.]
-# title = ""
-# link = ""
+[references.alabama_convict_lease]
+title = "Convict-Lease System"
+link = "https://encyclopediaofalabama.org/article/convict-lease-system/"
 
-# [references.]
-# title = ""
-# link = ""
+[references.akanso_no_report]
+title = "THE CONVICT LEASE SYSTEM IN THE SOUTHERN STATES"
+link = "https://www.victorianvoices.net/ARTICLES/CENTURY/Century1884A/C1884A-Convicts.pdf"
 
 # [references.]
 # title = ""
@@ -720,6 +724,8 @@ Marie Jenkins Schwartz에 따르면, {{<ref birthing_a_slave>}} 출산한 여성
 > *Neither slavery nor involuntary servitude,..., shall exist within the United States, or any place subject to their jurisdiction.* {{<ref constitution_us>}}
 >
 > 노예제도 또는 강제노역제도는 ... 미국 또는 그 관할에 속하는 어느 장소에서도 존재할 수 없다. {{<ref constitution_us_translation>}}
+>
+> {{<alignr>}}— 수정헌법 13조 1항{{</alignr>}}
 >
 
 그리하여 흑인들은 미국에서 더 이상 노예가 아니게 되었다. 
@@ -1171,15 +1177,15 @@ Sherman장군이 Lincoln의 승인을 받아, 특별야전명령 15호(Special F
 > {{<alignr>}} — Henry W. Grady {{</alignr>}}
 >
 
-남부인들은 산업화의 필요성을 체감했다. **실제로 산업화가 일어나기 시작했다.** 철도가 깔렸다. 앨라배마의 철도 교차점에 1871년 버밍엄이 건설되었다. 버밍엄의 선철 생산량은 1880년대 68,995에서 706,629영톤(gross ton)으로 치솟았다.{{<ref birmingham>}} 철도가 깔렸고, 1880년대에 철도 마일리지가 16,605마일에서 39,108 마일로 급증했다.{{<ref encyclopedia_new_south>}} 피에몬트에는 면직공장이, 사우스 캐롤라이나에선 인광석 및 비료 산업이, 담배 생산은 기계화되었다. 점차 노동수요가 생겨나기 시작했다. 
+남부인들은 산업화의 필요성을 체감했다. **실제로 산업화가 일어나기 시작했다.** 철도가 깔렸다. 앨라배마의 철도 교차점에 1871년 버밍엄이 건설되었다. 버밍엄의 선철 생산량은 1880년대 68,995에서 706,629영톤(gross ton)으로 치솟았다.{{<ref birmingham>}} 철도가 깔렸고, 1880년대에 철도 마일리지가 16,605마일에서 39,108 마일로 급증했다.{{<ref encyclopedia_new_south>}} 피에몬트에는 면직공장이, 사우스 캐롤라이나에선 인광석 및 비료 산업이 생겼으며, 담배 생산은 기계화되었다. 점차 노동수요가 생겨나기 시작했다. 
 
-남부의 산업화가 노동 수요를 촉발시켰지만, 반대로 노동 공급이 있었기 때문에 남부의 산업화를 촉진 시켰다. 남부엔 노동 공급이 있었다. **그것도 노예보다 값싼 노동력이.**
+그 후로 남부는 북부의 자본으로 말미암아 산업화가 가속화 된다. 그러나 단순히 자본과 수요가 모인 것으로만 이 산업화가 촉발된 것이 아니다. 남부의 산업화는 값 싼 노동 공급을 제공 받을 수 있었기 때문에 촉진되었다. 산업화가 수요고 노동이 공급이었던 것 뿐만 아니라, 노동이 산업을 수요로 했기 때문에 자본이 공급되었다. 즉, 남부엔 노동 공급이 있었던 것이다. **그것도 노예보다 값싼 노동력이, 풍족하게.**
 
 ---
 
-#### Trivia
+#### Trivia - 경제 식민지
 
-Henry W. Grady는 피켄스 카운티 장례식 일화를 여러번 사용하였다. 남부인들의 인식전환을 위해? 아니, 북부인들의 투자를 유치하기 위해, 북부에서 사용했다. 저 일화는 전부 북부에서 사용했다. 다시 한 번 저 일화를 읽어본다면, 교묘하게 남부의 인식을 천혜의 자원을 가진 곳으로 포장하는 것을 볼 수 있을 것이다. 그래서 북부 자본이 실제로 남부 산업화의 시동을 걸었지만, 이에 대해서 북부의 사실상 식민지화 라고 비판하는 학자들이 존재한다. {{<ref origins_new_south>}} 남부 지배 엘리트가 중앙 정치 권력에의 편입을 위한 북부 자본과의 결합을 시도했고, 그 결과 남부는 종속적 경제로 재편되었다는 것이다.
+Henry W. Grady는 피켄스 카운티 장례식 일화를 여러번 사용하였다. 남부인들의 인식전환을 위해? 아니, 북부인들의 투자를 유치하기 위해, 북부에서 사용했다. 저 일화는 전부 북부에서 사용했다. 다시 한 번 저 일화를 읽어본다면, 교묘하게 남부의 인식을 천혜의 자원을 가진 곳으로 포장하는 것을 볼 수 있을 것이다. 그래서 북부 자본이 실제로 남부 산업화의 시동을 걸었지만, 이에 대해서 북부의 사실상 식민지화 라고 비판하는 학자들이 존재한다. {{<ref origins_new_south>}} 남부 지배 엘리트가 중앙 정치 권력에의 편입을 위한 북부 자본과의 결합을 시도했고, 그 결과 남부는 종속적 경제로 재편되었다는 것이다. 2024년 기준, 미국 1인당 GDP 하위 5개 주 중 4개가 구 남부연합 소속이다.
 
 ---
 
@@ -1187,18 +1193,32 @@ Henry W. Grady는 피켄스 카운티 장례식 일화를 여러번 사용하였
 
 ### 수정헌법 13조의 의미
 
-수정헌법 13조의 의미
-- 노예 예비 해방선언의 전문
-- 수정헌법 13조의 전문
-- convict leasing의 시작
+>
+> *Neither slavery nor involuntary servitude, **except as a punishment for crime whereof the party shall have been duly convicted,** shall exist within the United States, or any place subject to their jurisdiction.* {{<ref constitution_us>}}
+>
+> *노예 제도 또는 강제 노역 제도는 **당사자가 정당하게 유죄판결을 받은 범죄에 대한 처벌이 아니면** 미국 또는 그 관할에 속하는 어느 장소에서도 존재할 수 없다.* {{<ref constitution_us_translation>}}
+>
+> {{<alignr>}}— 수정헌법 13조 1항{{</alignr>}}
+>
 
-Convict leasing 섹션에서:
+뉴욕 Newgate Prision이 과밀 수용 상태에 빠지자, 뉴욕 주 의회가 Auburn에 두 번째 주립 교도소 건설을 승인했다. 그리고 1821년 엘램 린즈(Elam Lynds)가 키를 잡게 된다. 이 당시 퀘이커교는 범죄는 도덕적 질병으로 인해 얻어진다고 믿었다. 침묵과 노동을 통해서 교화가 가능하다고 믿었다. 그리하여 엘램 린즈는 교도소에서 침묵하는 시스템을 만들고, 일출부터 일몰까지 노동자들에게 채찍질과 함께 강제 노역을 시켰다. {{<ref offering_hope>}} 그 노동력은 1821년 기업가 Samuel D. Dunham과 첫 계약을 맺은 것을 시작으로 시장에 공급되기 시작했다. 
 
-Penal Code Section 2의 포괄적 범죄화 ("insulting gestures", "seditious speeches", 포괄 조항)
-Penal Code Section 4: 노예 시절 형법 재시행
-Penal Code Section 5: 경범죄 벌금 미납 → 공개 경매 hire out
-Pig laws (1876~)
-인종중립 재포장
+1828년 Auburn 교도소의 지출은 <span class="no-math">$</span>35,504 였고, 계약 수입은 $34,504 였다. {{<ref why_auburn>}} 교도소의 운영비를 거의 다 메꾸는 상황이었다. 안 할 이유가 없었다. 곧 교도소 자체가 수익시설로 전환되었고, 결국 Auburn system은 미국 교도소의 de facto standard 위치를 차지하게 된다. 이와 비슷한 시스템이 모든 주에 깔리게 된다. 죄수 노역을 허가하는 주는 1870년대에 1개 주에서 1880년대 39개주로 늘어난다.{{<ref economic_consequences>}} 참고로 여기서 1개주의 의미는 나머지 주에선 죄수 노동을 안시켰다는 것이 아니고, 민간 자본에게 돈을 받고 노역을 대여하는 시스템을 사용했는지 안했는지의 차이이다. 즉, 대다수의 미국 교도소는 이때부터 죄수에게 강제노역을 시켰다. 미국은 죄수 노동을 버릴 수 없었다. 그런 흐름에서 수정헌법 13조엔 예외 조항이 붙었다.
+
+전후 남부에선 북부 모델이 불가능했다. 우선 교도소 자체가 물리적으로 없는 케이스가 많았다. 전쟁중에는 교도소가 주로 군사물자 생산 거점으로 활용되었기 때문에 군사 목표가 되었고, 교도소가 파괴된 경우가 많았기 때문이다. 혹은 남부연합이 죄수들을 복무 조건으로 사면했고, 그 과정에서 죄수들이 불태운 경우도 있었다. 교도소를 다시 짓는 것은 돈이 많이 들 뿐더러, 정치적 추진력도 필요했다. 둘 중 어느것도 전후 남부에는 남아있지 않았다. 특히 전후 reconstruction era는 정치적으로 극히 혼란했던 시기였다.
+
+그러나 죄수들은 쏟아져들어오기 시작했다. Black codes의 영향이었다. 단적인 예를 들자면, 조지아의 전쟁 전 수감자수 중 최대치는 1860년의 243명이었다. {{<ref inmates_make_war>}} 1878년엔 임대한 죄수만 1,239명이다.{{<ref rooted_in_slavery>}} 대다수 남부주들은 100~200명 사이의 죄수를 교도소에 유지했으나, 전후에는 주로 2000명, 그 이상으로 늘어나게된다. 인종비율은 주마다 다르지만, 앨라배마의 경우 99%백인에서 90%흑인으로 바뀌게 된다.{{<ref alabama_penitentiary>}} (왜냐하면 노예들의 처벌은 전적으로 주인에게 권한이 있었기 때문에 수감되는 경우는 거의 없었다.) 그러나 앞서 언급했듯이, 남부 교도소는 많이 파괴되었고, 파괴되지 않았다 하더라도 이렇게 많은 죄수를 수감할 수 없었다. 
+
+그래서 남부 주들은 죄수를 맡기기로 한다. 기록에 따르면 미시시피 주 정부는 죄수들을 관리하는 명목으로 Richardson이라는 민간사업자에게 연간 $18,000{{<ref convict_leasing>}}를 지불하기로 약속했다. 아칸소의 경우에도 공식적으로 주가 지급했다고 되어있으나, 이에 대한 비용은 명시하지않았다. (실제로 no report is made to public이라 명시했다.{{<ref akanso_no_report>}}) 어떤 주들은 돈을 지급하지 않되, 죄수들의 의식주를 해결해 주는것으로 죄수를 임대했다. 아칸소가 1873년 개정으로 수감자 유지비 지급을 끊고, 조지아도 1876년{{<ref georgia_1876>}} 이런 방식으로 전환했다. 앨라배마는 죄수를 철도회사에게 임대했고, 둘 사이에 금액은 오가지않았다. {{<ref alabama_convict_lease>}}
+
+이 흐름이 길게 가진 않았다. 남부의 혼란한 정치시기는 곧 지나갔고, 주 정부들이 죄수들이 생산하는 경제적 규모의 가치를 모를 정도의 바보가 아니기 때문이다. 이윽고 돈을 받으며 죄수의 노동력을 제공하는 죄수 임대 시스템이 정착하게 된다.
+
+---
+
+#### Trivia - Pennsylvania system vs Auburn system
+
+
+---
 
 ### 죄수임대의 경제성
 
@@ -1211,6 +1231,10 @@ Pig laws (1876~)
 - 결과적으로 노예가 더 적은 리스크(외주화)로 전국에 퍼짐
 - 노동자들의 협상력 약화
 
+Trivia - 인센티브로 인한 공급확대
+
+
+
 ### 죄수임대 폐지흐름
 
 죄수임대 폐지 흐름
@@ -1220,6 +1244,11 @@ Pig laws (1876~)
 - 기업가들은 기업가 나름대로 공급을 받는 기업과 못 받는 기업 사이 알력이 존재.
 - 이 세가지 흐름으로 죄수임대는 폐지됨. 죄수 노동만이 남았음.
 - 그러나 노동 수요가 부족했으면 과연 폐지했을까? 노동이 부족해지면 어떻게 되는 것인가?
+
+Trivia
+
+현대의 교도소 노동
+
 
 ## 덧붙임
 ### 수감자 노동
