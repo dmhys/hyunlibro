@@ -9,10 +9,10 @@
     {{- $num := 1 -}}
     {{- range $keys -}}
         {{- if eq . $key -}}
-            <sup><a href="#ref-{{ $key }}">[{{ $num }}]</a></sup>
+            <sup><a href='#ref-{{ $key }}'>[{{ $num }}]</a></sup>
         {{- end -}}
         {{- $num = add $num 1 -}}
     {{- end -}}
 {{- else -}}
-    <sup><a href="#reference-{{ $key }}">[{{ $key }}]</a></sup>
+    <sup><a href='#reference-{{ $key }}'>[{{ $key }}]</a></sup>
 {{- end -}}
