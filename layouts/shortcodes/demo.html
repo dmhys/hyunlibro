@@ -14,10 +14,15 @@
 <script>
 (function(){
   var f = document.currentScript.previousElementSibling;
-  var fit = function(){ try { f.style.height = (f.contentDocument.documentElement.scrollHeight + 2) + 'px'; } catch(e){} };
+  /* body layout height is independent of the iframe viewport, so no feedback loop
+     (documentElement.scrollHeight tracks the viewport and can grow unboundedly) */
+  var fit = function(){ try {
+    var h = Math.ceil(f.contentDocument.body.getBoundingClientRect().height) + 2;
+    if (Math.abs(h - (parseFloat(f.style.height) || 0)) > 2) f.style.height = h + 'px';
+  } catch(e){} };
   f.addEventListener('load', function(){
     fit();
-    try { new ResizeObserver(fit).observe(f.contentDocument.documentElement); } catch(e){}
+    try { new ResizeObserver(fit).observe(f.contentDocument.body); } catch(e){}
   });
 })();
 </script>
