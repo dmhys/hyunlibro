@@ -1,0 +1,6 @@
+{{- /* Shield literal text from KaTeX auto-render, which treats "$" as an inline math
+       delimiter. Shortcode output bypasses goldmark's raw-HTML filter, so this works
+       without markup.goldmark.renderer.unsafe.
+
+       Usage: {{< nomath >}}$35,504{{< /nomath >}} */ -}}
+<span class="no-math">{{ .Inner }}</span>

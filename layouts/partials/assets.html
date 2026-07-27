@@ -120,7 +120,10 @@
     {{- if and $math.inlineLeftDelimiter $math.inlineRightDelimiter -}}
         {{- $delimiters = $delimiters | append (dict "left" $math.inlineRightDelimiter "right" $math.inlineRightDelimiter "display" false) -}}
     {{- end -}}
-    {{- $config = dict "strict" false "delimiters" $delimiters | dict "math" | merge $config -}}
+    {{- /* "$" is an inline delimiter, so prose containing two currency amounts on one
+           line would render as a formula. Elements marked .no-math are skipped;
+           use the `nomath` shortcode to emit one. */ -}}
+    {{- $config = dict "strict" false "delimiters" $delimiters "ignoredClasses" (slice "no-math") | dict "math" | merge $config -}}
 {{- end -}}
 
 {{- /* mermaid */ -}}
