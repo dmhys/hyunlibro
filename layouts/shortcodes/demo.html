@@ -1,8 +1,13 @@
 {{- $src := .Get "src" | default (.Get 0) -}}
 {{- $height := .Get "height" -}}
 {{- $res := .Page.Resources.Get $src -}}
-{{- $url := $src -}}
-{{- with $res }}{{ $url = printf "%s?v=%s" .RelPermalink (substr (.Content | md5) 0 8) }}{{ end -}}
+{{- $url := "" -}}
+{{- with $res -}}
+  {{- if .RelPermalink -}}
+    {{- $url = printf "%s?v=%s" .RelPermalink (substr (.Content | md5) 0 8) -}}
+  {{- end -}}
+{{- end -}}
+{{- if $url }}
 <iframe class="demo-embed" src="{{ $url }}" loading="lazy" title="{{ .Get "title" | default $src }}"
   style="width:100%;border:0;display:block;margin:1.5rem 0;{{ with $height }}height:{{ . }};{{ end }}"></iframe>
 {{- if not $height }}
@@ -16,4 +21,9 @@
   });
 })();
 </script>
+{{- end }}
+{{- else }}
+<div style="border:1px dashed #d64f7d;border-radius:6px;padding:.8em 1em;margin:1.5rem 0;font-size:.85em;">
+  demo not found: {{ $src }} — Hugo ≥ 0.144 + <code>[contentTypes]</code> 설정 필요 (리소스가 콘텐츠로 분류되면 임베드를 건너뜁니다)
+</div>
 {{- end }}
