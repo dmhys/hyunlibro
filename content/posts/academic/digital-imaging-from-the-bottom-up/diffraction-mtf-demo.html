@@ -4,38 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diffraction, Airy Disk &amp; MTF Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
 <style>
-  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
-  :root{
-    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
-    --accent:#2d96bd; --bench:#0b1220;
-  }
-  html[theme=dark]{
-    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
-    --accent:#55bde2;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:transparent; color:var(--ink);
-    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  }
-  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
-  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
-  .ctrl{ flex:1 1 200px; min-width:180px; }
-  .ctrl label{ display:flex; justify-content:space-between;
-    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
-    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
-  .ctrl label output{ color:var(--ink); font-weight:500; }
-  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
-  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
-    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
-    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
   .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
   .readout .sp{color:#ff7fa5; font-weight:600;}
 </style>
 </head>
 <body>
-<canvas id="cvD" height="462" aria-label="Airy disk and diffraction MTF simulation"></canvas>
+<canvas id="cvD" height="476" aria-label="Airy disk and diffraction MTF simulation"></canvas>
 <div class="controls">
   <div class="ctrl">
     <label>Aperture N (f-number) <output id="odn">2.8</output></label>
@@ -48,37 +24,9 @@
 </div>
 <div class="readout" id="roD"></div>
 
+<script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
-/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
-function syncTheme(){
-  let t = null;
-  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
-  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  document.documentElement.setAttribute('theme', t);
-}
-syncTheme();
-try{
-  new MutationObserver(syncTheme)
-    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
-}catch(e){}
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
-
-function fit(cv){
-  const dpr = window.devicePixelRatio || 1;
-  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
-  cv.style.height = h+'px';
-  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
-  const ctx = cv.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {ctx,W:w,H:h};
-}
-function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
-function label(ctx,txt,x,y,color,size){
-  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
-  ctx.fillText(txt,x,y);
-}
-
 const PIX=4;            /* sensor pixel pitch in µm */
 const SPAN=24;          /* half-width of the Airy panels in µm */
 
@@ -139,19 +87,16 @@ function drawD(){
 
   /* ---- panel 1: 2-D Airy pattern on a pixel grid ---- */
   const pS=150, pX=12, pY=24;
-  label(ctx,`Airy pattern (${PIX} µm pixel grid)`,pX,16,'#7f93b2');
-  const img=ctx.createImageData(pS,pS);
+  label(ctx,'Airy pattern',pX,16,'#7f93b2');
   const scl=pS/(2*SPAN);           /* px per µm */
-  for(let y=0;y<pS;y++)for(let x=0;x<pS;x++){
+  pixelLayer(ctx,pX,pY,pS,pS,(x,y,k,data)=>{
     const r=Math.hypot(x-pS/2,y-pS/2)/scl;
     const b=Math.pow(I(r),0.45);   /* gamma boost so the rings are visible */
-    const k=4*(y*pS+x);
-    img.data[k]=Math.round(11+b*(cr-11));
-    img.data[k+1]=Math.round(18+b*(cg-18));
-    img.data[k+2]=Math.round(32+b*(cb-32));
-    img.data[k+3]=255;
-  }
-  ctx.putImageData(img,pX,pY);
+    data[k]=Math.round(11+b*(cr-11));
+    data[k+1]=Math.round(18+b*(cg-18));
+    data[k+2]=Math.round(32+b*(cb-32));
+    data[k+3]=255;
+  });
   ctx.strokeStyle='rgba(127,147,178,.35)'; ctx.lineWidth=1;
   for(let u=PIX*Math.ceil(-SPAN/PIX);u<=SPAN;u+=PIX){
     const q=pX+(u+SPAN)*scl;
@@ -159,6 +104,9 @@ function drawD(){
     ctx.beginPath(); ctx.moveTo(pX,pY+(u+SPAN)*scl); ctx.lineTo(pX+pS,pY+(u+SPAN)*scl); ctx.stroke();
   }
   ctx.strokeStyle='#31435f'; ctx.strokeRect(pX,pY,pS,pS);
+  /* grid pitch annotated inside the panel, as panel 2 does with "1 px" —
+     the full caption above would run into the "PSF cross-section" heading */
+  label(ctx,`${PIX} µm grid`,pX+5,pY+pS-7,'#8b97ad',10.5);
 
   /* ---- panel 2: PSF cross-section ---- */
   const qx0=196, qx1=W-14, qy0=24, qy1=174;
@@ -196,7 +144,9 @@ function drawD(){
     const sx=mx0+(nu/numax)*(mx1-mx0);
     label(ctx,String(nu),sx-10,my1+13,'#55617a',10.5);
   });
-  label(ctx,'lp/mm',mx1-36,my1+13,'#55617a',10.5);
+  /* one row below the tick numbers: at numax the "400" tick sits flush with the
+     right edge and the unit would collide with it */
+  label(ctx,'lp/mm',mx1-36,my1+26,'#55617a',10.5);
   /* pixel Nyquist */
   const nx=mx0+(nyq/numax)*(mx1-mx0);
   dash(ctx,true); ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1;
@@ -215,8 +165,8 @@ function drawD(){
   }
 
   /* ---- panel 4: chirp resolution chart, ideal vs diffracted ---- */
-  const cx0=64, cx1=W-14, ch=40, iy=362, by=412;
-  label(ctx,'Resolution chart — finer bars to the right (10 → 300 lp/mm, schematic)',12,350,'#7f93b2');
+  const cx0=64, cx1=W-14, ch=40, iy=376, by=426;
+  label(ctx,'Resolution chart — finer bars to the right (10 → 300 lp/mm, schematic)',12,364,'#7f93b2');
   label(ctx,'ideal',12,iy+ch/2+4,'#7f93b2',11);
   label(ctx,`f/${N.toFixed(1)}`,12,by+ch/2+4,tint,11);
   let phi=0;

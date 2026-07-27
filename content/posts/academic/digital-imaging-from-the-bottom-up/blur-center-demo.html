@@ -4,32 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blur Center &amp; Entrance Pupil Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
 <style>
-  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
-  :root{
-    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
-    --accent:#2d96bd; --bench:#0b1220;
-  }
-  html[theme=dark]{
-    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
-    --accent:#55bde2;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:transparent; color:var(--ink);
-    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  }
-  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
-  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
-  .ctrl{ flex:1 1 200px; min-width:180px; }
-  .ctrl label{ display:flex; justify-content:space-between;
-    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
-    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
-  .ctrl label output{ color:var(--ink); font-weight:500; }
-  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
-  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
-    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
-    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
   .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
   .readout .sp{color:#ff7fa5; font-weight:600;}
 </style>
@@ -48,37 +24,9 @@
 </div>
 <div class="readout" id="roB"></div>
 
+<script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
-/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
-function syncTheme(){
-  let t = null;
-  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
-  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  document.documentElement.setAttribute('theme', t);
-}
-syncTheme();
-try{
-  new MutationObserver(syncTheme)
-    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
-}catch(e){}
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
-
-function fit(cv){
-  const dpr = window.devicePixelRatio || 1;
-  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
-  cv.style.height = h+'px';
-  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
-  const ctx = cv.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {ctx,W:w,H:h};
-}
-function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
-function label(ctx,txt,x,y,color,size){
-  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
-  ctx.fillText(txt,x,y);
-}
-
 /*
  * One lens (f=50), sensor fixed at 75 (focused on distance 150). Near and Far are
  * BOTH defocused; PF sits exactly ON the focus plane, so it images to a sharp point

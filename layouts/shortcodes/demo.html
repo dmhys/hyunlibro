@@ -1,3 +1,6 @@
+{{- /* The demo files link /css/demo-lib.css; compile and publish it to that path.
+       Referencing RelPermalink is what triggers publishing. */ -}}
+{{- $_ := (resources.Get "css/demo-lib.scss" | toCSS (dict "targetPath" "css/demo-lib.css")).RelPermalink -}}
 {{- $src := .Get "src" | default (.Get 0) -}}
 {{- $height := .Get "height" -}}
 {{- $res := .Page.Resources.Get $src -}}
