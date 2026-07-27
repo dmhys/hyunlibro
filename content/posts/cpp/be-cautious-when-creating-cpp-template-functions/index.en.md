@@ -35,7 +35,7 @@ int main()
 }
 ```
 
-Declaring and using it this way (calling foo<double> results in the same outcome) produces the following result:
+Declaring and using it this way (calling `foo<double>` results in the same outcome) produces the following result:
 
 ```bash
 ...

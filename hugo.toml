@@ -23,22 +23,22 @@ enableEmoji = true
 [languages]
   [languages.ko]
     disabled = false
-    languageCode = "ko-KR"
-    languageDirection = "ltr"
-    languageName = "Korean"
+    locale = "ko-KR"
+    direction = "ltr"
+    label = "Korean"
     title = "Hyun.Libro"
     weight = 1
   [languages.en]
     disabled = false
-    languageCode = "en-US"
-    languageDirection = "ltr"
-    languageName = "English"
+    locale = "en-US"
+    direction = "ltr"
+    label = "English"
     title = "Hyun.Libro"
     weight = 2
   [languages.ja]
     disabled = false
-    languageCode = "ja-JP"
-    languageName = "Japanese"
+    locale = "ja-JP"
+    label = "Japanese"
     title = "Hyun.Libro"
     weight = 3
 

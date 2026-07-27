@@ -41,21 +41,21 @@
                 {{- end -}}
                 {{- if hugo.IsMultilingual -}}
                     <a href="javascript:void(0);" class="menu-item language" title="{{ T "selectLanguage" }}">
-                        {{- .Language.LanguageName -}}
+                        {{- .Language.Label -}}
                         <i class="fas fa-chevron-right fa-fw" aria-hidden="true"></i>
                         <select class="language-select" id="language-select-desktop" onchange="location = this.value;">
                             {{- if eq .Kind "404" -}}
                                 {{- /* https://github.com/Fastbyte01/KeepIt/issues/378 */ -}}
-                                {{- range .Sites -}}
+                                {{- range hugo.Sites -}}
                                     {{- $link := printf "%v/404.html" .LanguagePrefix -}}
                                     <option value="{{ $link }}"{{ if eq . $.Site }} selected{{ end }}>
-                                        {{- .Language.LanguageName -}}
+                                        {{- .Language.Label -}}
                                     </option>
                                 {{- end -}}
                             {{- else -}}
                                 {{- range .AllTranslations -}}
                                     <option value="{{ .RelPermalink }}"{{ if eq .Lang $.Lang }} selected{{ end }}>
-                                        {{- .Language.LanguageName -}}
+                                        {{- .Language.Label -}}
                                     </option>
                                 {{- end -}}
                             {{- end -}}
@@ -151,21 +151,21 @@
             </a>
             {{- if hugo.IsMultilingual -}}
                 <a href="javascript:void(0);" class="menu-item" title="{{ T "selectLanguage" }}">
-                    {{- .Language.LanguageName -}}
+                    {{- .Language.Label -}}
                     <i class="fas fa-chevron-right fa-fw" aria-hidden="true"></i>
                     <select class="language-select" onchange="location = this.value;">
                         {{- if eq .Kind "404" -}}
                             {{- /* https://github.com/Fastbyte01/KeepIt/issues/378 */ -}}
-                            {{- range .Sites -}}
+                            {{- range hugo.Sites -}}
                                 {{- $link := printf "%v/404.html" .LanguagePrefix -}}
                                 <option value="{{ $link }}"{{ if eq . $.Site }} selected{{ end }}>
-                                    {{- .Language.LanguageName -}}
+                                    {{- .Language.Label -}}
                                 </option>
                             {{- end -}}
                         {{- else -}}
                             {{- range .AllTranslations -}}
                                 <option value="{{ .RelPermalink }}"{{ if eq .Lang $.Lang }} selected{{ end }}>
-                                    {{- .Language.LanguageName -}}
+                                    {{- .Language.Label -}}
                                 </option>
                             {{- end -}}
                         {{- end -}}
