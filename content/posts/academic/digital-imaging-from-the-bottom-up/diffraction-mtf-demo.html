@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diffraction, Airy Disk &amp; MTF Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 200px; min-width:180px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+  .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
+  .readout .sp{color:#ff7fa5; font-weight:600;}
+</style>
+</head>
+<body>
+<canvas id="cvD" height="462" aria-label="Airy disk and diffraction MTF simulation"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Aperture N (f-number) <output id="odn">2.8</output></label>
+    <input type="range" id="rdn" min="1.4" max="22" value="2.8" step="0.1">
+  </div>
+  <div class="ctrl">
+    <label>Wavelength λ (nm) <output id="odl">550</output></label>
+    <input type="range" id="rdl" min="450" max="650" value="550" step="5">
+  </div>
+</div>
+<div class="readout" id="roD"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+
+const PIX=4;            /* sensor pixel pitch in µm */
+const SPAN=24;          /* half-width of the Airy panels in µm */
+
+const cvD=document.getElementById('cvD');
+const rdn=document.getElementById('rdn'), rdl=document.getElementById('rdl');
+
+/* Bessel J1 via its integral form (fast enough for a lookup table) */
+function besselJ1(v){
+  const N=40; let s=0;
+  for(let i=0;i<=N;i++){
+    const tau=Math.PI*i/N;
+    const w=(i===0||i===N)?0.5:1;
+    s+=w*Math.cos(tau-v*Math.sin(tau));
+  }
+  return s*Math.PI/N/Math.PI;
+}
+/* Airy intensity I(r), r in µm; first zero at r = 1.22 λN */
+function airyLUT(lam,N){
+  const step=0.05, n=Math.ceil(SPAN*1.5/step)+1, lut=new Float64Array(n);
+  for(let i=0;i<n;i++){
+    const v=Math.PI*(i*step)/(lam*N);
+    lut[i]= v<1e-6 ? 1 : Math.pow(2*besselJ1(v)/v,2);
+  }
+  return {lut,step};
+}
+/* Diffraction MTF of a circular aperture; nu in lp/mm, cutoff nuc=1000/(λ[µm]·N) */
+function mtf(nu,nuc){
+  const s=nu/nuc;
+  if(s>=1) return 0;
+  return (2/Math.PI)*(Math.acos(s)-s*Math.sqrt(1-s*s));
+}
+/* Rough visible-wavelength tint for curves and the spot */
+function wl2rgb(w){
+  let r,g,b;
+  if(w<490){r=0;g=(w-440)/50;b=1;}
+  else if(w<510){r=0;g=1;b=(510-w)/20;}
+  else if(w<580){r=(w-510)/70;g=1;b=0;}
+  else if(w<645){r=1;g=(645-w)/65;b=0;}
+  else{r=1;g=0;b=0;}
+  return [Math.round(255*r),Math.round(255*g),Math.round(255*b)];
+}
+
+function drawD(){
+  const {ctx,W,H}=fit(cvD);
+  const N=+rdn.value, lnm=+rdl.value, lam=lnm/1000;  /* λ in µm */
+  document.getElementById('odn').textContent=N.toFixed(1);
+  document.getElementById('odl').textContent=lnm;
+
+  const nuc=1000/(lam*N);          /* MTF cutoff, lp/mm */
+  const nyq=1000/(2*PIX);          /* pixel Nyquist, lp/mm */
+  const r1=1.22*lam*N;             /* Airy first-zero radius, µm */
+  const {lut,step}=airyLUT(lam,N);
+  const I=r=>{const i=Math.min(Math.round(r/step),lut.length-1); return lut[i];};
+  const [cr,cg,cb]=wl2rgb(lnm);
+  const tint=`rgb(${cr},${cg},${cb})`;
+
+  ctx.clearRect(0,0,W,H);
+
+  /* ---- panel 1: 2-D Airy pattern on a pixel grid ---- */
+  const pS=150, pX=12, pY=24;
+  label(ctx,`Airy pattern (${PIX} µm pixel grid)`,pX,16,'#7f93b2');
+  const img=ctx.createImageData(pS,pS);
+  const scl=pS/(2*SPAN);           /* px per µm */
+  for(let y=0;y<pS;y++)for(let x=0;x<pS;x++){
+    const r=Math.hypot(x-pS/2,y-pS/2)/scl;
+    const b=Math.pow(I(r),0.45);   /* gamma boost so the rings are visible */
+    const k=4*(y*pS+x);
+    img.data[k]=Math.round(11+b*(cr-11));
+    img.data[k+1]=Math.round(18+b*(cg-18));
+    img.data[k+2]=Math.round(32+b*(cb-32));
+    img.data[k+3]=255;
+  }
+  ctx.putImageData(img,pX,pY);
+  ctx.strokeStyle='rgba(127,147,178,.35)'; ctx.lineWidth=1;
+  for(let u=PIX*Math.ceil(-SPAN/PIX);u<=SPAN;u+=PIX){
+    const q=pX+(u+SPAN)*scl;
+    ctx.beginPath(); ctx.moveTo(q,pY); ctx.lineTo(q,pY+pS); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pX,pY+(u+SPAN)*scl); ctx.lineTo(pX+pS,pY+(u+SPAN)*scl); ctx.stroke();
+  }
+  ctx.strokeStyle='#31435f'; ctx.strokeRect(pX,pY,pS,pS);
+
+  /* ---- panel 2: PSF cross-section ---- */
+  const qx0=196, qx1=W-14, qy0=24, qy1=174;
+  label(ctx,'PSF cross-section',qx0,16,'#7f93b2');
+  ctx.strokeStyle='#243349';
+  ctx.strokeRect(qx0,qy0,qx1-qx0,qy1-qy0);
+  /* pixel-width band from r=0 */
+  ctx.fillStyle='rgba(127,147,178,.12)';
+  ctx.fillRect(qx0,qy0,(PIX/SPAN)*(qx1-qx0),qy1-qy0);
+  label(ctx,'1 px',qx0+3,qy1-5,'#55617a',10.5);
+  ctx.strokeStyle=tint; ctx.lineWidth=1.8;
+  ctx.beginPath();
+  for(let i=0;i<=300;i++){
+    const r=SPAN*i/300;
+    const sx=qx0+(r/SPAN)*(qx1-qx0), sy=qy1-I(r)*(qy1-qy0-8);
+    i?ctx.lineTo(sx,sy):ctx.moveTo(sx,sy);
+  }
+  ctx.stroke();
+  /* first zero marker */
+  if(r1<SPAN){
+    const zx=qx0+(r1/SPAN)*(qx1-qx0);
+    dash(ctx,true); ctx.strokeStyle='#f6a72b'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(zx,qy0+4); ctx.lineTo(zx,qy1); ctx.stroke(); dash(ctx,false);
+    label(ctx,`1.22λN = ${r1.toFixed(1)} µm`,Math.min(zx+5,qx1-110),qy0+16,'#f6a72b',11);
+  }
+
+  /* ---- panel 3: diffraction MTF ---- */
+  const mx0=46, mx1=W-14, my0=205, my1=318, numax=400;
+  label(ctx,'Diffraction MTF',mx0,197,'#7f93b2');
+  ctx.strokeStyle='#243349'; ctx.strokeRect(mx0,my0,mx1-mx0,my1-my0);
+  [[1,'1'],[0.5,'0.5'],[0,'0']].forEach(([v,t])=>{
+    label(ctx,t,mx0-22,my1-v*(my1-my0)+4,'#55617a',10.5);
+  });
+  [100,200,300,400].forEach(nu=>{
+    const sx=mx0+(nu/numax)*(mx1-mx0);
+    label(ctx,String(nu),sx-10,my1+13,'#55617a',10.5);
+  });
+  label(ctx,'lp/mm',mx1-36,my1+13,'#55617a',10.5);
+  /* pixel Nyquist */
+  const nx=mx0+(nyq/numax)*(mx1-mx0);
+  dash(ctx,true); ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(nx,my0); ctx.lineTo(nx,my1); ctx.stroke(); dash(ctx,false);
+  label(ctx,`pixel Nyquist (${PIX} µm)`,nx+5,my0+14,'#8b97ad',11);
+  ctx.strokeStyle=tint; ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let i=0;i<=300;i++){
+    const nu=numax*i/300;
+    const sx=mx0+(i/300)*(mx1-mx0), sy=my1-mtf(nu,nuc)*(my1-my0);
+    i?ctx.lineTo(sx,sy):ctx.moveTo(sx,sy);
+  }
+  ctx.stroke();
+  if(nuc<numax){
+    label(ctx,`cutoff 1/(λN) = ${nuc.toFixed(0)}`,Math.min(mx0+(nuc/numax)*(mx1-mx0)+5,mx1-150),my1-8,'#f6a72b',11);
+  }
+
+  /* ---- panel 4: chirp resolution chart, ideal vs diffracted ---- */
+  const cx0=64, cx1=W-14, ch=40, iy=362, by=412;
+  label(ctx,'Resolution chart — finer bars to the right (10 → 300 lp/mm, schematic)',12,350,'#7f93b2');
+  label(ctx,'ideal',12,iy+ch/2+4,'#7f93b2',11);
+  label(ctx,`f/${N.toFixed(1)}`,12,by+ch/2+4,tint,11);
+  let phi=0;
+  for(let x=cx0;x<cx1;x++){
+    const t=(x-cx0)/(cx1-cx0);
+    const period=24-20*t;             /* bar period in px, shrinking left to right */
+    phi+=2*Math.PI/period;
+    const nu=10+290*t;                /* nominal frequency for the MTF lookup */
+    const s=Math.sin(phi);
+    const vi=0.5+0.5*s;
+    const vb=0.5+0.5*mtf(nu,nuc)*s;
+    ctx.fillStyle=`rgb(${Math.round(15+vi*215)},${Math.round(21+vi*209)},${Math.round(34+vi*200)})`;
+    ctx.fillRect(x,iy,1,ch);
+    ctx.fillStyle=`rgb(${Math.round(15+vb*215)},${Math.round(21+vb*209)},${Math.round(34+vb*200)})`;
+    ctx.fillRect(x,by,1,ch);
+  }
+  ctx.strokeStyle='#31435f';
+  ctx.strokeRect(cx0,iy,cx1-cx0,ch);
+  ctx.strokeRect(cx0,by,cx1-cx0,ch);
+
+  /* ---- readout ---- */
+  const dia=2.44*lam*N;
+  const npx=dia/PIX;
+  const nLimit=2*PIX/(2.44*lam);    /* N at which the Airy diameter spans 2 pixels */
+  document.getElementById('roD').innerHTML=
+    `<span class="a">Airy disk</span>   first zero = 1.22·λ·N = ${r1.toFixed(2)} µm   diameter = ${dia.toFixed(1)} µm ≈ ${npx.toFixed(1)} px @ ${PIX} µm\n`+
+    `<span class="a">MTF</span>         cutoff = 1/(λN) = ${nuc.toFixed(0)} lp/mm   vs   pixel Nyquist = ${nyq.toFixed(0)} lp/mm\n`+
+    (npx>2
+      ? `<span class="sp">Diffraction-limited</span> — the Airy disk spans over 2 pixels: stopping down further only costs sharpness.\nFor ${PIX} µm pixels this territory begins around f/${nLimit.toFixed(1)}.`
+      : `<span class="ok">Not diffraction-limited yet</span> — the Airy disk still fits within ~2 pixels; aberrations and focus\ndominate sharpness here. Diffraction takes over around f/${nLimit.toFixed(1)} for ${PIX} µm pixels.`);
+}
+
+[rdn,rdl].forEach(el=>el.addEventListener('input',drawD));
+let rzD;
+window.addEventListener('resize',()=>{clearTimeout(rzD);rzD=setTimeout(drawD,120);});
+drawD();
+</script>
+</body>
+</html>

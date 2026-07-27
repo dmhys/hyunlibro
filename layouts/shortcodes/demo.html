@@ -1,0 +1,19 @@
+{{- $src := .Get "src" | default (.Get 0) -}}
+{{- $height := .Get "height" -}}
+{{- $res := .Page.Resources.Get $src -}}
+{{- $url := $src -}}
+{{- with $res }}{{ $url = printf "%s?v=%s" .RelPermalink (substr (.Content | md5) 0 8) }}{{ end -}}
+<iframe class="demo-embed" src="{{ $url }}" loading="lazy" title="{{ .Get "title" | default $src }}"
+  style="width:100%;border:0;display:block;margin:1.5rem 0;{{ with $height }}height:{{ . }};{{ end }}"></iframe>
+{{- if not $height }}
+<script>
+(function(){
+  var f = document.currentScript.previousElementSibling;
+  var fit = function(){ try { f.style.height = (f.contentDocument.documentElement.scrollHeight + 2) + 'px'; } catch(e){} };
+  f.addEventListener('load', function(){
+    fit();
+    try { new ResizeObserver(fit).observe(f.contentDocument.documentElement); } catch(e){}
+  });
+})();
+</script>
+{{- end }}

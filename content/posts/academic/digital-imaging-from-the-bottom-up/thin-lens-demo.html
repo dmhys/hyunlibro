@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thin Lens Imaging Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 200px; min-width:180px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<canvas id="cv1" height="340" aria-label="Thin lens ray-tracing simulation"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Object distance u <output id="o1so">150</output></label>
+    <input type="range" id="r1so" min="30" max="230" value="150" step="1">
+  </div>
+  <div class="ctrl">
+    <label>Focal length f <output id="o1f">60</output></label>
+    <input type="range" id="r1f" min="35" max="110" value="60" step="1">
+  </div>
+</div>
+<div class="readout" id="ro1"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+function lensGlyph(ctx,sx,cy,halfHpx,color){
+  ctx.strokeStyle=color; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
+  ctx.beginPath();
+  ctx.moveTo(sx,cy-halfHpx);
+  ctx.quadraticCurveTo(sx+10,cy,sx,cy+halfHpx);
+  ctx.quadraticCurveTo(sx-10,cy,sx,cy-halfHpx);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+function arrowV(ctx,sx,syBase,syTip,color,dashed){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2;
+  dash(ctx,!!dashed);
+  ctx.beginPath(); ctx.moveTo(sx,syBase); ctx.lineTo(sx,syTip); ctx.stroke();
+  dash(ctx,false);
+  const dir = syTip<syBase?-1:1;
+  ctx.beginPath();
+  ctx.moveTo(sx,syTip); ctx.lineTo(sx-4,syTip-dir*8); ctx.lineTo(sx+4,syTip-dir*8);
+  ctx.closePath(); ctx.fill();
+}
+
+const cv1=document.getElementById('cv1');
+const r1so=document.getElementById('r1so'), r1f=document.getElementById('r1f');
+function draw1(){
+  const {ctx,W,H}=fit(cv1);
+  const so=+r1so.value, f=+r1f.value;
+  document.getElementById('o1so').textContent=so;
+  document.getElementById('o1f').textContent=f;
+
+  const xmin=-255,xmax=255;
+  const X=x=>(x-xmin)/(xmax-xmin)*(W-24)+12;
+  const cy=H*0.55, Y=y=>cy-y*(H*0.42)/95;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(10,cy); ctx.lineTo(W-10,cy); ctx.stroke();
+
+  [[-f,'F'],[f,"F′"]].forEach(([fx,t])=>{
+    ctx.strokeStyle='#3d5273'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(X(fx),cy-6); ctx.lineTo(X(fx),cy+6); ctx.stroke();
+    label(ctx,t,X(fx)-5,cy+22,'#7f93b2');
+  });
+  lensGlyph(ctx,X(0),cy,H*0.40,'#6ea8e8');
+
+  const h=42;
+  const nearFocal=Math.abs(so-f)<2.5;
+  let si=0,m=0,virtual=false,farOut=false;
+  if(!nearFocal){ si=so*f/(so-f); m=-si/so; virtual=si<0; farOut=si>245; }
+
+  arrowV(ctx,X(-so),cy,Y(h),'#e8edf6');
+  label(ctx,'Object',X(-so)-14,Y(h)-10,'#e8edf6');
+
+  const tip={x:-so,y:h};
+  const rays=[];
+  rays.push({inY:h, outY0:h, outSlope:-h/f, color:'#a8e05f'});
+  const s2=(0-h)/(0-tip.x);
+  rays.push({inY:0, outY0:0, outSlope:s2, color:'#f6a72b'});
+  if(!nearFocal){
+    const y3=-h*f/(so-f);
+    rays.push({inY:y3, outY0:y3, outSlope:0, color:'#ff7fa5'});
+  }
+  const xEnd=250;
+  rays.forEach(r=>{
+    ctx.strokeStyle=r.color; ctx.lineWidth=1.8; dash(ctx,false);
+    ctx.beginPath();
+    ctx.moveTo(X(tip.x),Y(tip.y));
+    ctx.lineTo(X(0),Y(r.inY));
+    ctx.lineTo(X(xEnd),Y(r.outY0+r.outSlope*xEnd));
+    ctx.stroke();
+    if(virtual){
+      dash(ctx,true); ctx.globalAlpha=.75;
+      ctx.beginPath();
+      ctx.moveTo(X(0),Y(r.outY0));
+      ctx.lineTo(X(si),Y(r.outY0+r.outSlope*si));
+      ctx.stroke();
+      ctx.globalAlpha=1; dash(ctx,false);
+    }
+  });
+
+  let ro=`1/${so} + 1/v = 1/${f}`;
+  if(nearFocal){ ro+=`   →  v → ∞  (object at focal point: rays exit parallel, no image)`; }
+  else if(farOut){ ro+=`   →  v = ${si.toFixed(0)}  (near focus: image forms far off-screen)`; }
+  else{
+    const ix=X(si), iy=Y(m*h);
+    arrowV(ctx,ix,cy,iy,virtual?'#c9b0ff':'#e8edf6',virtual);
+    label(ctx,virtual?'Virtual image':'Image',ix+8,iy+(m*h>0?-8:16),virtual?'#c9b0ff':'#e8edf6');
+    ro+=`   →  v = ${si.toFixed(1)},  m = ${m.toFixed(2)}`
+       +(virtual?'   (u < f: virtual image at intersection of back-extended rays)':'');
+  }
+  document.getElementById('ro1').innerHTML=ro;
+}
+
+[r1so,r1f].forEach(el=>el.addEventListener('input',draw1));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw1,120);});
+draw1();
+</script>
+</body>
+</html>

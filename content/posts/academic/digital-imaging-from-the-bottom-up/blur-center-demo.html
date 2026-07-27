@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blur Center &amp; Entrance Pupil Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 200px; min-width:180px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+  .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
+  .readout .sp{color:#ff7fa5; font-weight:600;}
+</style>
+</head>
+<body>
+<canvas id="cvB" height="400" aria-label="Defocus blur center and entrance pupil simulation"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Stop position t (t&lt;0: in front of lens) <output id="obt">15</output></label>
+    <input type="range" id="rbt" min="-15" max="30" value="15" step="1">
+  </div>
+  <div class="ctrl">
+    <label>Stop radius a <output id="oba">6</output></label>
+    <input type="range" id="rba" min="0.2" max="9" value="6" step="0.2">
+  </div>
+</div>
+<div class="readout" id="roB"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+
+/*
+ * One lens (f=50), sensor fixed at 75 (focused on distance 150). Near and Far are
+ * BOTH defocused; PF sits exactly ON the focus plane, so it images to a sharp point
+ * at any aperture. All three are aligned on one sight line of the initial entrance
+ * pupil (stop at t=15 -> EP at 21.43): three different blurs, one pixel — until the
+ * stop moves and the EP leaves that sight line.
+ */
+const F=50, SEN=75, FOCUS=150;
+const P1=[-110,28], P2=[-260,60];   /* aligned with EP(t=15)=(21.43,0) */
+const PF=[-150,36.535];             /* on the focus plane, same sight line */
+const cvB=document.getElementById('cvB');
+const rbt=document.getElementById('rbt'), rba=document.getElementById('rba');
+
+/* Ray from P with object-space slope u: height at the stop plane */
+function yAtStop(P,u,t){
+  if(t<0) return P[1]+u*(t-P[0]);
+  const yL=P[1]-u*P[0];
+  return yL+(u-yL/F)*t;
+}
+/* Heights at the lens and at the sensor */
+function pathOf(P,u){
+  const yL=P[1]-u*P[0];
+  const uP=u-yL/F;
+  return {yL, ys:yL+uP*SEN};
+}
+/* Height at the stop is linear in u: solve for the ray through a given stop height */
+function solveU(P,t,target){
+  const a=yAtStop(P,0,t), b=yAtStop(P,0.01,t);
+  return 0.01*(target-a)/(b-a);
+}
+
+function drawB(){
+  const {ctx,W,H}=fit(cvB);
+  const t=+rbt.value, a=+rba.value;
+  document.getElementById('obt').textContent=t;
+  document.getElementById('oba').textContent=a;
+
+  const stripW=92;
+  const plotW=W-stripW-16;
+  const xmin=-286, xmax=96;
+  const X=x=>(x-xmin)/(xmax-xmin)*(plotW-18)+10;
+  const cy=H*0.44;
+  const Y=y=>cy-y*(H*0.4)/70;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(8,cy); ctx.lineTo(plotW,cy); ctx.stroke();
+
+  /* focus plane marker */
+  dash(ctx,true); ctx.strokeStyle='#2c3c56';
+  ctx.beginPath(); ctx.moveTo(X(-FOCUS),Y(66)); ctx.lineTo(X(-FOCUS),Y(-30)); ctx.stroke();
+  dash(ctx,false);
+  label(ctx,'Focus plane (150)',X(-FOCUS)-48,Y(66)-6,'#4d6285',11);
+
+  /* lens */
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
+  ctx.beginPath();
+  ctx.moveTo(X(0),Y(30));
+  ctx.quadraticCurveTo(X(0)+10,cy,X(0),Y(-30));
+  ctx.quadraticCurveTo(X(0)-10,cy,X(0),Y(30));
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  label(ctx,'Lens f=50',X(0)-26,Y(30)-8,'#6ea8e8',11.5);
+
+  /* stop */
+  ctx.fillStyle='#55617a';
+  ctx.fillRect(X(t)-3,Y(30),6,Y(a)-Y(30));
+  ctx.fillRect(X(t)-3,Y(-a),6,Y(-30)-Y(-a));
+  label(ctx,'Stop',X(t)-12,Y(-30)+16,'#8b97ad',11.5);
+
+  /* sensor */
+  ctx.fillStyle='#c3ccdb';
+  ctx.fillRect(X(SEN)-2,Y(30),4,Y(-30)-Y(30));
+  label(ctx,'Sensor',X(SEN)-16,Y(30)-8,'#c3ccdb',11.5);
+
+  /* entrance pupil: the stop itself if in front of the lens, else its image through the lens */
+  const xEP = t<0 ? t : F*t/(F-t);
+  const rEP = t<0 ? a : a*F/(F-t);
+  dash(ctx,true); ctx.strokeStyle='#f6a72b'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(X(xEP),Y(rEP)); ctx.lineTo(X(xEP),Y(-rEP)); ctx.stroke();
+  dash(ctx,false);
+  ctx.fillStyle='#f6a72b';
+  ctx.beginPath(); ctx.arc(X(xEP),cy,3.6,0,7); ctx.fill();
+  label(ctx,'Entrance pupil',X(xEP)-38,Y(Math.max(rEP,12))-8,'#f6a72b',12);
+
+  const pts=[
+    {P:P1,color:'#ff7fa5',fill:'rgba(255,127,165,.13)',name:'Near'},
+    {P:P2,color:'#31c9ba',fill:'rgba(49,201,186,.12)',name:'Far'},
+    {P:PF,color:'#a8e05f',fill:'rgba(168,224,95,.14)',name:'In focus'}
+  ];
+  const centers=[];
+  pts.forEach(o=>{
+    /* scene point */
+    ctx.fillStyle=o.color;
+    ctx.beginPath(); ctx.arc(X(o.P[0]),Y(o.P[1]),5,0,7); ctx.fill();
+    label(ctx,o.name,X(o.P[0])-12,Y(o.P[1])-12,o.color);
+
+    /* EP sight line (object space) */
+    dash(ctx,true); ctx.strokeStyle='rgba(246,167,43,.55)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(X(o.P[0]),Y(o.P[1])); ctx.lineTo(X(xEP),cy); ctx.stroke();
+    dash(ctx,false);
+
+    /* admitted cone: marginal rays through the stop edges */
+    const uT=solveU(o.P,t,a), uB=solveU(o.P,t,-a);
+    const pT=pathOf(o.P,uT), pB=pathOf(o.P,uB);
+    ctx.fillStyle=o.fill;
+    ctx.beginPath();
+    ctx.moveTo(X(o.P[0]),Y(o.P[1]));
+    ctx.lineTo(X(0),Y(pT.yL)); ctx.lineTo(X(SEN),Y(pT.ys));
+    ctx.lineTo(X(SEN),Y(pB.ys)); ctx.lineTo(X(0),Y(pB.yL));
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=o.color; ctx.globalAlpha=.5; ctx.lineWidth=1.2;
+    [[pT],[pB]].forEach(([pp])=>{
+      ctx.beginPath();
+      ctx.moveTo(X(o.P[0]),Y(o.P[1]));
+      ctx.lineTo(X(0),Y(pp.yL)); ctx.lineTo(X(SEN),Y(pp.ys));
+      ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+
+    /* chief ray: through the stop center */
+    const uC=solveU(o.P,t,0);
+    const pC=pathOf(o.P,uC);
+    ctx.strokeStyle=o.color; ctx.lineWidth=2.2;
+    ctx.beginPath();
+    ctx.moveTo(X(o.P[0]),Y(o.P[1]));
+    ctx.lineTo(X(0),Y(pC.yL)); ctx.lineTo(X(SEN),Y(pC.ys));
+    ctx.stroke();
+
+    /* blur segment on the sensor */
+    ctx.strokeStyle=o.color; ctx.lineWidth=5; ctx.globalAlpha=.85;
+    ctx.beginPath(); ctx.moveTo(X(SEN)+7,Y(pT.ys)); ctx.lineTo(X(SEN)+7,Y(pB.ys)); ctx.stroke();
+    ctx.globalAlpha=1;
+
+    centers.push({c:pC.ys, top:pT.ys, bot:pB.ys, blur:Math.abs(pT.ys-pB.ys), color:o.color, name:o.name});
+  });
+
+  /* ---- magnified sensor strip ---- */
+  const sx=W-stripW+6;
+  ctx.fillStyle='#111a2a'; ctx.fillRect(sx,16,stripW-12,H-32);
+  ctx.strokeStyle='#31435f'; ctx.strokeRect(sx,16,stripW-12,H-32);
+  label(ctx,'Sensor ×6',sx+6,32,'#7f93b2',11);
+  const mean=(centers[0].c+centers[1].c)/2;
+  const MAG=6*(H*0.4)/70;
+  const my=H/2;
+  const SY=y=>my-(y-mean)*MAG;
+  /* blur bars side by side */
+  centers.forEach((o,i)=>{
+    const bx=sx+18+i*26;
+    ctx.strokeStyle=o.color; ctx.lineWidth=9; ctx.globalAlpha=.4;
+    ctx.beginPath(); ctx.moveTo(bx,SY(o.top)); ctx.lineTo(bx,SY(o.bot)); ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.fillStyle=o.color;
+    ctx.beginPath(); ctx.arc(bx,SY(o.c),4,0,7); ctx.fill();
+  });
+  /* connect the blur centers */
+  ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1; dash(ctx,true);
+  ctx.beginPath();
+  centers.forEach((o,i)=>{
+    const bx=sx+18+i*26;
+    i?ctx.lineTo(bx,SY(o.c)):ctx.moveTo(bx,SY(o.c));
+  });
+  ctx.stroke();
+  dash(ctx,false);
+
+  const cs=centers.map(o=>o.c);
+  const d=Math.max(...cs)-Math.min(...cs);
+  const same=d<0.02;
+  const maxBlur=Math.max(centers[0].blur,centers[1].blur);
+  document.getElementById('roB').innerHTML=
+    `<span class="a">Entrance pupil  x = ${xEP.toFixed(1)}</span>\n`+
+    `Blur center   Near y = ${centers[0].c.toFixed(2)}   Far y = ${centers[1].c.toFixed(2)}   In-focus y = ${centers[2].c.toFixed(2)}   Δ = <b>${d.toFixed(2)}</b>\n`+
+    `Blur size     Near ${centers[0].blur.toFixed(2)}   Far ${centers[1].blur.toFixed(2)}   In-focus ${centers[2].blur.toFixed(2)} — sharp at any aperture\n`+
+    (same
+      ? `<span class="ok">Δ = 0</span> — three depths on one EP sight line: three different blurs, one pixel.\nOnly the point ON the focus plane is sharp — focus decides sharpness, the EP decides the pixel.`
+      : `<span class="sp">Pixels split</span> — glass, points and sensor are unchanged, but the moving stop shifted the EP\noff the shared sight line. Return t to 15 to merge them again.`)+
+    (maxBlur<0.3
+      ? `\n<span class="ok">Pinhole limit</span> — the cones degenerate into single rays: every depth is sharp at once.\nSelection becomes imaging. (In reality, diffraction takes over around here.)`
+      : ``);
+}
+
+[rbt,rba].forEach(el=>el.addEventListener('input',drawB));
+let rzB;
+window.addEventListener('resize',()=>{clearTimeout(rzB);rzB=setTimeout(drawB,120);});
+drawB();
+</script>
+</body>
+</html>

@@ -281,3 +281,10 @@ enableEmoji = true
       id = "G-JSZZVZZZS9"
       # whether to anonymize IP
       anonymizeIP = false
+
+[contentTypes]
+  [contentTypes."text/asciidoc"]
+  [contentTypes."text/markdown"]
+  [contentTypes."text/org"]
+  [contentTypes."text/pandoc"]
+  [contentTypes."text/rst"]

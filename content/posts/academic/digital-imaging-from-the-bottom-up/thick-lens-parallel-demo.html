@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thick Lens Parallel Ray Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 24px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 160px; min-width:150px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<canvas id="cvP" height="320" aria-label="Thick lens parallel ray simulation"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Front R₁ <output id="oc1">100</output></label>
+    <input type="range" id="rc1" min="-12" max="12" value="10" step="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Rear R₂ <output id="oc2">-100</output></label>
+    <input type="range" id="rc2" min="-12" max="12" value="-10" step="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Thickness d <output id="od">45</output></label>
+    <input type="range" id="rd" min="8" max="70" value="45" step="1">
+  </div>
+  <div class="ctrl">
+    <label>Index n <output id="on">1.52</output></label>
+    <input type="range" id="rn" min="1.44" max="1.90" value="1.52" step="0.01">
+  </div>
+</div>
+<div class="readout" id="roP"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+
+const cvP=document.getElementById('cvP');
+const rc1=document.getElementById('rc1'), rc2=document.getElementById('rc2');
+const rd=document.getElementById('rd'), rn=document.getElementById('rn');
+
+function drawP(){
+  const {ctx,W,H}=fit(cvP);
+  /* curvature sliders are in units of 1e-3 (scene units) */
+  const C1=(+rc1.value)*1e-3, C2=(+rc2.value)*1e-3;
+  const d=+rd.value, n=+rn.value;
+  document.getElementById('oc1').textContent = C1===0?'∞':(1/C1).toFixed(0);
+  document.getElementById('oc2').textContent = C2===0?'∞':(1/C2).toFixed(0);
+  document.getElementById('od').textContent = d;
+  document.getElementById('on').textContent = n.toFixed(2);
+
+  const xmin=-255,xmax=255;
+  const X=x=>(x-xmin)/(xmax-xmin)*(W-24)+12;
+  const cy=H*0.46, Y=y=>cy-y*(H*0.42)/95;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(10,cy); ctx.lineTo(W-10,cy); ctx.stroke();
+
+  /* ---- lens body ---- */
+  const V1=-d/2, V2=d/2, aMax=58;
+  const sag=(C,y)=>{
+    if(C===0) return 0;
+    const R=1/C;
+    return R - Math.sign(R)*Math.sqrt(Math.max(R*R-y*y,0));
+  };
+  /* clamp the aperture so the two surfaces never cross (edge thickness >= 1.5) */
+  let a=aMax;
+  while(a>12 && d + sag(C2,a) - sag(C1,a) < 1.5) a-=1;
+
+  const surf=(xv,C)=>{
+    const pts=[], N=24;
+    for(let i=0;i<=N;i++){
+      const y=-a + 2*a*i/N;
+      pts.push([xv+sag(C,y),y]);
+    }
+    return pts;
+  };
+  const s1=surf(V1,C1), s2=surf(V2,C2);
+  ctx.beginPath();
+  s1.forEach(([x,y],i)=> i?ctx.lineTo(X(x),Y(y)):ctx.moveTo(X(x),Y(y)));
+  s2.slice().reverse().forEach(([x,y])=> ctx.lineTo(X(x),Y(y)));
+  ctx.closePath();
+  ctx.fillStyle='rgba(110,168,232,.10)'; ctx.fill();
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.stroke();
+
+  /* ---- paraxial system ---- */
+  const P1=(n-1)*C1, P2=(1-n)*C2;
+  const P = P1 + P2 - (d/n)*P1*P2;               // Gullstrand
+  const afocal = Math.abs(P) < 2e-5;
+
+  /* parallel rays at three heights, refracting at each surface */
+  const heights=[[a*0.62,'#a8e05f'],[a*0.30,'#f6a72b'],[-a*0.46,'#ff7fa5']];
+  const trace=(hh)=>{
+    const ug=-hh*P1/n;
+    const h2=hh+ug*d;
+    const s2r=n*ug-h2*P2;
+    return {h2,s2r};
+  };
+
+  if(afocal){
+    heights.forEach(([hh,c])=>{
+      const t=trace(hh);
+      ctx.strokeStyle=c; ctx.lineWidth=1.8;
+      ctx.beginPath();
+      ctx.moveTo(X(xmin+5),Y(hh)); ctx.lineTo(X(V1),Y(hh));
+      ctx.lineTo(X(V2),Y(t.h2)); ctx.lineTo(X(xmax-5),Y(t.h2+t.s2r*(xmax-5-V2)));
+      ctx.stroke();
+    });
+    label(ctx,'Parallel rays',X(xmin+12),Y(a*0.62)-8,'#9fb0c8');
+    document.getElementById('roP').innerHTML='P ≈ 0  →  afocal system: parallel light exits parallel';
+    return;
+  }
+
+  const f  = 1/P;                                 // EFL, measured from H'
+  const xH  = V1 - f*(n-1)*d*C2/n;                // 1st principal plane
+  const xHp = V2 - f*(n-1)*d*C1/n;                // 2nd principal plane
+  const Fp  = xHp + f;
+  const BFL = f + (xHp - V2);
+  const virtual = f<0;
+
+  /* ---- principal planes ---- */
+  [[xH,'H',-4],[xHp,'H′',-8]].forEach(([x,t,dx])=>{
+    ctx.strokeStyle='#f6a72b'; ctx.lineWidth=1.4; dash(ctx,true);
+    ctx.beginPath(); ctx.moveTo(X(x),Y(a+14)); ctx.lineTo(X(x),Y(-a-14)); ctx.stroke(); dash(ctx,false);
+    label(ctx,t,X(x)+dx,Y(a+14)-6,'#f6a72b',13);
+  });
+
+  /* ---- real parallel rays (bend at each surface) ---- */
+  heights.forEach(([hh,c])=>{
+    const t=trace(hh);
+    ctx.strokeStyle=c; ctx.lineWidth=1.8;
+    ctx.beginPath();
+    ctx.moveTo(X(xmin+5),Y(hh));
+    ctx.lineTo(X(V1),Y(hh));
+    ctx.lineTo(X(V2),Y(t.h2));
+    ctx.lineTo(X(xmax-5),Y(t.h2+t.s2r*(xmax-5-V2)));
+    ctx.stroke();
+    if(virtual){                                   /* back-extension to the virtual focus */
+      dash(ctx,true); ctx.globalAlpha=.7;
+      ctx.beginPath();
+      ctx.moveTo(X(V2),Y(t.h2));
+      ctx.lineTo(X(Fp),Y(t.h2+t.s2r*(Fp-V2)));
+      ctx.stroke();
+      ctx.globalAlpha=1; dash(ctx,false);
+    }
+  });
+  label(ctx,'Parallel rays',X(xmin+12),Y(heights[0][0])-8,'#9fb0c8');
+
+  /* ---- model rays (solid white): straight to H', single bend toward F' ---- */
+  ctx.strokeStyle='rgba(232,237,246,.9)'; ctx.lineWidth=1.3;
+  heights.forEach(([hh])=>{
+    ctx.beginPath();
+    ctx.moveTo(X(xmin+5),Y(hh));
+    ctx.lineTo(X(xHp),Y(hh));
+    const xe = virtual? xHp+40 : xmax-5;
+    ctx.lineTo(X(xe),Y(hh*(1-(xe-xHp)/f)));
+    ctx.stroke();
+  });
+
+  /* ---- F' ---- */
+  if(Fp>xmin+10 && Fp<xmax-10){
+    ctx.fillStyle= virtual?'#c9b0ff':'#e8edf6';
+    ctx.beginPath(); ctx.arc(X(Fp),Y(0),4,0,Math.PI*2); ctx.fill();
+    label(ctx,virtual?'F′ (virtual)':'F′',X(Fp)-8,Y(0)+20,virtual?'#c9b0ff':'#e8edf6',13);
+  }
+
+  /* ---- EFL / BFL brackets ---- */
+  if(!virtual && Fp<xmax-10){
+    const brk=(x1,x2,yy,t,c)=>{
+      ctx.strokeStyle=c; ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(X(x1),yy); ctx.lineTo(X(x2),yy);
+      ctx.moveTo(X(x1),yy-5); ctx.lineTo(X(x1),yy+5);
+      ctx.moveTo(X(x2),yy-5); ctx.lineTo(X(x2),yy+5);
+      ctx.stroke();
+      label(ctx,t,(X(x1)+X(x2))/2-14,yy+16,c);
+    };
+    brk(xHp,Fp,H-52,'EFL','#e8edf6');
+    brk(V2, Fp,H-24,'BFL','#7f93b2');
+  }
+
+  /* ---- readout ---- */
+  let ro=`EFL f = ${f.toFixed(1)}   BFL = ${BFL.toFixed(1)}\n`
+        +`H: ${(xH-V1)>=0?'+':''}${(xH-V1).toFixed(1)} from V₁,  H′: ${(xHp-V2)>=0?'+':''}${(xHp-V2).toFixed(1)} from V₂`;
+  if(virtual) ro+='\nf < 0 — diverging system: F′ is virtual (back-extension of exit rays)';
+  else if(xHp < V1) ro+='\nH′ outside the glass (front side) — the telephoto principle: barrel shorter than f';
+  else if(xHp > V2) ro+='\nH′ outside the glass (rear side) — the retrofocus principle: long back focus at short f';
+  document.getElementById('roP').innerHTML=ro;
+}
+
+[rc1,rc2,rd,rn].forEach(el=>el.addEventListener('input',drawP));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(drawP,120);});
+drawP();
+</script>
+</body>
+</html>

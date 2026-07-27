@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thick Lens Imaging Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 24px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 150px; min-width:140px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<canvas id="cvT" height="340" aria-label="Thick lens imaging simulation"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Object distance <output id="oso">190</output></label>
+    <input type="range" id="rso" min="40" max="230" value="190" step="1">
+  </div>
+  <div class="ctrl">
+    <label>Front R₁ <output id="oc1">100</output></label>
+    <input type="range" id="rc1" min="-12" max="12" value="10" step="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Rear R₂ <output id="oc2">-100</output></label>
+    <input type="range" id="rc2" min="-12" max="12" value="-10" step="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Thickness d <output id="od">45</output></label>
+    <input type="range" id="rd" min="8" max="70" value="45" step="1">
+  </div>
+  <div class="ctrl">
+    <label>Index n <output id="on">1.52</output></label>
+    <input type="range" id="rn" min="1.44" max="1.90" value="1.52" step="0.01">
+  </div>
+</div>
+<div class="readout" id="roT"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+function arrowV(ctx,sx,syBase,syTip,color,dashed){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2;
+  dash(ctx,!!dashed);
+  ctx.beginPath(); ctx.moveTo(sx,syBase); ctx.lineTo(sx,syTip); ctx.stroke();
+  dash(ctx,false);
+  const dir = syTip<syBase?-1:1;
+  ctx.beginPath();
+  ctx.moveTo(sx,syTip); ctx.lineTo(sx-4,syTip-dir*8); ctx.lineTo(sx+4,syTip-dir*8);
+  ctx.closePath(); ctx.fill();
+}
+
+const cvT=document.getElementById('cvT');
+const rso=document.getElementById('rso');
+const rc1=document.getElementById('rc1'), rc2=document.getElementById('rc2');
+const rd=document.getElementById('rd'), rn=document.getElementById('rn');
+
+function drawT(){
+  const {ctx,W,H}=fit(cvT);
+  /* curvature sliders are in units of 1e-3 (scene units) */
+  const so=+rso.value;
+  const C1=(+rc1.value)*1e-3, C2=(+rc2.value)*1e-3;
+  const d=+rd.value, n=+rn.value;
+  document.getElementById('oso').textContent = so;
+  document.getElementById('oc1').textContent = C1===0?'∞':(1/C1).toFixed(0);
+  document.getElementById('oc2').textContent = C2===0?'∞':(1/C2).toFixed(0);
+  document.getElementById('od').textContent = d;
+  document.getElementById('on').textContent = n.toFixed(2);
+
+  const xmin=-255,xmax=255;
+  const X=x=>(x-xmin)/(xmax-xmin)*(W-24)+12;
+  const cy=H*0.5, Y=y=>cy-y*(H*0.42)/95;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(10,cy); ctx.lineTo(W-10,cy); ctx.stroke();
+
+  /* ---- lens body ---- */
+  const V1=-d/2, V2=d/2, aMax=58;
+  const sag=(C,y)=>{
+    if(C===0) return 0;
+    const R=1/C;
+    return R - Math.sign(R)*Math.sqrt(Math.max(R*R-y*y,0));
+  };
+  /* clamp the aperture so the two surfaces never cross (edge thickness >= 1.5) */
+  let a=aMax;
+  while(a>12 && d + sag(C2,a) - sag(C1,a) < 1.5) a-=1;
+
+  const surf=(xv,C)=>{
+    const pts=[], N=24;
+    for(let i=0;i<=N;i++){
+      const y=-a + 2*a*i/N;
+      pts.push([xv+sag(C,y),y]);
+    }
+    return pts;
+  };
+  const s1=surf(V1,C1), s2=surf(V2,C2);
+  ctx.beginPath();
+  s1.forEach(([x,y],i)=> i?ctx.lineTo(X(x),Y(y)):ctx.moveTo(X(x),Y(y)));
+  s2.slice().reverse().forEach(([x,y])=> ctx.lineTo(X(x),Y(y)));
+  ctx.closePath();
+  ctx.fillStyle='rgba(110,168,232,.10)'; ctx.fill();
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.stroke();
+
+  /* ---- paraxial system ---- */
+  const P1=(n-1)*C1, P2=(1-n)*C2;
+  const P = P1 + P2 - (d/n)*P1*P2;               // Gullstrand
+  const afocal = Math.abs(P) < 2e-5;
+
+  const h=42;
+  const xObj = V1 - so;
+  arrowV(ctx,X(xObj),cy,Y(h),'#e8edf6');
+  label(ctx,'Object',X(xObj)-14,Y(h)-10,'#e8edf6');
+
+  /* real rays: from the object tip toward three aperture heights, refracting at each surface */
+  const aims=[[a*0.45,'#a8e05f'],[0,'#f6a72b'],[-a*0.45,'#ff7fa5']];
+  const trace=(aim)=>{
+    const s0=(aim-h)/(V1-xObj);
+    const h1=h+s0*(V1-xObj);
+    const ug=(s0-h1*P1)/n;
+    const h2=h1+ug*d;
+    const s2r=n*ug-h2*P2;
+    return {h1,h2,s2r};
+  };
+
+  if(afocal){
+    aims.forEach(([aim,c])=>{
+      const t=trace(aim);
+      ctx.strokeStyle=c; ctx.lineWidth=1.8;
+      ctx.beginPath();
+      ctx.moveTo(X(xObj),Y(h)); ctx.lineTo(X(V1),Y(t.h1));
+      ctx.lineTo(X(V2),Y(t.h2)); ctx.lineTo(X(xmax-5),Y(t.h2+t.s2r*(xmax-5-V2)));
+      ctx.stroke();
+    });
+    document.getElementById('roT').innerHTML='P ≈ 0  →  afocal system: no focal length, no image';
+    return;
+  }
+
+  const f  = 1/P;                                 // EFL, measured from H'
+  const xH  = V1 - f*(n-1)*d*C2/n;                // 1st principal plane
+  const xHp = V2 - f*(n-1)*d*C1/n;                // 2nd principal plane
+  const Fp  = xHp + f;
+
+  const u = xH - xObj;                            // object distance from H
+  const nearFocal = f>0 && Math.abs(u-f)<2.5;
+  let v=0,m=0,virtual=false,farOut=false,xImg=0,hImg=0;
+  if(!nearFocal){
+    v = u*f/(u-f); m = -v/u; virtual = v<0;
+    xImg = xHp + v; hImg = m*h;
+    farOut = xImg>xmax-10 || xImg<xmin+10;
+  }
+
+  /* ---- principal planes & F' ---- */
+  [[xH,'H',-4],[xHp,'H′',-8]].forEach(([x,t,dx])=>{
+    ctx.strokeStyle='#f6a72b'; ctx.lineWidth=1.4; dash(ctx,true);
+    ctx.beginPath(); ctx.moveTo(X(x),Y(a+14)); ctx.lineTo(X(x),Y(-a-14)); ctx.stroke(); dash(ctx,false);
+    label(ctx,t,X(x)+dx,Y(a+14)-6,'#f6a72b',13);
+  });
+  if(Fp>xmin+10 && Fp<xmax-10){
+    ctx.strokeStyle='#3d5273'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(X(Fp),cy-6); ctx.lineTo(X(Fp),cy+6); ctx.stroke();
+    label(ctx,'F′',X(Fp)-6,cy+20,'#7f93b2');
+  }
+
+  /* ---- real rays (bend at each surface) ---- */
+  aims.forEach(([aim,c])=>{
+    const t=trace(aim);
+    ctx.strokeStyle=c; ctx.lineWidth=1.8;
+    ctx.beginPath();
+    ctx.moveTo(X(xObj),Y(h));
+    ctx.lineTo(X(V1),Y(t.h1));
+    ctx.lineTo(X(V2),Y(t.h2));
+    ctx.lineTo(X(xmax-5),Y(t.h2+t.s2r*(xmax-5-V2)));
+    ctx.stroke();
+    if(virtual && !farOut){                        /* back-extension to the virtual image */
+      dash(ctx,true); ctx.globalAlpha=.7;
+      ctx.beginPath();
+      ctx.moveTo(X(V2),Y(t.h2));
+      ctx.lineTo(X(xImg),Y(t.h2+t.s2r*(xImg-V2)));
+      ctx.stroke();
+      ctx.globalAlpha=1; dash(ctx,false);
+    }
+  });
+
+  /* ---- model ray (dashed): straight to H', single bend ---- */
+  dash(ctx,true); ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.moveTo(X(xObj),Y(h));
+  ctx.lineTo(X(xHp),Y(h));
+  const xe = virtual? (farOut? xHp+40 : xImg) : xmax-5;
+  ctx.lineTo(X(xe),Y(h*(1-(xe-xHp)/f)));
+  ctx.stroke(); dash(ctx,false);
+
+  /* ---- nodal ray (dashed): aimed at N(=H), exits from N'(=H') with the same slope ---- */
+  const sN = -h/(xH - xObj);
+  dash(ctx,true); ctx.strokeStyle='#31c9ba'; ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.moveTo(X(xObj),Y(h));
+  ctx.lineTo(X(xH),Y(0));
+  ctx.moveTo(X(xHp),Y(0));
+  ctx.lineTo(X(xmax-5),Y(sN*(xmax-5-xHp)));
+  ctx.stroke();
+  if(virtual && !farOut){
+    ctx.globalAlpha=.7;
+    ctx.beginPath();
+    ctx.moveTo(X(xHp),Y(0));
+    ctx.lineTo(X(xImg),Y(sN*(xImg-xHp)));
+    ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+  dash(ctx,false);
+  label(ctx,'nodal ray',X((xObj+xH)/2)-24,Y(h/2)-8,'#31c9ba');
+
+  /* ---- image ---- */
+  let note='';
+  if(nearFocal) note='u ≈ f  →  image at infinity (rays exit parallel)';
+  else if(farOut) note=`image far off-screen (v = ${v.toFixed(0)})`;
+  else{
+    arrowV(ctx,X(xImg),cy,Y(hImg),virtual?'#c9b0ff':'#e8edf6',virtual);
+    label(ctx,virtual?'Virtual image':'Image',X(xImg)+8,Y(hImg)+(hImg>0?-8:16),virtual?'#c9b0ff':'#e8edf6');
+  }
+
+  /* ---- readout ---- */
+  let ro=`EFL f = ${f.toFixed(1)}   BFL = ${(f+(xHp-V2)).toFixed(1)}   `
+        +`H: ${(xH-V1)>=0?'+':''}${(xH-V1).toFixed(1)} from V₁,  H′: ${(xHp-V2)>=0?'+':''}${(xHp-V2).toFixed(1)} from V₂`;
+  if(nearFocal||farOut){ ro+=`\n1/${u.toFixed(0)} + 1/v = 1/${f.toFixed(1)}   →  ${note}`; }
+  else{
+    ro+=`\n1/${u.toFixed(0)} + 1/v = 1/${f.toFixed(1)}   →  v = ${v.toFixed(1)},  m = ${m.toFixed(2)}`
+       +`   (u from H, v from H′)`
+       +(virtual? (f<0?'\nf < 0 — diverging lens: always a virtual, upright, reduced image'
+                      :'\nu < f — virtual image at intersection of back-extended rays'):'');
+  }
+  if(xHp < V1) ro+='\nH′ outside the glass (front side) — the telephoto principle: barrel shorter than f';
+  else if(xHp > V2) ro+='\nH′ outside the glass (rear side) — the retrofocus principle: long back focus at short f';
+  document.getElementById('roT').innerHTML=ro;
+}
+
+[rso,rc1,rc2,rd,rn].forEach(el=>el.addEventListener('input',drawT));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(drawT,120);});
+drawT();
+</script>
+</body>
+</html>

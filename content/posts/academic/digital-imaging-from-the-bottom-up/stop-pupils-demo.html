@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aperture Stop &amp; Pupils Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 200px; min-width:180px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+  .readout .a{color:#f6a72b;} .readout .c{color:#31c9ba;}
+</style>
+</head>
+<body>
+<canvas id="cvS" height="360" aria-label="Aperture stop and pupils simulation"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Stop position t <output id="ost">26</output></label>
+    <input type="range" id="rst" min="20" max="32" value="26" step="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Stop radius a <output id="osa">7</output></label>
+    <input type="range" id="rsa" min="4" max="10" value="7" step="0.5">
+  </div>
+</div>
+<div class="readout" id="roS"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+function lensGlyph(ctx,sx,cy,halfHpx,color){
+  ctx.strokeStyle=color; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
+  ctx.beginPath();
+  ctx.moveTo(sx,cy-halfHpx);
+  ctx.quadraticCurveTo(sx+10,cy,sx,cy+halfHpx);
+  ctx.quadraticCurveTo(sx-10,cy,sx,cy-halfHpx);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+
+/* Two thin lenses: L1 at x=0 (f1=100), L2 at x=40 (f2=30); a physical stop sits between them */
+const D={x0:-95, f1:100, L2:40, f2:30, sensor:60};
+const cvS=document.getElementById('cvS');
+const rst=document.getElementById('rst'), rsa=document.getElementById('rsa');
+
+/* Paraxial trace: (y0,u0) at x0 -> L1 -> stop plane -> L2 -> sensor */
+function trace(y0,u0,t){
+  const pts=[[D.x0,y0]];
+  let y=y0+u0*(0-D.x0), u=u0;
+  pts.push([0,y]);
+  u=u-y/D.f1;
+  const yStop=y+u*t;
+  pts.push([t,yStop]);
+  const y2=y+u*D.L2;
+  pts.push([D.L2,y2]);
+  const u2=u-y2/D.f2;
+  const yS=y2+u2*(D.sensor-D.L2);
+  pts.push([D.sensor,yS]);
+  return {pts,yStop,u2,y2,yS,yL1:pts[1][1]};
+}
+/* Height at the stop is linear in y0: solve for the ray that hits a given stop height */
+function solveY0(u0,t,target){
+  const a=trace(0,u0,t).yStop, b=trace(1,u0,t).yStop;
+  return (target-a)/(b-a);
+}
+
+function drawS(){
+  const {ctx,W,H}=fit(cvS);
+  const t=+rst.value, a=+rsa.value;
+  document.getElementById('ost').textContent=t;
+  document.getElementById('osa').textContent=a;
+
+  const xmin=-102,xmax=74;
+  const X=x=>(x-xmin)/(xmax-xmin)*(W-24)+12;
+  const cy=H*0.5, Y=y=>cy-y*(H*0.46)/30;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(10,cy); ctx.lineTo(W-10,cy); ctx.stroke();
+
+  /* Pupils = images of the stop formed by the lens group on each side */
+  const xEP=D.f1*t/(D.f1-t);
+  const rEP=a*Math.abs(D.f1/(D.f1-t));
+  const d2=D.L2-t;
+  const v=D.f2*d2/(d2-D.f2);
+  const xXP=D.L2+v;
+  const rXP=a*Math.abs(D.f2/(d2-D.f2));
+
+  lensGlyph(ctx,X(0),cy,H*0.42,'#6ea8e8');
+  lensGlyph(ctx,X(D.L2),cy,H*0.34,'#6ea8e8');
+  label(ctx,'L1',X(0)-8,cy-H*0.42-8,'#6ea8e8');
+  label(ctx,'L2',X(D.L2)-8,cy-H*0.34-8,'#6ea8e8');
+
+  ctx.fillStyle='#55617a';
+  const topY=Y(30), botY=Y(-30);
+  ctx.fillRect(X(t)-3,topY,6,Y(a)-topY);
+  ctx.fillRect(X(t)-3,Y(-a),6,botY-Y(-a));
+  label(ctx,'Aperture stop',X(t)-46,botY+16,'#8b97ad');
+
+  ctx.fillStyle='#c3ccdb';
+  ctx.fillRect(X(D.sensor)-2,Y(14),4,Y(-14)-Y(14));
+  label(ctx,'Sensor',X(D.sensor)-20,Y(-14)+18,'#c3ccdb');
+
+  /* Two ray bundles: on-axis and one off-axis field point */
+  const bundles=[
+    {u0:0,color:'#a8e05f'},
+    {u0:Math.tan(-10*Math.PI/180),color:'#ff7fa5'}
+  ];
+  bundles.forEach(b=>{
+    /* marginal rays: graze the stop edges */
+    [a,-a].forEach(edge=>{
+      const y0=solveY0(b.u0,t,edge);
+      const tr=trace(y0,b.u0,t);
+      ctx.strokeStyle=b.color; ctx.globalAlpha=.45; ctx.lineWidth=1.4; dash(ctx,false);
+      ctx.beginPath();
+      tr.pts.forEach((p,i)=> i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])));
+      ctx.stroke(); ctx.globalAlpha=1;
+    });
+    /* chief ray: through the stop center */
+    const y0c=solveY0(b.u0,t,0);
+    const tr=trace(y0c,b.u0,t);
+    ctx.strokeStyle=b.color; ctx.lineWidth=2.2;
+    ctx.beginPath();
+    tr.pts.forEach((p,i)=> i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])));
+    ctx.stroke();
+
+    /* extensions of the off-axis chief ray: object side aims at EP, image side leaves XP */
+    if(Math.abs(b.u0)>1e-9){
+      dash(ctx,true); ctx.strokeStyle='#f6a72b'; ctx.lineWidth=1.4;
+      const xCross=-tr.yL1/b.u0;
+      ctx.beginPath();
+      ctx.moveTo(X(0),Y(tr.yL1));
+      ctx.lineTo(X(Math.min(xCross+6,72)),Y(tr.yL1+b.u0*Math.min(xCross+6,72)));
+      ctx.stroke();
+      ctx.strokeStyle='#31c9ba';
+      const xC2=D.L2-tr.y2/tr.u2;
+      const xTo=Math.max(xC2-6,xmin+4);
+      ctx.beginPath();
+      ctx.moveTo(X(D.L2),Y(tr.y2));
+      ctx.lineTo(X(xTo),Y(tr.y2+tr.u2*(xTo-D.L2)));
+      ctx.stroke();
+      dash(ctx,false);
+    }
+  });
+
+  function pupilMark(x,r,color,name,below){
+    dash(ctx,true); ctx.strokeStyle=color; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(X(x),Y(r)); ctx.lineTo(X(x),Y(-r)); ctx.stroke();
+    dash(ctx,false);
+    ctx.fillStyle=color;
+    ctx.beginPath(); ctx.arc(X(x),cy,3.4,0,7); ctx.fill();
+    label(ctx,name,X(x)-name.length*3.6,below?Y(-r)+18:Y(r)-10,color,12.5);
+  }
+  pupilMark(xEP,rEP,'#f6a72b','Entrance pupil',false);
+  pupilMark(xXP,rXP,'#31c9ba','Exit pupil',true);
+
+  document.getElementById('roS').innerHTML=
+    `Physical stop    x=${t.toFixed(1)}   radius ${a.toFixed(1)}\n`+
+    `<span class="a">Entrance pupil   x=${xEP.toFixed(1)}   radius ${rEP.toFixed(1)}   (×${(rEP/a).toFixed(2)}) — the stop imaged by the front lens</span>\n`+
+    `<span class="c">Exit pupil       x=${xXP.toFixed(1)}   radius ${rXP.toFixed(1)}   (×${(rXP/a).toFixed(2)}) — the stop imaged by the rear lens</span>\n`+
+    `Chief rays (solid, through the stop center): the amber dashed extension aims at the EP center,\n`+
+    `the teal dashed extension leaves from the XP center — independent of field angle`+
+    (xXP<0?`\nNote: XP now floats in front of the whole system — pupils are virtual images, this is not an error`:``);
+}
+
+[rst,rsa].forEach(el=>el.addEventListener('input',drawS));
+let rzS;
+window.addEventListener('resize',()=>{clearTimeout(rzS);rzS=setTimeout(drawS,120);});
+drawS();
+</script>
+</body>
+</html>

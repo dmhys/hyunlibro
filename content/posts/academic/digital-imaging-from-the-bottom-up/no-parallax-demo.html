@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No-Parallax Point Demo</title>
+<style>
+  /* Follows the KeepIt theme palette; html[theme=dark] is synced from the parent page */
+  :root{
+    --ink:#161209; --ink-soft:#a9a9b3; --readout-bg:#f0f0f0;
+    --accent:#2d96bd; --bench:#0b1220;
+  }
+  html[theme=dark]{
+    --ink:#a9a9b3; --ink-soft:#5d5d5f; --readout-bg:#363636;
+    --accent:#55bde2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:transparent; color:var(--ink);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  canvas{ width:100%; display:block; background:var(--bench); border-radius:6px; }
+  .controls{ display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:12px; align-items:center; }
+  .ctrl{ flex:1 1 200px; min-width:180px; }
+  .ctrl label{ display:flex; justify-content:space-between;
+    font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px; }
+  .ctrl label output{ color:var(--ink); font-weight:500; }
+  input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+  .readout{ margin-top:10px; font-family:'Source Code Pro',Menlo,Consolas,Monaco,monospace;
+    font-size:12.5px; line-height:1.9; color:var(--ink-soft); background:var(--readout-bg);
+    border-radius:6px; padding:8px 14px; white-space:pre-wrap; }
+  .readout .a{color:#f6a72b;} .readout .c{color:#31c9ba;}
+</style>
+</head>
+<body>
+<canvas id="cvN" height="420" aria-label="No-parallax point simulation (top-down view)"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label>Camera rotation θ (deg) <output id="onth">12</output></label>
+    <input type="range" id="rnth" min="-20" max="20" value="12" step="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Pivot position p (0 = entrance pupil) <output id="onp">-45</output></label>
+    <input type="range" id="rnp" min="-60" max="100" value="-45" step="1">
+  </div>
+</div>
+<div class="readout" id="roN"></div>
+
+<script>
+"use strict";
+/* Follow the parent page's body[theme]; fall back to OS preference when standalone */
+function syncTheme(){
+  let t = null;
+  try{ if(window.parent !== window) t = window.parent.document.body.getAttribute('theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('theme', t);
+}
+syncTheme();
+try{
+  new MutationObserver(syncTheme)
+    .observe(window.parent.document.body, {attributes:true, attributeFilter:['theme']});
+}catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+
+function fit(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = parseInt(cv.getAttribute('height'),10);
+  cv.style.height = h+'px';
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ ctx.setLineDash(on?[5,5]:[]); }
+function label(ctx,txt,x,y,color,size){
+  ctx.fillStyle=color; ctx.font=(size||12)+'px "Source Code Pro",Consolas,monospace';
+  ctx.fillText(txt,x,y);
+}
+
+/*
+ * Top-down view of a camera photographing two scene points.
+ * The camera is modeled as a pinhole at its entrance pupil (EP), initially at the
+ * origin looking along +x. Near and Far are collinear with the initial EP, so at
+ * θ=0 Near exactly covers Far on the sensor.
+ * The camera rotates by θ about a pivot at (p,0). Only p=0 (pivot = EP) keeps the
+ * viewpoint fixed, so only there the two points stay aligned at every angle.
+ */
+const NEAR={x:80, y:20}, FAR={x:320, y:80};
+const FIMG=120;               /* image-space scale (arbitrary focal length) */
+const IMG_HALF=125;           /* half-range of the sensor strip in image units */
+const TH_MAX=20*Math.PI/180;  /* slider range, used for the EP-path arc */
+
+const cvN=document.getElementById('cvN');
+const rnth=document.getElementById('rnth'), rnp=document.getElementById('rnp');
+
+/* EP position after rotating the camera by th about the fixed pivot (p,0) */
+function pose(th,p){
+  const c=Math.cos(th), s=Math.sin(th);
+  return {ex:p-p*c, ey:-p*s, c, s};
+}
+/* 1-D photo coordinate of world point Q (null if behind the camera).
+ * Sign convention: positive = to the camera's RIGHT, so the strip reads like the
+ * photo the camera takes. Top-down, forward = +x, sky = out of the screen, hence
+ * world +y (up on the canvas) is the camera's left. */
+function imgCoord(Q,E){
+  const vx=Q.x-E.ex, vy=Q.y-E.ey;
+  const fx= vx*E.c+vy*E.s, fy=-vx*E.s+vy*E.c;
+  if(fx<=1e-6) return null;
+  return -FIMG*fy/fx;
+}
+
+function drawN(){
+  const {ctx,W,H}=fit(cvN);
+  const thDeg=+rnth.value, p=+rnp.value;
+  const th=thDeg*Math.PI/180;
+  document.getElementById('onth').textContent=thDeg;
+  document.getElementById('onp').textContent=p;
+
+  const xmin=-75,xmax=345, ymin=-72,ymax=100;
+  const stripTop=H-56;
+  const X=x=>(x-xmin)/(xmax-xmin)*(W-24)+12;
+  const Y=y=>12+(ymax-y)*(stripTop-38-12)/(ymax-ymin);
+  const E=pose(th,p);
+
+  ctx.clearRect(0,0,W,H);
+
+  /* optical axis of the initial pose */
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(X(xmin+3),Y(0)); ctx.lineTo(X(xmax-3),Y(0)); ctx.stroke();
+
+  /* path traced by the EP as the camera rotates about the pivot (a point when p=0) */
+  if(Math.abs(p)>0.5){
+    ctx.strokeStyle='#8b97ad'; ctx.globalAlpha=.55; ctx.lineWidth=1.2; dash(ctx,true);
+    ctx.beginPath();
+    for(let i=0;i<=24;i++){
+      const a=-TH_MAX+i*(2*TH_MAX/24), Ei=pose(a,p);
+      i?ctx.lineTo(X(Ei.ex),Y(Ei.ey)):ctx.moveTo(X(Ei.ex),Y(Ei.ey));
+    }
+    ctx.stroke(); dash(ctx,false); ctx.globalAlpha=1;
+  }
+
+  /* camera body drawn in world coordinates: local frame is EP-centered, +x = forward */
+  const T=(lx,ly)=>[X(E.ex+lx*E.c-ly*E.s), Y(E.ey+lx*E.s+ly*E.c)];
+  function poly(pts,close){
+    ctx.beginPath();
+    pts.forEach((q,i)=>{const s=T(q[0],q[1]); i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});
+    if(close) ctx.closePath();
+  }
+  ctx.strokeStyle='#3d5273'; ctx.lineWidth=1.4;
+  poly([[-50,-13],[-6,-13],[-6,13],[-50,13]],true); ctx.stroke();
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=2.5;
+  poly([[-42,-12],[-42,12]]); ctx.stroke();
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=2.5;
+  poly([[0,-16],[0,16]]); ctx.stroke();
+
+  /* entrance pupil and pivot */
+  ctx.fillStyle='#f6a72b';
+  ctx.beginPath(); ctx.arc(X(E.ex),Y(E.ey),3.6,0,7); ctx.fill();
+  label(ctx,'EP',X(E.ex)+7,Y(E.ey)-7,'#f6a72b',12.5);
+  ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.6;
+  ctx.beginPath();
+  ctx.moveTo(X(p)-6,Y(0)); ctx.lineTo(X(p)+6,Y(0));
+  ctx.moveTo(X(p),Y(0)-6); ctx.lineTo(X(p),Y(0)+6);
+  ctx.stroke();
+  label(ctx,'Pivot',X(p)-17,Y(0)+20,'#e8edf6');
+
+  /* scene points */
+  ctx.fillStyle='#f6a72b';
+  ctx.beginPath(); ctx.arc(X(NEAR.x),Y(NEAR.y),5,0,7); ctx.fill();
+  label(ctx,'Near',X(NEAR.x)-14,Y(NEAR.y)-11,'#f6a72b',12.5);
+  ctx.fillStyle='#31c9ba';
+  ctx.beginPath(); ctx.arc(X(FAR.x),Y(FAR.y),5,0,7); ctx.fill();
+  label(ctx,'Far',X(FAR.x)-10,Y(FAR.y)-11,'#31c9ba',12.5);
+
+  /* line of sight through Near: if the viewpoint has not moved, it still hits Far */
+  const dx=NEAR.x-E.ex, dy=NEAR.y-E.ey;
+  if(dx>1e-6){
+    const yEnd=E.ey+dy*(xmax-5-E.ex)/dx;
+    ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.2; dash(ctx,true); ctx.globalAlpha=.85;
+    ctx.beginPath(); ctx.moveTo(X(E.ex),Y(E.ey)); ctx.lineTo(X(xmax-5),Y(yEnd)); ctx.stroke();
+    ctx.globalAlpha=1; dash(ctx,false);
+  }
+  /* ray to Far */
+  ctx.strokeStyle='#31c9ba'; ctx.lineWidth=1.2; ctx.globalAlpha=.75;
+  ctx.beginPath(); ctx.moveTo(X(E.ex),Y(E.ey)); ctx.lineTo(X(FAR.x),Y(FAR.y)); ctx.stroke();
+  ctx.globalAlpha=1;
+
+  /* ---- 1-D sensor image strip ---- */
+  const sw=Math.min(360,W-40), sx0=(W-sw)/2;
+  label(ctx,'Photo (1-D, as seen by the camera)',sx0,stripTop-8,'#8b97ad');
+  ctx.fillStyle='#1a2436';
+  ctx.fillRect(sx0,stripTop,sw,24);
+  ctx.strokeStyle='#3d5273'; ctx.lineWidth=1;
+  ctx.strokeRect(sx0,stripTop,sw,24);
+  label(ctx,'L',sx0-14,stripTop+17,'#8b97ad');
+  label(ctx,'R',sx0+sw+6,stripTop+17,'#8b97ad');
+  ctx.strokeStyle='#55617a';
+  ctx.beginPath(); ctx.moveTo(sx0+sw/2,stripTop); ctx.lineTo(sx0+sw/2,stripTop+24); ctx.stroke();
+
+  const mF=imgCoord(FAR,E), mN=imgCoord(NEAR,E);
+  function mark(m,color,w0,h0){
+    if(m===null) return;
+    const mc=Math.max(-IMG_HALF,Math.min(IMG_HALF,m));
+    const px=sx0+sw/2+mc/IMG_HALF*(sw/2-4);
+    ctx.fillStyle=color;
+    ctx.fillRect(px-w0/2,stripTop+12-h0/2,w0,h0);
+  }
+  mark(mF,'#31c9ba',10,18);
+  mark(mN,'#f6a72b',5,24);
+
+  /* ---- readout ---- */
+  const fmt=m=> m===null?'behind cam':m.toFixed(1);
+  const where= p<-0.5?'(behind the EP: camera body / tripod-socket territory)'
+             : p>0.5?'(in front of the EP)':'';
+  let ro=`θ = ${thDeg.toFixed(1)}°,  pivot p = ${p.toFixed(0)}  ${where}\n`
+        +`<span class="c">image(Far)  = ${fmt(mF)}</span>   <span class="a">image(Near) = ${fmt(mN)}</span>`;
+  if(mF!==null&&mN!==null){
+    ro+=`   →   parallax Δ = ${(mN-mF).toFixed(1)}`;
+  }
+  ro+='\n';
+  if(Math.abs(p)<=0.5){
+    ro+=`Pivot = entrance pupil: the viewpoint never moves, so Near stays locked on Far (Δ = 0)\n`
+       +`at every angle — the no-parallax point.`;
+  }else{
+    ro+=`Rotating about p ≠ 0 translates the EP itself (gray dashed path) → Near slides against Far\n`
+       +`between shots = stitching parallax. Set p = 0 and sweep θ again.`;
+  }
+  document.getElementById('roN').innerHTML=ro;
+}
+
+[rnth,rnp].forEach(el=>el.addEventListener('input',drawN));
+let rzN;
+window.addEventListener('resize',()=>{clearTimeout(rzN);rzN=setTimeout(drawN,120);});
+drawN();
+</script>
+</body>
+</html>

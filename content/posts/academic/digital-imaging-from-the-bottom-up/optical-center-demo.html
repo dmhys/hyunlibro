@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>광학 중심은 어디서 태어나는가 — 조리개와 선택</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f5f1; --ink:#1b232e; --ink-soft:#4a5666; --hair:#d7dbd2;
+    --bench:#0b1220; --amber:#f6a72b; --cyan:#31c9ba; --pink:#ff7fa5;
+    --glass:#6ea8e8; --card:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Sans KR','Apple SD Gothic Neo',sans-serif;
+    line-height:1.78; font-size:16.5px; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:780px; margin:0 auto; padding:0 20px 110px;}
+
+  header{padding:64px 0 36px; border-bottom:1px solid var(--hair);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;
+    color:var(--ink-soft); text-transform:uppercase; margin-bottom:16px;}
+  h1{font-size:clamp(26px,5vw,38px); font-weight:700; line-height:1.3; letter-spacing:-0.02em;}
+  .lede{margin-top:20px; font-size:17px; color:var(--ink-soft); max-width:62ch;}
+
+  section{margin-top:64px;}
+  .sec-tag{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.12em;
+    color:#b0770f; margin-bottom:10px;}
+  h2{font-size:23px; font-weight:700; letter-spacing:-0.015em; margin-bottom:16px;}
+  p{margin-bottom:16px; max-width:68ch;}
+  .thesis{background:var(--bench); color:#e8edf6; border-radius:14px;
+    padding:24px 28px; margin:24px 0; font-size:17px; line-height:1.85;}
+  .thesis .k{color:var(--amber); font-weight:700;}
+
+  .bench{background:var(--card); border:1px solid var(--hair); border-radius:14px;
+    padding:18px 18px 14px; margin:26px 0; box-shadow:0 1px 0 rgba(20,30,45,.04);}
+  .bench canvas{width:100%; display:block; background:var(--bench); border-radius:9px;}
+  .bench-head{display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:12px; gap:12px; flex-wrap:wrap;}
+  .bench-title{font-weight:700; font-size:15px;}
+  .bench-sub{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
+  .controls{display:flex; flex-wrap:wrap; gap:14px 28px; margin-top:14px; align-items:center;}
+  .ctrl{flex:1 1 210px; min-width:190px;}
+  .ctrl label{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace;
+    font-size:12px; color:var(--ink-soft); margin-bottom:4px;}
+  .ctrl label output{color:var(--ink); font-weight:500;}
+  input[type=range]{width:100%; accent-color:#c47e12; height:22px;}
+  input[type=range]:focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px;}
+  .readout{margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+    line-height:1.9; color:var(--ink-soft); background:#f0f2ec; border-radius:8px;
+    padding:10px 14px; white-space:pre-wrap;}
+  .readout b{color:var(--ink); font-weight:500;}
+  .readout .a{color:#b0770f;} .readout .ok{color:#0e8b7f; font-weight:700;}
+  .readout .sp{color:#d64f7d; font-weight:700;}
+  ol{margin:0 0 16px 1.25em;} li{margin-bottom:10px; max-width:66ch;}
+  .fin{margin-top:70px; padding-top:26px; border-top:1px solid var(--hair);
+    color:var(--ink-soft); font-size:15px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Supplement · Where the optical center is born</div>
+  <h1>광학 중심은 어디서 태어나는가</h1>
+  <p class="lede">
+    렌즈는 조리개 없이도 결상한다. 그런데 왜 조리개를 도입해야 "투영 중심"이 생기는가.
+    답: 결상과 투영은 다른 문제이고, 중심은 결상이 아니라 <b>선택</b>에서 태어나기 때문이다.
+  </p>
+</header>
+
+<section>
+  <div class="sec-tag">§1 · 중심이 필요 없는 세계</div>
+  <h2>초점 맞은 평면 하나만 찍는다면</h2>
+  <p>
+    물체면의 한 점에서 퍼진 광선은 — 렌즈를 통과할 수만 있다면 어느 광선이든 —
+    전부 상면의 대응점 한 곳으로 수렴한다. "어느 광선이 대표인가"라는 질문이
+    성립하지 않으므로, 이 세계에는 투영 중심이라는 개념이 등장할 자리가 없다.
+    복사기·스캐너처럼 단일 평면만 다루는 광학이 그렇다.
+  </p>
+</section>
+
+<section>
+  <div class="sec-tag">§2 · 깊이가 들어오는 순간</div>
+  <h2>디포커스가 "선택"을 강제한다</h2>
+  <p>
+    3차원 장면에서는 거의 모든 점이 초점면 밖에 있다. 초점이 어긋난 점은 센서에
+    점이 아니라 <b>흐림 원반</b>으로 찍히고, 그 점이 "어디에 보이는가"는 원반의
+    중심으로 정의된다. 원반의 중심을 지나는 광선은 정확히 <b>조리개 정중앙을 통과한
+    광선(주광선)</b>이다 — 조리개가 허락한 광선 원뿔의 축이니까.
+  </p>
+  <div class="thesis">
+    즉 3D → 2D 사상은 "점 → 그 점의 광선 다발 중 <span class="k">조리개가 고른
+    원뿔의 축</span> → 센서 위치"로 결정된다. 모든 점의 원뿔 축은 물체 공간에서
+    한 점 — 조리개의 상, <span class="k">입사동 중심</span> — 을 지나므로,
+    <b>같은 픽셀에 찍히는 3D 점들 = 입사동 중심을 지나는 한 직선 위의 점들</b>.
+    이것이 중심투영의 정의다. 렌즈는 광선을 꺾을 뿐이고, 어느 광선이 대표인지는
+    구멍이 고른다. 투영 중심은 고르는 쪽에서 태어난다.
+  </div>
+</section>
+
+<section>
+  <div class="sec-tag">§3 · 실험</div>
+  <h2>같은 시선, 같은 픽셀 — 그리고 조리개를 밀면</h2>
+  <p>
+    아래 계는 렌즈(f=50) 하나, 센서는 거리 150에 초점을 맞춘 위치에 고정.
+    근경(분홍, 거리 110)과 원경(청록, 거리 260) 두 점은 <b>둘 다 초점이 어긋나
+    있고</b>, 초기 조리개 위치(t=15)의 입사동 시선 한 줄 위에 정렬되어 있다.
+    흐림 크기는 서로 달라도 <b>흐림의 중심 — 픽셀 — 은 정확히 일치</b>함을
+    오른쪽 확대 스트립에서 확인하라. 이제 조리개를 밀어 보라. 유리도, 두 점도,
+    센서도 그대로인데 입사동이 이동하면서 두 점의 픽셀이 갈라진다.
+    조리개 <i>반경</i>은 아무리 바꿔도 흐림 크기만 변할 뿐 중심은 움직이지 않는다 —
+    크기는 심도의 문제, 위치는 원근의 문제다. 마지막으로 반경을 끝까지 조여 보라.
+    흐림이 함께 0으로 수렴하며 두 점 모두, <b>초점면 밖에 있는데도</b> 선명해진다.
+    원뿔이 광선 하나로 퇴화하는 핀홀 극한이다.
+  </p>
+
+  <div class="bench">
+    <div class="bench-head">
+      <div class="bench-title">실험 · 흐림의 중심은 입사동이 정한다</div>
+      <div class="bench-sub">f=50 · sensor@75 (focus 150) · paraxial</div>
+    </div>
+    <canvas id="cv" height="400" aria-label="디포커스 블러 중심과 입사동 시뮬레이션"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label>조리개 위치 t (t&lt;0: 렌즈 앞) <output id="ot">15</output></label>
+        <input type="range" id="rt" min="-15" max="30" value="15" step="1">
+      </div>
+      <div class="ctrl">
+        <label>조리개 반경 a <output id="oa">6</output></label>
+        <input type="range" id="ra" min="0.2" max="9" value="6" step="0.2">
+      </div>
+    </div>
+    <div class="readout" id="ro"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-tag">§4 · 따름정리</div>
+  <h2>세 가지가 자동으로 풀린다</h2>
+  <ol>
+    <li><b>조리개 없는 렌즈는 없다.</b> 아이리스를 제거해도 렌즈 테두리가 광속을
+      제한하는 조리개가 된다. 맨렌즈에도 투영 중심은 이미 있으며(자기 개구의 상),
+      아이리스는 그 중심을 제어·이동시키는 장치일 뿐이다.</li>
+    <li><b>핀홀은 이 구조의 극한이다.</b> 구멍을 0으로 줄이면 유리 없이 완전한
+      카메라가 된다 — 원뿔이 광선 하나로 퇴화해 선택이 곧 결상이 되므로.
+      렌즈란 "구멍을 크게 뚫고도(광량) 선택된 원뿔이 다시 한 점으로 모이게(선명도)
+      만드는 보정 장치"다. 원근 기하는 처음부터 끝까지 구멍의 소유다.</li>
+    <li><b>얇은 렌즈 작도가 혼란의 범인이다.</b> 조리개가 렌즈 위치에 붙어 있으면
+      입사동 = 렌즈 개구 그 자체라서, "중심 통과 무굴절 광선"과 "주광선"이
+      우연히 같은 광선이 된다. 그래서 렌즈 중심이 곧 투영 중심처럼 보인다.
+      조리개를 렌즈에서 떼는 순간 두 개념은 분리되고, 투영 중심은 렌즈가 아니라
+      조리개의 상을 따라간다 — 위 실험이 보여주는 그대로.</li>
+  </ol>
+</section>
+
+<div class="fin">
+  요약: 결상은 "모은다", 투영은 "고른다". 렌즈가 전자를, 조리개가 후자를 담당하며
+  광학 중심은 후자의 산물이다 — 정확히는, 고르는 구멍이 물체 쪽에서 보이는 위치(입사동)에.
+</div>
+
+</div>
+
+<script>
+"use strict";
+const F=50, SEN=75, FOCUS=150;
+const P1=[-110,28], P2=[-260,60];   // aligned with EP(t=15)=(21.43,0)
+const cv=document.getElementById('cv');
+const rt=document.getElementById('rt'), ra=document.getElementById('ra');
+
+function fit(c){
+  const dpr=window.devicePixelRatio||1;
+  const w=c.clientWidth, h=parseInt(c.getAttribute('height'),10);
+  c.style.height=h+'px';
+  c.width=Math.round(w*dpr); c.height=Math.round(h*dpr);
+  const ctx=c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:h};
+}
+function dash(ctx,on){ctx.setLineDash(on?[5,5]:[]);}
+function label(ctx,t,x,y,c,s){ctx.fillStyle=c;ctx.font=(s||12)+'px "IBM Plex Mono",monospace';ctx.fillText(t,x,y);}
+
+function yAtStop(P,u,t){
+  if(t<0) return P[1]+u*(t-P[0]);
+  const yL=P[1]-u*P[0];
+  return yL+(u-yL/F)*t;
+}
+function pathOf(P,u){          // [lens-y, sensor-y]
+  const yL=P[1]-u*P[0];
+  const uP=u-yL/F;
+  return {yL, ys:yL+uP*SEN};
+}
+function solveU(P,t,target){   // u such that yAtStop == target
+  const a=yAtStop(P,0,t), b=yAtStop(P,0.01,t);
+  return 0.01*(target-a)/(b-a);
+}
+
+function draw(){
+  const {ctx,W,H}=fit(cv);
+  const t=+rt.value, a=+ra.value;
+  document.getElementById('ot').textContent=t;
+  document.getElementById('oa').textContent=a;
+
+  const stripW=92;
+  const plotW=W-stripW-16;
+  const xmin=-286, xmax=96;
+  const X=x=>(x-xmin)/(xmax-xmin)*(plotW-18)+10;
+  const cy=H*0.44;
+  const Y=y=>cy-y*(H*0.4)/70;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(8,cy); ctx.lineTo(plotW,cy); ctx.stroke();
+
+  // focus plane marker
+  dash(ctx,true); ctx.strokeStyle='#2c3c56';
+  ctx.beginPath(); ctx.moveTo(X(-FOCUS),Y(66)); ctx.lineTo(X(-FOCUS),Y(-30)); ctx.stroke();
+  dash(ctx,false);
+  label(ctx,'초점면(150)',X(-FOCUS)-32,Y(66)-6,'#4d6285',11);
+
+  // lens
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
+  ctx.beginPath();
+  ctx.moveTo(X(0),Y(30));
+  ctx.quadraticCurveTo(X(0)+10,cy,X(0),Y(-30));
+  ctx.quadraticCurveTo(X(0)-10,cy,X(0),Y(30));
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  label(ctx,'렌즈 f=50',X(0)-24,Y(30)-8,'#6ea8e8',11.5);
+
+  // stop
+  ctx.fillStyle='#55617a';
+  ctx.fillRect(X(t)-3,Y(30),6,Y(a)-Y(30));
+  ctx.fillRect(X(t)-3,Y(-a),6,Y(-30)-Y(-a));
+  label(ctx,'조리개',X(t)-18,Y(-30)+16,'#8b97ad',11.5);
+
+  // sensor
+  ctx.fillStyle='#c3ccdb';
+  ctx.fillRect(X(SEN)-2,Y(30),4,Y(-30)-Y(30));
+  label(ctx,'센서',X(SEN)-12,Y(30)-8,'#c3ccdb',11.5);
+
+  // entrance pupil
+  const xEP = t<0 ? t : F*t/(F-t);
+  const rEP = t<0 ? a : a*F/(F-t);
+  dash(ctx,true); ctx.strokeStyle='#f6a72b'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(X(xEP),Y(rEP)); ctx.lineTo(X(xEP),Y(-rEP)); ctx.stroke();
+  dash(ctx,false);
+  ctx.fillStyle='#f6a72b';
+  ctx.beginPath(); ctx.arc(X(xEP),cy,3.6,0,7); ctx.fill();
+  label(ctx,'입사동 EP',X(xEP)-26,Y(rEP)-8,'#f6a72b',12);
+
+  const pts=[
+    {P:P1,color:'#ff7fa5',fill:'rgba(255,127,165,.13)',name:'근경'},
+    {P:P2,color:'#31c9ba',fill:'rgba(49,201,186,.12)',name:'원경'}
+  ];
+  const centers=[];
+  pts.forEach(o=>{
+    // scene point
+    ctx.fillStyle=o.color;
+    ctx.beginPath(); ctx.arc(X(o.P[0]),Y(o.P[1]),5,0,7); ctx.fill();
+    label(ctx,o.name,X(o.P[0])-12,Y(o.P[1])-12,o.color);
+
+    // EP sight line (object space)
+    dash(ctx,true); ctx.strokeStyle='rgba(246,167,43,.55)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(X(o.P[0]),Y(o.P[1])); ctx.lineTo(X(xEP),cy); ctx.stroke();
+    dash(ctx,false);
+
+    // admitted cone: marginal rays through stop edges
+    const uT=solveU(o.P,t,a), uB=solveU(o.P,t,-a);
+    const pT=pathOf(o.P,uT), pB=pathOf(o.P,uB);
+    ctx.fillStyle=o.fill;
+    ctx.beginPath();
+    ctx.moveTo(X(o.P[0]),Y(o.P[1]));
+    ctx.lineTo(X(0),Y(pT.yL)); ctx.lineTo(X(SEN),Y(pT.ys));
+    ctx.lineTo(X(SEN),Y(pB.ys)); ctx.lineTo(X(0),Y(pB.yL));
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=o.color; ctx.globalAlpha=.5; ctx.lineWidth=1.2;
+    [[pT],[pB]].forEach(([pp])=>{
+      ctx.beginPath();
+      ctx.moveTo(X(o.P[0]),Y(o.P[1]));
+      ctx.lineTo(X(0),Y(pp.yL)); ctx.lineTo(X(SEN),Y(pp.ys));
+      ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+
+    // chief ray
+    const uC=solveU(o.P,t,0);
+    const pC=pathOf(o.P,uC);
+    ctx.strokeStyle=o.color; ctx.lineWidth=2.2;
+    ctx.beginPath();
+    ctx.moveTo(X(o.P[0]),Y(o.P[1]));
+    ctx.lineTo(X(0),Y(pC.yL)); ctx.lineTo(X(SEN),Y(pC.ys));
+    ctx.stroke();
+
+    // blur segment on sensor
+    ctx.strokeStyle=o.color; ctx.lineWidth=5; ctx.globalAlpha=.85;
+    ctx.beginPath(); ctx.moveTo(X(SEN)+7,Y(pT.ys)); ctx.lineTo(X(SEN)+7,Y(pB.ys)); ctx.stroke();
+    ctx.globalAlpha=1;
+
+    centers.push({c:pC.ys, top:pT.ys, bot:pB.ys, blur:Math.abs(pT.ys-pB.ys), color:o.color, name:o.name});
+  });
+
+  /* ---- magnified sensor strip ---- */
+  const sx=W-stripW+6;
+  ctx.fillStyle='#111a2a'; ctx.fillRect(sx,16,stripW-12,H-32);
+  ctx.strokeStyle='#31435f'; ctx.strokeRect(sx,16,stripW-12,H-32);
+  label(ctx,'센서 ×6',sx+6,32,'#7f93b2',11);
+  const mean=(centers[0].c+centers[1].c)/2;
+  const MAG=6*(H*0.4)/70;
+  const my=H/2;
+  const SY=y=>my-(y-mean)*MAG;
+  // blur bars side by side
+  centers.forEach((o,i)=>{
+    const bx=sx+26+i*30;
+    ctx.strokeStyle=o.color; ctx.lineWidth=9; ctx.globalAlpha=.4;
+    ctx.beginPath(); ctx.moveTo(bx,SY(o.top)); ctx.lineTo(bx,SY(o.bot)); ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.fillStyle=o.color;
+    ctx.beginPath(); ctx.arc(bx,SY(o.c),4,0,7); ctx.fill();
+  });
+  // connect centers
+  ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1; dash(ctx,true);
+  ctx.beginPath();
+  ctx.moveTo(sx+26,SY(centers[0].c)); ctx.lineTo(sx+56,SY(centers[1].c)); ctx.stroke();
+  dash(ctx,false);
+
+  const d=Math.abs(centers[0].c-centers[1].c);
+  const same=d<0.02;
+  const maxBlur=Math.max(centers[0].blur,centers[1].blur);
+  document.getElementById('ro').innerHTML=
+    `<span class="a">입사동 EP  x = ${xEP.toFixed(1)}</span>\n`+
+    `흐림 중심   근경 y = ${centers[0].c.toFixed(2)}   원경 y = ${centers[1].c.toFixed(2)}   Δ = <b>${d.toFixed(2)}</b>\n`+
+    `흐림 지름   근경 ${centers[0].blur.toFixed(2)}   원경 ${centers[1].blur.toFixed(2)}\n`+
+    (same
+      ? `<span class="ok">Δ = 0</span> — 두 점이 현재 EP의 한 시선 위에 있다. 흐림 크기가 달라도 픽셀은 하나: 이 "같은 픽셀 관계"의 꼭짓점이 곧 광학 중심이다.`
+      : `<span class="sp">픽셀 분리</span> — 유리·점·센서는 그대로인데 조리개가 움직여 EP가 이동했고, 두 점은 더 이상 한 시선 위에 있지 않다. t=15로 되돌리면 다시 합쳐진다.`)+
+    (maxBlur<0.3
+      ? `\n<span class="ok">핀홀 극한</span> — 원뿔이 광선 하나로 퇴화해 초점면 밖의 깊이까지 전부 선명하다. 선택이 곧 결상. (실물이라면 이쯤에서 회절이 다시 흐림을 키운다)`
+      : ``);
+}
+
+[rt,ra].forEach(el=>el.addEventListener('input',draw));
+let rz;
+window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>
