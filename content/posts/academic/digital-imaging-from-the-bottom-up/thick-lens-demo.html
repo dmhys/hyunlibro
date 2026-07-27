@@ -193,9 +193,13 @@ function drawT(){
 
   /* ---- nodal ray (dashed): aimed at N(=H), exits from N'(=H') with the same slope ---- */
   const sN = -h/(xH - xObj);
+  /* The approach to N almost coincides with the amber ray aimed at the vertex — they
+     only separate near the lens — so the incoming leg is drawn from where the two
+     visibly part rather than all the way back to the object. */
+  const xNin = xObj + 0.62*(xH - xObj);
   dash(ctx,true); ctx.strokeStyle='#31c9ba'; ctx.lineWidth=1.4;
   ctx.beginPath();
-  ctx.moveTo(X(xObj),Y(h));
+  ctx.moveTo(X(xNin),Y(h + sN*(xNin - xObj)));
   ctx.lineTo(X(xH),Y(0));
   ctx.moveTo(X(xHp),Y(0));
   ctx.lineTo(X(xmax-5),Y(sN*(xmax-5-xHp)));
@@ -209,7 +213,7 @@ function drawT(){
     ctx.globalAlpha=1;
   }
   dash(ctx,false);
-  label(ctx,'nodal ray',X((xObj+xH)/2)-24,Y(h/2)-8,'#31c9ba');
+  label(ctx,'nodal ray',X((xNin+xH)/2)-24,Y(h+sN*((xNin+xH)/2-xObj))-8,'#31c9ba');
 
   /* ---- image ---- */
   let note='';

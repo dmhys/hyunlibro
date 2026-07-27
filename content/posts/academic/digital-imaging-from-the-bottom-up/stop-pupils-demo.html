@@ -69,7 +69,7 @@ function drawS(){
 
   const xmin=-102,xmax=74;
   const X=x=>(x-xmin)/(xmax-xmin)*(W-24)+12;
-  const cy=H*0.5, Y=y=>cy-y*(H*0.46)/30;
+  const cy=H*0.5, Y=y=>cy-y*(H*0.40)/30;
 
   ctx.clearRect(0,0,W,H);
   ctx.strokeStyle='#243349'; ctx.lineWidth=1;
@@ -83,10 +83,10 @@ function drawS(){
   const xXP=D.L2+v;
   const rXP=a*Math.abs(D.f2/(d2-D.f2));
 
-  lensGlyph(ctx,X(0),cy,H*0.42,'#6ea8e8');
-  lensGlyph(ctx,X(D.L2),cy,H*0.34,'#6ea8e8');
-  label(ctx,'L1',X(0)-8,cy-H*0.42-8,'#6ea8e8');
-  label(ctx,'L2',X(D.L2)-8,cy-H*0.34-8,'#6ea8e8');
+  lensGlyph(ctx,X(0),cy,H*0.365,'#6ea8e8');
+  lensGlyph(ctx,X(D.L2),cy,H*0.296,'#6ea8e8');
+  label(ctx,'L1',X(0)-8,cy-H*0.365-8,'#6ea8e8');
+  label(ctx,'L2',X(D.L2)-8,cy-H*0.296-8,'#6ea8e8');
 
   ctx.fillStyle='#55617a';
   const topY=Y(30), botY=Y(-30);
@@ -104,14 +104,35 @@ function drawS(){
     {u0:Math.tan(-10*Math.PI/180),color:'#ff7fa5'}
   ];
   bundles.forEach(b=>{
-    /* marginal rays: graze the stop edges */
+    /* marginal rays: graze the stop edges, and it is their extensions that build the pupils */
     [a,-a].forEach(edge=>{
       const y0=solveY0(b.u0,t,edge);
       const tr=trace(y0,b.u0,t);
-      ctx.strokeStyle=b.color; ctx.globalAlpha=.45; ctx.lineWidth=1.4; dash(ctx,false);
+      ctx.strokeStyle=b.color; ctx.globalAlpha=.35; ctx.lineWidth=1.3; dash(ctx,false);
       ctx.beginPath();
       tr.pts.forEach((p,i)=> i?ctx.lineTo(X(p[0]),Y(p[1])):ctx.moveTo(X(p[0]),Y(p[1])));
       ctx.stroke(); ctx.globalAlpha=1;
+
+      /* Where the ray *appears* to come from / go to when the glass is ignored.
+         Extending the incoming segment past L1 lands on the EP edge, and running the
+         outgoing segment back past L2 lands on the XP edge — exactly, for every field
+         angle. That coincidence is what "pupil = image of the stop" means. */
+      ctx.globalAlpha=.45; ctx.lineWidth=1.1; dash(ctx,true);
+      ctx.strokeStyle='#f6a72b';
+      ctx.beginPath();
+      ctx.moveTo(X(0),Y(tr.yL1));
+      ctx.lineTo(X(xEP),Y(tr.yL1+b.u0*xEP));
+      ctx.stroke();
+      ctx.strokeStyle='#31c9ba';
+      ctx.beginPath();
+      ctx.moveTo(X(D.L2),Y(tr.y2));
+      ctx.lineTo(X(xXP),Y(tr.y2+tr.u2*(xXP-D.L2)));
+      ctx.stroke();
+      dash(ctx,false); ctx.globalAlpha=1;
+
+      /* the grazing point itself */
+      ctx.fillStyle=b.color;
+      ctx.beginPath(); ctx.arc(X(t),Y(edge),2.6,0,7); ctx.fill();
     });
     /* chief ray: through the stop center */
     const y0c=solveY0(b.u0,t,0);
@@ -146,6 +167,8 @@ function drawS(){
     dash(ctx,false);
     ctx.fillStyle=color;
     ctx.beginPath(); ctx.arc(X(x),cy,3.4,0,7); ctx.fill();
+    /* edges: every marginal-ray extension converges on these two points */
+    [r,-r].forEach(e=>{ ctx.beginPath(); ctx.arc(X(x),Y(e),3.2,0,7); ctx.fill(); });
     label(ctx,name,X(x)-name.length*3.6,below?Y(-r)+18:Y(r)-10,color,12.5);
   }
   pupilMark(xEP,rEP,'#f6a72b','Entrance pupil',false);
@@ -155,8 +178,9 @@ function drawS(){
     `Physical stop    x=${t.toFixed(1)}   radius ${a.toFixed(1)}\n`+
     `<span class="a">Entrance pupil   x=${xEP.toFixed(1)}   radius ${rEP.toFixed(1)}   (×${(rEP/a).toFixed(2)}) — the stop imaged by the front lens</span>\n`+
     `<span class="c">Exit pupil       x=${xXP.toFixed(1)}   radius ${rXP.toFixed(1)}   (×${(rXP/a).toFixed(2)}) — the stop imaged by the rear lens</span>\n`+
-    `Chief rays (solid, through the stop center): the amber dashed extension aims at the EP center,\n`+
-    `the teal dashed extension leaves from the XP center — independent of field angle`+
+    `Marginal rays graze the stop edge (dots). Extend them with the glass ignored — dashed —\n`+
+    `and they land on the pupil edges; the chief rays through the stop centre land on the centres.\n`+
+    `Both hold for every field angle: that is the whole content of "a pupil is the stop, imaged".`+
     (xXP<0?`\nNote: XP now floats in front of the whole system — pupils are virtual images, this is not an error`:``);
 }
 

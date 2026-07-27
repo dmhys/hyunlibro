@@ -147,16 +147,22 @@ function drawP(){
   });
   label(ctx,'Parallel rays',X(xmin+12),Y(heights[0][0])-8,'#9fb0c8');
 
-  /* ---- model rays (solid white): straight to H', single bend toward F' ---- */
-  ctx.strokeStyle='rgba(232,237,246,.9)'; ctx.lineWidth=1.3;
-  heights.forEach(([hh])=>{
+  /* ---- model rays (dashed, one per real ray): no bend until H′ ----
+     Coming in from the left the model and the real ray are the same horizontal line,
+     so only the stretch after the real ray bends (V1) is drawn. Overdrawing the shared
+     part just washes out the colour underneath it. Same hue as its real ray, so the
+     pair reads as "this ray, idealised". */
+  dash(ctx,true); ctx.lineWidth=1.3; ctx.globalAlpha=.75;
+  heights.forEach(([hh,c])=>{
+    ctx.strokeStyle=c;
     ctx.beginPath();
-    ctx.moveTo(X(xmin+5),Y(hh));
+    ctx.moveTo(X(V1),Y(hh));
     ctx.lineTo(X(xHp),Y(hh));
     const xe = virtual? xHp+40 : xmax-5;
     ctx.lineTo(X(xe),Y(hh*(1-(xe-xHp)/f)));
     ctx.stroke();
   });
+  ctx.globalAlpha=1; dash(ctx,false);
 
   /* ---- F' ---- */
   if(Fp>xmin+10 && Fp<xmax-10){
