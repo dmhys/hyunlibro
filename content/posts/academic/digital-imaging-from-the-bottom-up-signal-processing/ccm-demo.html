@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colour Correction Matrix Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>
+  .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
+  .readout .sp{color:#ff7fa5; font-weight:600;}
+</style>
+</head>
+<body>
+<canvas id="cvCm" height="400" aria-label="Filter crosstalk, colour patches and the correction matrix"></canvas>
+<div class="btns" id="bnCm">
+  <button data-m="diag" class="active">Diagonal only (WB-style)</button>
+  <button data-m="full">Full 3&times;3 (CCM)</button>
+</div>
+<div class="controls">
+  <div class="ctrl">
+    <label>Correction strength (%) <output id="occ">0</output></label>
+    <input type="range" id="rcc" min="0" max="100" value="0" step="2">
+  </div>
+</div>
+<div class="readout" id="roCm"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script src="/js/spectrum-lib.js"></script>
+<script>
+"use strict";
+/*
+ * Continuation of the WB demo: the patches below are already white-balanced (the
+ * gray patch reads neutral), yet the colours are desaturated — overlapping filters
+ * leaked neighbours' light into every channel. The demo lets you try to fix that
+ * with the only tool WB had (a diagonal) and fail, then open the off-diagonals:
+ * the CCM is the 3x3 least-squares fit to a narrow-filter reference. Off-diagonals
+ * come out negative (subtract the leak), which amplifies noise — and because a 3x3
+ * acts inside the already-collapsed 3D space, a residual always survives.
+ */
+const CAM=SPEC.makeFilters(1.3);    /* overlap chosen so the fitted CCM's off-diagonals
+                                       land around -0.2 ~ -0.3, typical of real cameras */
+const REF=SPEC.makeFilters(0.45);   /* narrow "ideal" reference filters */
+const PATCH=[
+  {n:'red',     f:l=>0.05+0.9*SPEC.sig((l-600)/15)},
+  {n:'orange',  f:l=>0.05+0.9*SPEC.sig((l-575)/15)},
+  {n:'yellow',  f:l=>0.05+0.9*SPEC.sig((l-545)/12)},
+  {n:'green',   f:l=>0.05+0.75*SPEC.gauss(l,540,35)},
+  {n:'cyan',    f:l=>0.05+0.8*SPEC.sig((555-l)/15)},
+  {n:'blue',    f:l=>0.05+0.8*SPEC.gauss(l,460,32)},
+  {n:'magenta', f:l=>0.05+0.7*SPEC.gauss(l,450,35)+0.8*SPEC.sig((l-600)/15)},
+  {n:'skin',    f:l=>0.15+0.4*SPEC.sig((l-570)/45)},
+  {n:'gray',    f:l=>0.35},
+];
+const cvCm=document.getElementById('cvCm'), roCm=document.getElementById('roCm');
+const rcc=document.getElementById('rcc');
+let mode='diag';
+
+/* Responses of every patch through a filter set, white-balanced on the gray patch
+   (both pipelines neutralised — what remains to compare is saturation). */
+function responses(F){
+  const cs=PATCH.map(p=>F.resp(Array.from({length:SPEC.N},(_,i)=>p.f(SPEC.lam(i)))));
+  const cg=cs[PATCH.length-1];
+  const t=(cg[0]+cg[1]+cg[2])/3;
+  return cs.map(c=>c.map((v,k)=>v*t/cg[k]));
+}
+const ref=responses(REF), cam=responses(CAM);
+
+/* Full least-squares 3x3: cam -> ref over the patch set (normal equations per row). */
+function fitCCM(){
+  const AtA=[[0,0,0],[0,0,0],[0,0,0]], Atb=[[0,0,0],[0,0,0],[0,0,0]];
+  cam.forEach((a,p)=>{
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+      AtA[i][j]+=a[i]*a[j];
+      Atb[i][j]+=a[i]*ref[p][j];
+    }
+  });
+  return [0,1,2].map(k=>SPEC.solve3(AtA.map(r=>[...r]),[Atb[0][k],Atb[1][k],Atb[2][k]]));
+}
+/* Best DIAGONAL fit: the strongest correction WB-style gains can offer here. */
+function fitDiag(){
+  return [0,1,2].map(k=>{
+    let num=0,den=0;
+    cam.forEach((a,p)=>{num+=a[k]*ref[p][k];den+=a[k]*a[k];});
+    return den>1e-12?num/den:1;
+  });
+}
+const MFULL=fitCCM(), DIAG=fitDiag();
+
+function drawCm(){
+  const {ctx,W,H}=fit(cvCm);
+  ctx.clearRect(0,0,W,H);
+  const m=+rcc.value/100;
+  const M=mode==='full'
+    ? MFULL.map((r,k)=>r.map((v,j)=>(1-m)*(k===j?1:0)+m*v))
+    : [0,1,2].map(k=>[0,1,2].map(j=>k===j?(1-m)+m*DIAG[k]:0));
+  const apply=v=>[0,1,2].map(k=>M[k][0]*v[0]+M[k][1]*v[1]+M[k][2]*v[2]);
+  const cur=cam.map(apply);
+
+  /* ---- top: the two filter sets ---- */
+  const g=SPEC.geom(W,H,{right:20,py1:H-206,top:16});
+  SPEC.drawAxis(ctx,g);
+  SPEC.drawFilters(ctx,g,CAM);
+  SPEC.drawFilters(ctx,g,REF,{noFill:true,dashed:true,strokeA:'99',lw:1,noLabel:true});
+  SPEC.drawBlind(ctx,g,CAM);
+  label(ctx,'solid: camera filters   dashed: narrow reference',g.px0+6,g.py0+28,'rgba(255,255,255,.45)',11);
+
+  /* ---- bottom: patches, left half reference / right half camera + correction ---- */
+  const py=H-136, ph=64, gap=6;
+  const pw=(W-40-gap*(PATCH.length-1))/PATCH.length;
+  const bright=Math.max(...ref.flat());
+  const col=c=>c.map(v=>Math.round(255*Math.pow(Math.min(1,Math.max(0,v)/bright),1/2.2)));
+  let worst=0, wi=0, mean=0;
+  PATCH.forEach((p,i)=>{
+    const x=20+i*(pw+gap);
+    const [r1,g1,b1]=col(ref[i]);
+    const [r2,g2,b2]=col(cur[i]);
+    ctx.fillStyle=`rgb(${r1},${g1},${b1})`; ctx.fillRect(x,py,pw/2,ph);
+    ctx.fillStyle=`rgb(${r2},${g2},${b2})`; ctx.fillRect(x+pw/2,py,pw/2,ph);
+    ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=1; ctx.strokeRect(x,py,pw,ph);
+    label(ctx,p.n,x+2,py+ph+14,'rgba(255,255,255,.45)',10);
+    const e=Math.max(...[0,1,2].map(k=>Math.abs(cur[i][k]-ref[i][k])))/bright;
+    mean+=e/PATCH.length;
+    if(e>worst){worst=e;wi=i;}
+  });
+  label(ctx,'left: reference   right: camera (already white-balanced) + correction',20,py-8,'rgba(255,255,255,.45)',11);
+
+  const noise=M.map(r=>Math.sqrt(r[0]**2+r[1]**2+r[2]**2));
+  const fm=(v,k,j)=>{
+    const s=(v<0?'':' ')+v.toFixed(2);
+    if(k===j) return `<span class="a">${s}</span>`;
+    return v<-0.005?`<span class="sp">${s}</span>`:s;
+  };
+  const rowTxt=(r,k)=>`[${fm(r[0],k,0)} ${fm(r[1],k,1)} ${fm(r[2],k,2)} ]`;
+  roCm.innerHTML=
+    `Applied matrix (${mode==='full'?'full 3×3':'diagonal only — WB had nothing left'})\n`+
+    `  ${rowTxt(M[0],0)}  noise ×${noise[0].toFixed(2)}\n`+
+    `  ${rowTxt(M[1],1)}  noise ×${noise[1].toFixed(2)}\n`+
+    `  ${rowTxt(M[2],2)}  noise ×${noise[2].toFixed(2)}\n`+
+    `max residual ${(100*worst).toFixed(1)}% (${PATCH[wi].n})   mean ${(100*mean).toFixed(1)}%\n`+
+    (m<0.05
+      ? `<span class="sp">Desaturated</span> — the gray patch is already neutral (white-balanced), yet every colour is washed out:\noverlapping filters leaked neighbours' light into each channel. Raise the strength.`
+      : mode==='diag'
+        ? `<span class="sp">Saturation barely moves</span> — a diagonal can only rescale whole channels, and on balanced data\nthat job is already done. The leak sits in the OFF-diagonals. Switch to the full 3×3.`
+        : `<span class="a">Negative off-diagonals</span> subtract the leaked signal — and amplify noise by the row norms above.\n<span class="sp">Residual remains</span>: a 3×3 acts inside the collapsed 3-number space; it cannot undo the integral.`);
+}
+
+document.getElementById('bnCm').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  mode=b.dataset.m;
+  document.querySelectorAll('#bnCm button').forEach(x=>x.classList.toggle('active',x===b));
+  drawCm();
+});
+rcc.addEventListener('input',()=>{
+  document.getElementById('occ').textContent=rcc.value;
+  drawCm();
+});
+let rzCm;
+window.addEventListener('resize',()=>{clearTimeout(rzCm);rzCm=setTimeout(drawCm,120);});
+drawCm();
+</script>
+</body>
+</html>

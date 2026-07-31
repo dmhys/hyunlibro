@@ -17,4 +17,3 @@ series_weight = 6
 
 +++
 
-# depth camera에 대한 이해(itof, dtof, structured light, stereo vision)

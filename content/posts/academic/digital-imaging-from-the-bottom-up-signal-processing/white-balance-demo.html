@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Balance &amp; Colour Temperature Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>
+  .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
+  .readout .sp{color:#ff7fa5; font-weight:600;}
+</style>
+</head>
+<body>
+<canvas id="cvWb" height="330" aria-label="Illuminant times reflectance, recorded colour and white balance gains"></canvas>
+<div class="btns" id="bnWb">
+  <button data-p="white" class="active">White paper</button>
+  <button data-p="gray">Gray card</button>
+  <button data-p="apple">Red apple</button>
+  <button data-p="leaf">Green leaf</button>
+  <button data-p="cloth">Blue cloth</button>
+</div>
+<div class="controls">
+  <div class="ctrl">
+    <label>Colour temperature (K) <output id="otp">6500</output></label>
+    <input type="range" id="rtp" min="2000" max="10000" value="6500" step="100">
+  </div>
+  <div class="ctrl">
+    <label>White balance (%) <output id="owb">0</output></label>
+    <input type="range" id="rwb" min="0" max="100" value="0" step="2">
+  </div>
+</div>
+<div class="readout" id="roWb"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script src="/js/spectrum-lib.js"></script>
+<script>
+"use strict";
+/*
+ * What the sensor records is illuminant x reflectance, collapsed to three numbers —
+ * so the light's colour is baked into every pixel. White balance solves for the three
+ * gains that make a WHITE surface read neutral under the current illuminant, then
+ * applies those same gains to everything. A diagonal fix: it rescales the three
+ * numbers, it cannot re-separate what the integrals already merged.
+ */
+const SURF={
+  white: {n:'white paper', f:l=>0.95},
+  gray:  {n:'gray card',   f:l=>0.35},
+  apple: {n:'red apple',   f:l=>0.06+0.85*SPEC.sig((l-590)/18)},
+  leaf:  {n:'green leaf',  f:l=>0.05+0.5*SPEC.gauss(l,550,35)},
+  cloth: {n:'blue cloth',  f:l=>0.07+0.65*SPEC.gauss(l,460,38)},
+};
+const cvWb=document.getElementById('cvWb'), roWb=document.getElementById('roWb');
+const rtp=document.getElementById('rtp'), rwb=document.getElementById('rwb');
+let surf='white';
+
+function drawWb(){
+  const {ctx,W,H}=fit(cvWb);
+  ctx.clearRect(0,0,W,H);
+  const T=+rtp.value, m=+rwb.value/100;
+
+  const I=SPEC.sampleFn(l=>SPEC.planck(l,T));
+  const R=Array.from({length:SPEC.N},(_,i)=>SURF[surf].f(SPEC.lam(i)));
+  const P=I.map((v,i)=>v*R[i]);
+  const c=SPEC.F0.resp(P);
+
+  /* gains from the white reference under this SAME illuminant */
+  const cw=SPEC.F0.resp(I);
+  const t=(cw[0]+cw[1]+cw[2])/3;
+  const gains=cw.map(v=>t/v);
+  const gApplied=gains.map(v=>1+(v-1)*m);
+  const cb=c.map((v,k)=>v*gApplied[k]);
+
+  const g=SPEC.geom(W,H);
+  SPEC.drawAxis(ctx,g);
+  SPEC.drawFilters(ctx,g,SPEC.F0,{fillA:'14',strokeA:'44',noLabel:true});
+  SPEC.drawBlind(ctx,g);
+  SPEC.drawCurve(ctx,g,I,'#f6a72b',1.6,true);          /* illuminant */
+  SPEC.drawCurve(ctx,g,R,'rgba(255,255,255,.35)',1.3,true); /* reflectance */
+  SPEC.drawCurve(ctx,g,P,'#fff',2.2);                  /* what reaches the sensor */
+  label(ctx,'illuminant',g.px0+6,g.py0+12,'#f6a72b',11);
+  label(ctx,'reflectance',g.px0+6,g.py0+26,'rgba(255,255,255,.45)',11);
+  label(ctx,'reaches sensor',g.px0+6,g.py0+40,'#fff',11);
+
+  /* right panel: recorded vs white-balanced */
+  const rx=W-118, rw=100;
+  const draw=(cc,y,name)=>{
+    const [dr,dg,db]=SPEC.swatch(cc);
+    ctx.fillStyle=`rgb(${dr},${dg},${db})`;
+    ctx.fillRect(rx,y,rw,44);
+    ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1; ctx.strokeRect(rx,y,rw,44);
+    label(ctx,name,rx,y+58,'rgba(255,255,255,.45)',11);
+  };
+  draw(c,g.py0,'recorded');
+  draw(cb,g.py0+82,'after WB');
+  label(ctx,`gain R ${gApplied[0].toFixed(2)}`,rx,g.py0+186,SPEC.F0.def[0].c,11);
+  label(ctx,`gain G ${gApplied[1].toFixed(2)}`,rx,g.py0+202,SPEC.F0.def[1].c,11);
+  label(ctx,`gain B ${gApplied[2].toFixed(2)}`,rx,g.py0+218,SPEC.F0.def[2].c,11);
+
+  const cast=Math.max(...c)/Math.max(Math.min(...c),1e-6);
+  roWb.innerHTML=
+    `Illuminant ${T} K   (${SURF[surf].n})   recorded R ${c[0].toFixed(3)} G ${c[1].toFixed(3)} B ${c[2].toFixed(3)}\n`+
+    `WB gains solved on a white surface: <span class="a">R×${gApplied[0].toFixed(2)}  G×${gApplied[1].toFixed(2)}  B×${gApplied[2].toFixed(2)}</span> — one gain per channel, every pixel\n`+
+    (m>0.9
+      ? `<span class="ok">Balanced</span> — the light's cast is divided back out of every pixel.\nGains act per channel; mixing BETWEEN channels is the next demo's job (CCM).`
+      : (cast>1.6 && (surf==='white'||surf==='gray')
+        ? `<span class="sp">Colour cast</span> — this surface is neutral, but the recorded numbers are not:\nthe sensor records illuminant × reflectance. Drag <b>White balance</b> to divide the light back out.`
+        : `The sensor cannot tell "warm light on neutral paper" from "orange paper in neutral light".\nMove the temperature, then drag <b>White balance</b>.`));
+}
+
+document.getElementById('bnWb').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  surf=b.dataset.p;
+  document.querySelectorAll('#bnWb button').forEach(x=>x.classList.toggle('active',x===b));
+  drawWb();
+});
+function syncOut(){
+  document.getElementById('otp').textContent=rtp.value;
+  document.getElementById('owb').textContent=rwb.value;
+}
+[rtp,rwb].forEach(el=>el.addEventListener('input',()=>{syncOut();drawWb();}));
+let rzWb;
+window.addEventListener('resize',()=>{clearTimeout(rzWb);rzWb=setTimeout(drawWb,120);});
+syncOut(); drawWb();
+</script>
+</body>
+</html>

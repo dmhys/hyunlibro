@@ -17,4 +17,3 @@ series_weight = 8
 
 +++
 
-# realistic simulation을 위한 센서별 특징

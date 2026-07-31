@@ -17,5 +17,4 @@ series_weight = 9
 
 +++
 
-# Rendering & inverse rendering
 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spectrum &rarr; Three Numbers Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>
+  .readout .a{color:#f6a72b;} .readout .ok{color:#31c9ba; font-weight:600;}
+  .readout .sp{color:#ff7fa5; font-weight:600;}
+</style>
+</head>
+<body>
+<canvas id="cvSp" height="330" aria-label="Spectrum collapsing into three filter responses"></canvas>
+<div class="btns" id="bnSp">
+  <button data-p="laser" class="active">Yellow laser</button>
+  <button data-p="led">White LED</button>
+  <button data-p="tungsten">Tungsten</button>
+  <button data-p="peaks2">Two peaks</button>
+  <button data-p="rand">Random</button>
+</div>
+<div class="controls">
+  <div class="ctrl">
+    <label>Peak shift &Delta;&lambda; (nm) <output id="osh">0</output></label>
+    <input type="range" id="rsh" min="-60" max="60" value="0" step="2">
+  </div>
+  <div class="ctrl">
+    <label>Metamer morph (%) <output id="omt">0</output></label>
+    <input type="range" id="rmt" min="0" max="100" value="0" step="2">
+  </div>
+</div>
+<div class="readout" id="roSp"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script src="/js/spectrum-lib.js"></script>
+<script>
+"use strict";
+/*
+ * A spectrum is a continuous curve; the sensor keeps only three weighted sums of it
+ * (the filter responses). The metamer slider morphs the curve toward a spike mixture
+ * with the SAME three responses — the numbers and the reproduced colour stay frozen.
+ */
+const PRESETS={
+  laser:    l=>SPEC.gauss(l,580,9),
+  led:      l=>SPEC.gauss(l,450,13)+0.78*SPEC.gauss(l,562,60),
+  tungsten: l=>SPEC.planck(l,2856),
+  peaks2:   l=>0.9*SPEC.gauss(l,535,22)+SPEC.gauss(l,635,25),
+};
+let randSpec=l=>SPEC.gauss(l,520,40);
+function makeRandom(){
+  const k=2+Math.floor(Math.random()*3);
+  const bumps=Array.from({length:k},()=>({mu:405+Math.random()*270,s:12+Math.random()*48,a:0.3+Math.random()*0.7}));
+  randSpec=l=>bumps.reduce((acc,b)=>acc+b.a*SPEC.gauss(l,b.mu,b.s),0);
+}
+
+const cvSp=document.getElementById('cvSp'), roSp=document.getElementById('roSp');
+const rsh=document.getElementById('rsh'), rmt=document.getElementById('rmt');
+let preset='laser';
+
+function drawSp(){
+  const {ctx,W,H}=fit(cvSp);
+  ctx.clearRect(0,0,W,H);
+  const d=+rsh.value, m=+rmt.value/100;
+  const fn=preset==='rand'?randSpec:PRESETS[preset];
+  const S0=SPEC.sampleFn(l=>fn(l-d));
+  const M=SPEC.metamerOf(S0);
+  const S=S0.map((v,i)=>(1-m)*v+m*M[i]);
+  const c=SPEC.F0.resp(S);
+
+  const g=SPEC.geom(W,H);
+  SPEC.drawAxis(ctx,g);
+  SPEC.drawFilters(ctx,g);
+  SPEC.drawBlind(ctx,g);
+  if(m>0.02) SPEC.drawCurve(ctx,g,S0,'rgba(255,255,255,.32)',1.4,true);
+  SPEC.drawCurve(ctx,g,S,'#f6a72b',2.2);
+
+  /* right panel: the three numbers + the colour they reproduce */
+  const rx=W-118, rw=100;
+  const [dr,dg,db]=SPEC.swatch(c);
+  ctx.fillStyle=`rgb(${dr},${dg},${db})`;
+  ctx.fillRect(rx,g.py0,rw,40);
+  ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=1; ctx.strokeRect(rx,g.py0,rw,40);
+  label(ctx,'reproduced',rx+18,g.py0+54,'rgba(255,255,255,.45)',11);
+
+  const by1=g.py1, by0=g.py0+78, bw=20;
+  c.forEach((v,k)=>{
+    const bx=rx+8+k*32, h=(by1-by0)*Math.min(1,v/0.85);
+    ctx.fillStyle=SPEC.F0.def[k].c+'cc';
+    ctx.fillRect(bx,by1-h,bw,h);
+    label(ctx,SPEC.F0.def[k].n,bx+6,by1+14,SPEC.F0.def[k].c,12);
+    label(ctx,v.toFixed(2),bx-2,by1-h-5,'rgba(255,255,255,.7)',10);
+  });
+
+  roSp.innerHTML=
+    `Sensor keeps <span class="a">3 numbers</span>   R ${c[0].toFixed(3)}   G ${c[1].toFixed(3)}   B ${c[2].toFixed(3)}   (from ${SPEC.N} spectrum samples)\n`+
+    (m>0.03
+      ? `<span class="ok">Same three numbers</span> — a completely different curve the sensor cannot tell apart (metamerism).\nThe reproduced colour is decided by the 3 numbers alone, never by the curve behind them.`
+      : `Shift the spectrum: the numbers and the colour follow.\nThen drag <b>Metamer morph</b> — the curve will change while R·G·B stay frozen.`);
+}
+
+document.getElementById('bnSp').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  preset=b.dataset.p;
+  if(preset==='rand') makeRandom();
+  document.querySelectorAll('#bnSp button').forEach(x=>x.classList.toggle('active',x===b));
+  rsh.value=0; rmt.value=0;
+  syncOut(); drawSp();
+});
+function syncOut(){
+  document.getElementById('osh').textContent=rsh.value;
+  document.getElementById('omt').textContent=rmt.value;
+}
+[rsh,rmt].forEach(el=>el.addEventListener('input',()=>{syncOut();drawSp();}));
+let rzSp;
+window.addEventListener('resize',()=>{clearTimeout(rzSp);rzSp=setTimeout(drawSp,120);});
+syncOut(); drawSp();
+</script>
+</body>
+</html>
