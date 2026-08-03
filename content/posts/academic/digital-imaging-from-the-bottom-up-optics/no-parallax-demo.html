@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,14 +10,14 @@
 </style>
 </head>
 <body>
-<canvas id="cvN" height="420" aria-label="No-parallax point simulation (top-down view)"></canvas>
+<canvas id="cvN" height="420" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Camera rotation θ (deg) <output id="onth">12</output></label>
+    <label><span data-t="thLbl"></span> <output id="onth">12</output></label>
     <input type="range" id="rnth" min="-20" max="20" value="12" step="0.5">
   </div>
   <div class="ctrl">
-    <label>Pivot position p (0 = entrance pupil) <output id="onp">-45</output></label>
+    <label><span data-t="pLbl"></span> <output id="onp">-45</output></label>
     <input type="range" id="rnp" min="-60" max="100" value="-45" step="1">
   </div>
 </div>
@@ -26,6 +26,28 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'No-parallax point simulation (top-down view)',
+       thLbl:'Camera rotation \u03b8 (deg)', pLbl:'Pivot position p (0 = entrance pupil)',
+       ep:'EP', pivot:'Pivot', near:'Near', far:'Far',
+       strip:'Photo (1-D, as seen by the camera)', left:'L', right:'R',
+       behindCam:'behind cam',
+       behindEp:'(behind the EP: camera body / tripod-socket territory)',
+       frontEp:'(in front of the EP)',
+       imgFar:'image(Far)', imgNear:'image(Near)', parallax:'parallax',
+       locked:'Pivot = entrance pupil: the viewpoint never moves, so Near stays locked on Far (\u0394 = 0)\nat every angle \u2014 the no-parallax point.',
+       sliding:'Rotating about p \u2260 0 translates the EP itself (gray dashed path) \u2192 Near slides against Far\nbetween shots = stitching parallax. Set p = 0 and sweep \u03b8 again.' },
+  ko:{ aria:'무시차점 시뮬레이션 (위에서 본 모습)',
+       thLbl:'카메라 회전 \u03b8 (도)', pLbl:'회전축 위치 p (0 = 입사동)',
+       ep:'입사동', pivot:'회전축', near:'근거리', far:'원거리',
+       strip:'사진 (1차원, 카메라가 본 것)', left:'좌', right:'우',
+       behindCam:'카메라 뒤',
+       behindEp:'(입사동 뒤: 카메라 몸체 / 삼각대 소켓 영역)',
+       frontEp:'(입사동 앞)',
+       imgFar:'상(원거리)', imgNear:'상(근거리)', parallax:'시차',
+       locked:'회전축 = 입사동: 시점이 움직이지 않으므로 어떤 각도에서도 근거리가 원거리에 고정된다(\u0394 = 0).\n이것이 무시차점이다.',
+       sliding:'p \u2260 0에서 회전하면 입사동 자체가 평행이동한다(회색 점선) \u2192 컷 사이에서 근거리가\n원거리에 대해 미끄러진다 = 스티칭 시차. p = 0으로 두고 \u03b8를 다시 훑어보라.' }
+});
 /*
  * Top-down view of a camera photographing two scene points.
  * The camera is modeled as a pinhole at its entrance pupil (EP), initially at the
@@ -105,21 +127,21 @@ function drawN(){
   /* entrance pupil and pivot */
   ctx.fillStyle='#f6a72b';
   ctx.beginPath(); ctx.arc(X(E.ex),Y(E.ey),3.6,0,7); ctx.fill();
-  label(ctx,'EP',X(E.ex)+7,Y(E.ey)-7,'#f6a72b',12.5);
+  label(ctx,T.ep,X(E.ex)+7,Y(E.ey)-7,'#f6a72b',12.5);
   ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.6;
   ctx.beginPath();
   ctx.moveTo(X(p)-6,Y(0)); ctx.lineTo(X(p)+6,Y(0));
   ctx.moveTo(X(p),Y(0)-6); ctx.lineTo(X(p),Y(0)+6);
   ctx.stroke();
-  label(ctx,'Pivot',X(p)-17,Y(0)+20,'#e8edf6');
+  label(ctx,T.pivot,X(p)-17,Y(0)+20,'#e8edf6');
 
   /* scene points */
   ctx.fillStyle='#f6a72b';
   ctx.beginPath(); ctx.arc(X(NEAR.x),Y(NEAR.y),5,0,7); ctx.fill();
-  label(ctx,'Near',X(NEAR.x)-14,Y(NEAR.y)-11,'#f6a72b',12.5);
+  label(ctx,T.near,X(NEAR.x)-14,Y(NEAR.y)-11,'#f6a72b',12.5);
   ctx.fillStyle='#31c9ba';
   ctx.beginPath(); ctx.arc(X(FAR.x),Y(FAR.y),5,0,7); ctx.fill();
-  label(ctx,'Far',X(FAR.x)-10,Y(FAR.y)-11,'#31c9ba',12.5);
+  label(ctx,T.far,X(FAR.x)-10,Y(FAR.y)-11,'#31c9ba',12.5);
 
   /* line of sight through Near: if the viewpoint has not moved, it still hits Far */
   const dx=NEAR.x-E.ex, dy=NEAR.y-E.ey;
@@ -136,13 +158,13 @@ function drawN(){
 
   /* ---- 1-D sensor image strip ---- */
   const sw=Math.min(360,W-40), sx0=(W-sw)/2;
-  label(ctx,'Photo (1-D, as seen by the camera)',sx0,stripTop-8,'#8b97ad');
+  label(ctx,T.strip,sx0,stripTop-8,'#8b97ad');
   ctx.fillStyle='#1a2436';
   ctx.fillRect(sx0,stripTop,sw,24);
   ctx.strokeStyle='#3d5273'; ctx.lineWidth=1;
   ctx.strokeRect(sx0,stripTop,sw,24);
-  label(ctx,'L',sx0-14,stripTop+17,'#8b97ad');
-  label(ctx,'R',sx0+sw+6,stripTop+17,'#8b97ad');
+  label(ctx,T.left,sx0-14,stripTop+17,'#8b97ad');
+  label(ctx,T.right,sx0+sw+6,stripTop+17,'#8b97ad');
   ctx.strokeStyle='#55617a';
   ctx.beginPath(); ctx.moveTo(sx0+sw/2,stripTop); ctx.lineTo(sx0+sw/2,stripTop+24); ctx.stroke();
 
@@ -158,21 +180,18 @@ function drawN(){
   mark(mN,'#f6a72b',5,24);
 
   /* ---- readout ---- */
-  const fmt=m=> m===null?'behind cam':m.toFixed(1);
-  const where= p<-0.5?'(behind the EP: camera body / tripod-socket territory)'
-             : p>0.5?'(in front of the EP)':'';
+  const fmt=m=> m===null?T.behindCam:m.toFixed(1);
+  const where= p<-0.5?T.behindEp : p>0.5?T.frontEp:'';
   let ro=`θ = ${thDeg.toFixed(1)}°,  pivot p = ${p.toFixed(0)}  ${where}\n`
-        +`<span class="c">image(Far)  = ${fmt(mF)}</span>   <span class="a">image(Near) = ${fmt(mN)}</span>`;
+        +`<span class="c">${T.imgFar}  = ${fmt(mF)}</span>   <span class="a">${T.imgNear} = ${fmt(mN)}</span>`;
   if(mF!==null&&mN!==null){
-    ro+=`   →   parallax Δ = ${(mN-mF).toFixed(1)}`;
+    ro+=`   →   ${T.parallax} Δ = ${(mN-mF).toFixed(1)}`;
   }
   ro+='\n';
   if(Math.abs(p)<=0.5){
-    ro+=`Pivot = entrance pupil: the viewpoint never moves, so Near stays locked on Far (Δ = 0)\n`
-       +`at every angle — the no-parallax point.`;
+    ro+=T.locked;
   }else{
-    ro+=`Rotating about p ≠ 0 translates the EP itself (gray dashed path) → Near slides against Far\n`
-       +`between shots = stitching parallax. Set p = 0 and sweep θ again.`;
+    ro+=T.sliding;
   }
   document.getElementById('roN').innerHTML=ro;
 }

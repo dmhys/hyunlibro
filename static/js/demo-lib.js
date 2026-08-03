@@ -16,6 +16,35 @@ try{
 }catch(e){}
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
 
+/* Language of the embedding page. Demos live in same-origin iframes, so the parent
+   document is readable; standalone, fall back to this document's own lang. */
+function pageLang(){
+  let l = null;
+  try{ if(window.parent !== window) l = window.parent.document.documentElement.lang; }catch(e){}
+  return (l || document.documentElement.lang || 'en').slice(0,2);
+}
+
+/* Pick a string table for the embedding page's language and fill any element
+   carrying data-t="<key>" with the matching string.
+
+   The selected language is stamped back onto <html lang>: a single demo file is
+   embedded in pages of several languages, so the document's declared language has
+   to follow the strings it actually renders, not the file it was authored in. */
+function i18n(tables){
+  const l = pageLang(), t = tables[l];
+  document.documentElement.lang = t ? l : 'en';
+  const strings = t || tables.en;
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const s = strings[el.dataset.t];
+    if(s !== undefined) el.textContent = s;
+  });
+  document.querySelectorAll('[data-t-aria]').forEach(el=>{
+    const s = strings[el.dataset.tAria];
+    if(s !== undefined) el.setAttribute('aria-label', s);
+  });
+  return strings;
+}
+
 /* Size the backing store for the display density and scale the context so all
    drawing code can stay in CSS pixels.
 

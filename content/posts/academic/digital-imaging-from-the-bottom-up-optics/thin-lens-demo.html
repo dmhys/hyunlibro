@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="/css/demo-lib.css">
 </head>
 <body>
-<canvas id="cv1" height="340" aria-label="Thin lens ray-tracing simulation"></canvas>
+<canvas id="cv1" height="340" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Object distance u <output id="o1so">150</output></label>
+    <label><span data-t="uLbl"></span> <output id="o1so">150</output></label>
     <input type="range" id="r1so" min="30" max="230" value="150" step="1">
   </div>
   <div class="ctrl">
-    <label>Focal length f <output id="o1f">60</output></label>
+    <label><span data-t="fLbl"></span> <output id="o1f">60</output></label>
     <input type="range" id="r1f" min="35" max="110" value="60" step="1">
   </div>
 </div>
@@ -23,6 +23,18 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'Thin lens ray-tracing simulation', uLbl:'Object distance u', fLbl:'Focal length f',
+       obj:'Object', img:'Image', vimg:'Virtual image',
+       atFocus:'(object at focal point: rays exit parallel, no image)',
+       farOut:'(near focus: image forms far off-screen)',
+       vNote:'(u < f: virtual image at intersection of back-extended rays)' },
+  ko:{ aria:'얇은 렌즈 광선 추적 시뮬레이션', uLbl:'물체거리 u', fLbl:'초점거리 f',
+       obj:'물체', img:'상', vimg:'허상',
+       atFocus:'(물체가 초점에 있다: 광선이 평행하게 나가 상이 맺히지 않는다)',
+       farOut:'(초점 근처: 상이 화면 밖 멀리 맺힌다)',
+       vNote:'(u < f: 광선을 뒤로 연장한 교점에 허상이 맺힌다)' }
+});
 function lensGlyph(ctx,sx,cy,halfHpx,color){
   ctx.strokeStyle=color; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
   ctx.beginPath();
@@ -71,7 +83,7 @@ function draw1(){
   if(!nearFocal){ si=so*f/(so-f); m=-si/so; virtual=si<0; farOut=si>245; }
 
   arrowV(ctx,X(-so),cy,Y(h),'#e8edf6');
-  label(ctx,'Object',X(-so)-14,Y(h)-10,'#e8edf6');
+  label(ctx,T.obj,X(-so)-14,Y(h)-10,'#e8edf6');
 
   const tip={x:-so,y:h};
   const rays=[];
@@ -101,14 +113,14 @@ function draw1(){
   });
 
   let ro=`1/${so} + 1/v = 1/${f}`;
-  if(nearFocal){ ro+=`   →  v → ∞  (object at focal point: rays exit parallel, no image)`; }
-  else if(farOut){ ro+=`   →  v = ${si.toFixed(0)}  (near focus: image forms far off-screen)`; }
+  if(nearFocal){ ro+=`   →  v → ∞  ${T.atFocus}`; }
+  else if(farOut){ ro+=`   →  v = ${si.toFixed(0)}  ${T.farOut}`; }
   else{
     const ix=X(si), iy=Y(m*h);
     arrowV(ctx,ix,cy,iy,virtual?'#c9b0ff':'#e8edf6',virtual);
-    label(ctx,virtual?'Virtual image':'Image',ix+8,iy+(m*h>0?-8:16),virtual?'#c9b0ff':'#e8edf6');
+    label(ctx,virtual?T.vimg:T.img,ix+8,iy+(m*h>0?-8:16),virtual?'#c9b0ff':'#e8edf6');
     ro+=`   →  v = ${si.toFixed(1)},  m = ${m.toFixed(2)}`
-       +(virtual?'   (u < f: virtual image at intersection of back-extended rays)':'');
+       +(virtual?'   '+T.vNote:'');
   }
   document.getElementById('ro1').innerHTML=ro;
 }

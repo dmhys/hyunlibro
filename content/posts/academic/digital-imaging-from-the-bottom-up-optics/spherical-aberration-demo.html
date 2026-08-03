@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spherical Aberration Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>#cvR{margin-top:8px}</style>
+</head>
+<body>
+<canvas id="cvI" height="200" data-t-aria="ariaI"></canvas>
+<canvas id="cvR" height="200" data-t-aria="ariaR"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label><span data-t="fLbl"></span> <output id="of">90</output> mm</label>
+    <input type="range" id="rf" min="55" max="150" value="90" step="1">
+  </div>
+</div>
+<div class="readout" id="ro"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script>
+"use strict";
+/* Equiconvex spherical lens. The diameter D is fixed and only f moves, so a shorter
+   f means a stronger curvature. The two panels differ in exactly one thing: the
+   direction a ray takes after leaving the glass. Lens shape and in-glass path are
+   identical in both, so whatever separates them comes from the refraction itself. */
+const T = i18n({
+  en:{ ariaI:'Ideal lens: every ray converges to the single paraxial focus',
+       ariaR:'Real spherical lens: the higher the ray, the closer to the lens it crosses the axis',
+       fLbl:'Focal length f',
+       titleI:'Ideal lens \u2014 every ray meets at one point',
+       titleR:'Real spherical lens \u2014 higher rays cross the axis sooner',
+       par:'Paraxial focus', coc:'Circle of least confusion',
+       roPar:'paraxial focus at', roLsa:'longitudinal spherical aberration (LSA)',
+       roCoc:'circle of least confusion',
+       roTail:(d,r)=>`(${d}mm short of paraxial, ${r}\u00d7LSA)` },
+  ko:{ ariaI:'이상적인 렌즈: 모든 광선이 근축 초점 한 점에 모인다',
+       ariaR:'실제 구면 렌즈: 광선이 높을수록 렌즈에 가까운 곳에서 축과 만난다',
+       fLbl:'초점거리 f',
+       titleI:'이상적인 렌즈 \u2014 모든 광선이 한 점에 모인다',
+       titleR:'실제 구면 렌즈 \u2014 높은 광선일수록 앞에서 축과 만난다',
+       par:'근축 초점', coc:'최소착란원',
+       roPar:'근축 초점', roLsa:'종방향 구면수차(LSA)',
+       roCoc:'최소착란원',
+       roTail:(d,r)=>`(근축보다 ${d}mm 앞, LSA의 ${r}배)` }
+});
+const NG = 1.5, D = 44, EDGE = 2, LEAD = 26;
+const RAYS = 48;
+
+function geom(f){
+  const R = 2*(NG-1)*f;
+  const sag = R - Math.sqrt(R*R - (D/2)*(D/2));
+  return {R, sag, t: 2*sag + EDGE};
+}
+
+/* Exact Snell, no small-angle approximation. (nx,ny) is the unit normal, mu = n_in/n_out. */
+function refract(dx,dy,nx,ny,mu){
+  if(nx*dx + ny*dy > 0){ nx = -nx; ny = -ny; }
+  const c1 = -(nx*dx + ny*dy);
+  const s = 1 - mu*mu*(1 - c1*c1);
+  if(s < 0) return null;                       // total internal reflection
+  const k = mu*c1 - Math.sqrt(s);
+  return [mu*dx + k*nx, mu*dy + k*ny];
+}
+
+/* Refract a ray that arrives parallel to the axis at height h through both surfaces. */
+function trace(h,f){
+  const {R,t} = geom(f);
+  const c1x = -t/2 + R, c2x = t/2 - R;
+  const x1 = -t/2 + R - Math.sqrt(R*R - h*h), y1 = h;
+  const d = refract(1,0,(x1-c1x)/R, y1/R, 1/NG);
+  if(!d) return null;
+  const ox = x1-c2x, oy = y1;
+  const b = ox*d[0] + oy*d[1];
+  const disc = b*b - (ox*ox + oy*oy - R*R);
+  if(disc < 0) return null;
+  const s = -b + Math.sqrt(disc);
+  const x2 = x1 + s*d[0], y2 = y1 + s*d[1];
+  const d2 = refract(d[0],d[1],(x2-c2x)/R, y2/R, NG);
+  if(!d2) return null;
+  return {x1,y1,x2,y2, dx:d2[0], dy:d2[1]};
+}
+const cross = r => r.x2 - r.y2*r.dx/r.dy;      // where the exit ray crosses the axis
+
+function model(f){
+  const hs = [], rs = [];
+  for(let i=1;i<=RAYS;i++){
+    const h = (D/2)*0.995*i/RAYS;
+    const r = trace(h,f);
+    if(r){ hs.push(h); rs.push(r); }
+  }
+  const zPar = cross(trace(1e-4,f));           // paraxial focus — the reference line
+  const zMar = cross(rs[rs.length-1]);
+  /* Circle of least confusion: sweep z, take the bundle radius at each, keep the smallest. */
+  let zBest = zPar, halfBest = Infinity;
+  const lo = Math.min(zPar,zMar) - 1, hi = Math.max(zPar,zMar) + 1;
+  for(let i=0;i<=400;i++){
+    const z = lo + (hi-lo)*i/400;
+    let m = 0;
+    for(const r of rs) m = Math.max(m, Math.abs(r.y2 + (z-r.x2)*r.dy/r.dx));
+    if(m < halfBest){ halfBest = m; zBest = z; }
+  }
+  return {rs, zPar, zMar, zBest, blur: 2*halfBest, ...geom(f)};
+}
+
+function panel(cv, M, ideal){
+  const {ctx,W,H} = fit(cv);
+  const cy = H/2, t = M.t;
+  const span = t/2 + LEAD + M.zPar*1.10;
+  const sc = Math.min((H*0.42)/(D/2), W/span);
+  const X = x => (x + t/2 + LEAD)*sc, Y = y => cy - y*sc;
+  const xL = -t/2 - LEAD;
+
+  ctx.clearRect(0,0,W,H);
+
+  ctx.strokeStyle = '#3d5273'; ctx.lineWidth = 1; dash(ctx,true);
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke(); dash(ctx,false);
+
+  /* Paraxial focus — the reference line, drawn in both panels */
+  ctx.strokeStyle = '#e8edf6'; ctx.globalAlpha = .55; dash(ctx,true);
+  ctx.beginPath(); ctx.moveTo(X(M.zPar),10); ctx.lineTo(X(M.zPar),H-10); ctx.stroke();
+  dash(ctx,false); ctx.globalAlpha = 1;
+
+  /* Rays, drawn translucent and overlapping so the caustic emerges from ray density. */
+  ctx.lineWidth = 1;
+  for(const r of M.rs) for(const sgn of [1,-1]){
+    const y1 = sgn*r.y1, y2 = sgn*r.y2, dy = sgn*r.dy;
+    const marginal = r === M.rs[M.rs.length-1];
+    ctx.strokeStyle = marginal ? '#ff7fa5' : '#f6a72b';
+    ctx.globalAlpha = marginal ? .95 : .30;
+    ctx.beginPath();
+    ctx.moveTo(X(xL), Y(y1));
+    ctx.lineTo(X(r.x1), Y(y1));
+    ctx.lineTo(X(r.x2), Y(y2));
+    const xEnd = xL + span;
+    if(ideal){                                 // ideal: every ray through the paraxial focus
+      ctx.lineTo(X(M.zPar), Y(0));
+      ctx.lineTo(X(xEnd), Y((xEnd - M.zPar)*(0 - y2)/(M.zPar - r.x2)));
+    }else{                                     // real: keep the refracted direction
+      ctx.lineTo(X(xEnd), Y(y2 + (xEnd - r.x2)*dy/r.dx));
+    }
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  /* Lens element */
+  const R = M.R, c1x = -t/2 + R, c2x = t/2 - R;
+  ctx.beginPath();
+  for(let i=0;i<=60;i++){
+    const y = -D/2 + D*i/60, x = c1x - Math.sqrt(R*R - y*y);
+    i ? ctx.lineTo(X(x),Y(y)) : ctx.moveTo(X(x),Y(y));
+  }
+  for(let i=60;i>=0;i--){
+    const y = -D/2 + D*i/60, x = c2x + Math.sqrt(R*R - y*y);
+    ctx.lineTo(X(x),Y(y));
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(110,168,232,.10)'; ctx.fill();
+  ctx.strokeStyle = '#6ea8e8'; ctx.lineWidth = 1.6; ctx.stroke();
+
+  if(ideal){
+    ctx.fillStyle = '#e8edf6';
+    ctx.beginPath(); ctx.arc(X(M.zPar),cy,3.5,0,7); ctx.fill();
+    label(ctx,T.titleI,12,20,'#c3ccdb',12.5);
+    label(ctx,T.par,X(M.zPar)+7,H-14,'#8b97ad',11);
+  }else{
+    /* Circle of least confusion */
+    ctx.strokeStyle = '#31c9ba'; dash(ctx,true); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(M.zBest),10); ctx.lineTo(X(M.zBest),H-10); ctx.stroke();
+    dash(ctx,false);
+    /* LSA span: marginal focus to paraxial focus */
+    const yb = H-22;
+    ctx.strokeStyle = '#ff7fa5'; ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(X(M.zMar),yb-4); ctx.lineTo(X(M.zMar),yb+4);
+    ctx.moveTo(X(M.zMar),yb);   ctx.lineTo(X(M.zPar),yb);
+    ctx.moveTo(X(M.zPar),yb-4); ctx.lineTo(X(M.zPar),yb+4);
+    ctx.stroke();
+    label(ctx,'LSA '+(M.zPar-M.zMar).toFixed(1)+'mm',
+          X(M.zMar)+4, yb-8, '#ff7fa5', 11);
+    label(ctx,T.titleR,12,20,'#c3ccdb',12.5);
+    label(ctx,T.coc,X(M.zBest)+7,32,'#31c9ba',11);
+  }
+}
+
+const rf = document.getElementById('rf');
+function draw(){
+  const f = +rf.value;
+  document.getElementById('of').textContent = f;
+  const M = model(f);
+  panel(document.getElementById('cvI'), M, true);
+  panel(document.getElementById('cvR'), M, false);
+  document.getElementById('ro').textContent =
+    `f = ${f}mm    R = ${M.R.toFixed(0)}mm    f/${(f/D).toFixed(2)}    ${T.roPar} ${M.zPar.toFixed(1)}mm\n`+
+    `${T.roLsa} ${(M.zPar-M.zMar).toFixed(2)}mm    `+
+    `${T.roCoc} \u2300${M.blur.toFixed(2)}mm @ ${M.zBest.toFixed(1)}mm `+
+    T.roTail((M.zPar-M.zBest).toFixed(1), ((M.zPar-M.zBest)/(M.zPar-M.zMar)).toFixed(2));
+}
+rf.addEventListener('input',draw);
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>

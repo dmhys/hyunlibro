@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,14 +11,14 @@
 </style>
 </head>
 <body>
-<canvas id="cvB" height="400" aria-label="Defocus blur center and entrance pupil simulation"></canvas>
+<canvas id="cvB" height="400" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Stop position t (t&lt;0: in front of lens) <output id="obt">15</output></label>
+    <label><span data-t="tLbl"></span> <output id="obt">15</output></label>
     <input type="range" id="rbt" min="-15" max="30" value="15" step="1">
   </div>
   <div class="ctrl">
-    <label>Stop radius a <output id="oba">6</output></label>
+    <label><span data-t="aLbl"></span> <output id="oba">6</output></label>
     <input type="range" id="rba" min="0.2" max="9" value="6" step="0.2">
   </div>
 </div>
@@ -27,6 +27,32 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'Defocus blur center and entrance pupil simulation',
+       tLbl:'Stop position t (t<0: in front of lens)', aLbl:'Stop radius a',
+       focusPlane:'Focus plane (150)', lens:'Lens f=50', stop:'Stop', sensor:'Sensor',
+       ep:'Entrance pupil', sensorZoom:'Sensor \u00d76',
+       roEp:'Entrance pupil', roCenter:'Blur center', roSize:'Blur size',
+       near:'Near', far:'Far', infocus:'In-focus',
+       sharpAny:'sharp at any aperture',
+       merged:'\u2014 three depths on one EP sight line: three different blurs, one pixel.\nOnly the point ON the focus plane is sharp \u2014 focus decides sharpness, the EP decides the pixel.',
+       splitTag:'Pixels split',
+       split:'\u2014 glass, points and sensor are unchanged, but the moving stop shifted the EP\noff the shared sight line. Return t to 15 to merge them again.',
+       pinTag:'Pinhole limit',
+       pin:'\u2014 the cones degenerate into single rays: every depth is sharp at once.\nSelection becomes imaging. (In reality, diffraction takes over around here.)' },
+  ko:{ aria:'디포커스 블러 중심과 입사동 시뮬레이션',
+       tLbl:'조리개 위치 t (t<0: 렌즈 앞)', aLbl:'조리개 반지름 a',
+       focusPlane:'초점면 (150)', lens:'렌즈 f=50', stop:'조리개', sensor:'센서',
+       ep:'입사동', sensorZoom:'센서 \u00d76',
+       roEp:'입사동', roCenter:'블러 중심', roSize:'블러 크기',
+       near:'근거리', far:'원거리', infocus:'초점면',
+       sharpAny:'어떤 조리개에서도 선명',
+       merged:'\u2014 입사동에서 본 하나의 시선 위에 세 깊이가 놓인다: 블러는 셋 다 다른데 픽셀은 하나다.\n초점면 위의 점만 선명하다 \u2014 선명함은 초점이, 픽셀 위치는 입사동이 정한다.',
+       splitTag:'픽셀이 갈라졌다',
+       split:'\u2014 유리도 점도 센서도 그대로인데, 조리개를 옮기니 입사동이 공통 시선에서\n벗어났다. t를 15로 되돌리면 다시 겹친다.',
+       pinTag:'바늘구멍 극한',
+       pin:'\u2014 광추가 하나의 광선으로 수축한다: 모든 깊이가 동시에 선명해진다.\n선택이 곧 결상이 된다. (실제로는 이 근처부터 회절이 지배한다.)' }
+});
 /*
  * One lens (f=50), sensor fixed at 75 (focused on distance 150). Near and Far are
  * BOTH defocused; PF sits exactly ON the focus plane, so it images to a sharp point
@@ -79,7 +105,7 @@ function drawB(){
   dash(ctx,true); ctx.strokeStyle='#2c3c56';
   ctx.beginPath(); ctx.moveTo(X(-FOCUS),Y(66)); ctx.lineTo(X(-FOCUS),Y(-30)); ctx.stroke();
   dash(ctx,false);
-  label(ctx,'Focus plane (150)',X(-FOCUS)-48,Y(66)-6,'#4d6285',11);
+  label(ctx,T.focusPlane,X(-FOCUS)-48,Y(66)-6,'#4d6285',11);
 
   /* lens */
   ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
@@ -88,18 +114,18 @@ function drawB(){
   ctx.quadraticCurveTo(X(0)+10,cy,X(0),Y(-30));
   ctx.quadraticCurveTo(X(0)-10,cy,X(0),Y(30));
   ctx.closePath(); ctx.fill(); ctx.stroke();
-  label(ctx,'Lens f=50',X(0)-26,Y(30)-8,'#6ea8e8',11.5);
+  label(ctx,T.lens,X(0)-26,Y(30)-8,'#6ea8e8',11.5);
 
   /* stop */
   ctx.fillStyle='#55617a';
   ctx.fillRect(X(t)-3,Y(30),6,Y(a)-Y(30));
   ctx.fillRect(X(t)-3,Y(-a),6,Y(-30)-Y(-a));
-  label(ctx,'Stop',X(t)-12,Y(-30)+16,'#8b97ad',11.5);
+  label(ctx,T.stop,X(t)-12,Y(-30)+16,'#8b97ad',11.5);
 
   /* sensor */
   ctx.fillStyle='#c3ccdb';
   ctx.fillRect(X(SEN)-2,Y(30),4,Y(-30)-Y(30));
-  label(ctx,'Sensor',X(SEN)-16,Y(30)-8,'#c3ccdb',11.5);
+  label(ctx,T.sensor,X(SEN)-16,Y(30)-8,'#c3ccdb',11.5);
 
   /* entrance pupil: the stop itself if in front of the lens, else its image through the lens */
   const xEP = t<0 ? t : F*t/(F-t);
@@ -109,7 +135,7 @@ function drawB(){
   dash(ctx,false);
   ctx.fillStyle='#f6a72b';
   ctx.beginPath(); ctx.arc(X(xEP),cy,3.6,0,7); ctx.fill();
-  label(ctx,'Entrance pupil',X(xEP)-38,Y(Math.max(rEP,12))-8,'#f6a72b',12);
+  label(ctx,T.ep,X(xEP)-38,Y(Math.max(rEP,12))-8,'#f6a72b',12);
 
   const pts=[
     {P:P1,color:'#ff7fa5',fill:'rgba(255,127,165,.13)',name:'Near'},
@@ -167,7 +193,7 @@ function drawB(){
   const sx=W-stripW+6;
   ctx.fillStyle='#111a2a'; ctx.fillRect(sx,16,stripW-12,H-32);
   ctx.strokeStyle='#31435f'; ctx.strokeRect(sx,16,stripW-12,H-32);
-  label(ctx,'Sensor ×6',sx+6,32,'#7f93b2',11);
+  label(ctx,T.sensorZoom,sx+6,32,'#7f93b2',11);
   const mean=(centers[0].c+centers[1].c)/2;
   const MAG=6*(H*0.4)/70;
   const my=H/2;
@@ -196,14 +222,14 @@ function drawB(){
   const same=d<0.02;
   const maxBlur=Math.max(centers[0].blur,centers[1].blur);
   document.getElementById('roB').innerHTML=
-    `<span class="a">Entrance pupil  x = ${xEP.toFixed(1)}</span>\n`+
-    `Blur center   Near y = ${centers[0].c.toFixed(2)}   Far y = ${centers[1].c.toFixed(2)}   In-focus y = ${centers[2].c.toFixed(2)}   Δ = <b>${d.toFixed(2)}</b>\n`+
-    `Blur size     Near ${centers[0].blur.toFixed(2)}   Far ${centers[1].blur.toFixed(2)}   In-focus ${centers[2].blur.toFixed(2)} — sharp at any aperture\n`+
+    `<span class="a">${T.roEp}  x = ${xEP.toFixed(1)}</span>\n`+
+    `${T.roCenter}   ${T.near} y = ${centers[0].c.toFixed(2)}   ${T.far} y = ${centers[1].c.toFixed(2)}   ${T.infocus} y = ${centers[2].c.toFixed(2)}   Δ = <b>${d.toFixed(2)}</b>\n`+
+    `${T.roSize}   ${T.near} ${centers[0].blur.toFixed(2)}   ${T.far} ${centers[1].blur.toFixed(2)}   ${T.infocus} ${centers[2].blur.toFixed(2)} — ${T.sharpAny}\n`+
     (same
-      ? `<span class="ok">Δ = 0</span> — three depths on one EP sight line: three different blurs, one pixel.\nOnly the point ON the focus plane is sharp — focus decides sharpness, the EP decides the pixel.`
-      : `<span class="sp">Pixels split</span> — glass, points and sensor are unchanged, but the moving stop shifted the EP\noff the shared sight line. Return t to 15 to merge them again.`)+
+      ? `<span class="ok">Δ = 0</span> ${T.merged}`
+      : `<span class="sp">${T.splitTag}</span> ${T.split}`)+
     (maxBlur<0.3
-      ? `\n<span class="ok">Pinhole limit</span> — the cones degenerate into single rays: every depth is sharp at once.\nSelection becomes imaging. (In reality, diffraction takes over around here.)`
+      ? `\n<span class="ok">${T.pinTag}</span> ${T.pin}`
       : ``);
 }
 

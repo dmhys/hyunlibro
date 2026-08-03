@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,14 +10,14 @@
 </style>
 </head>
 <body>
-<canvas id="cvS" height="360" aria-label="Aperture stop and pupils simulation"></canvas>
+<canvas id="cvS" height="360" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Stop position t <output id="ost">26</output></label>
+    <label><span data-t="tLbl"></span> <output id="ost">26</output></label>
     <input type="range" id="rst" min="20" max="32" value="26" step="0.5">
   </div>
   <div class="ctrl">
-    <label>Stop radius a <output id="osa">7</output></label>
+    <label><span data-t="aLbl"></span> <output id="osa">7</output></label>
     <input type="range" id="rsa" min="4" max="10" value="7" step="0.5">
   </div>
 </div>
@@ -26,6 +26,22 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'Aperture stop and pupils simulation',
+       tLbl:'Stop position t', aLbl:'Stop radius a',
+       stop:'Aperture stop', sensor:'Sensor', ep:'Entrance pupil', xp:'Exit pupil',
+       roStop:'Physical stop', roRadius:'radius',
+       epNote:'the stop imaged by the front lens', xpNote:'the stop imaged by the rear lens',
+       body:'Marginal rays graze the stop edge (dots). Extend them with the glass ignored \u2014 dashed \u2014\nand they land on the pupil edges; the chief rays through the stop centre land on the centres.\nBoth hold for every field angle: that is the whole content of "a pupil is the stop, imaged".',
+       xpVirtual:'Note: XP now floats in front of the whole system \u2014 pupils are virtual images, this is not an error' },
+  ko:{ aria:'구경 조리개와 동공 시뮬레이션',
+       tLbl:'조리개 위치 t', aLbl:'조리개 반지름 a',
+       stop:'구경 조리개', sensor:'센서', ep:'입사동', xp:'출사동',
+       roStop:'실제 조리개', roRadius:'반지름',
+       epNote:'앞 렌즈가 맺은 조리개의 상', xpNote:'뒤 렌즈가 맺은 조리개의 상',
+       body:'주변광선은 조리개 가장자리를 스친다(점). 유리를 무시하고 연장하면 \u2014 점선 \u2014\n동공의 가장자리에 닿는다. 조리개 중심을 지나는 주광선은 동공의 중심에 닿는다.\n둘 다 모든 화각에서 성립한다. 이것이 "동공은 조리개의 상이다"의 전부다.',
+       xpVirtual:'참고: 출사동이 광학계 전체보다 앞에 떠 있다 \u2014 동공은 허상이므로 오류가 아니다' }
+});
 function lensGlyph(ctx,sx,cy,halfHpx,color){
   ctx.strokeStyle=color; ctx.lineWidth=1.6; ctx.fillStyle='rgba(110,168,232,.08)';
   ctx.beginPath();
@@ -92,11 +108,11 @@ function drawS(){
   const topY=Y(30), botY=Y(-30);
   ctx.fillRect(X(t)-3,topY,6,Y(a)-topY);
   ctx.fillRect(X(t)-3,Y(-a),6,botY-Y(-a));
-  label(ctx,'Aperture stop',X(t)-46,botY+16,'#8b97ad');
+  label(ctx,T.stop,X(t)-46,botY+16,'#8b97ad');
 
   ctx.fillStyle='#c3ccdb';
   ctx.fillRect(X(D.sensor)-2,Y(14),4,Y(-14)-Y(14));
-  label(ctx,'Sensor',X(D.sensor)-20,Y(-14)+18,'#c3ccdb');
+  label(ctx,T.sensor,X(D.sensor)-20,Y(-14)+18,'#c3ccdb');
 
   /* Two ray bundles: on-axis and one off-axis field point */
   const bundles=[
@@ -171,17 +187,15 @@ function drawS(){
     [r,-r].forEach(e=>{ ctx.beginPath(); ctx.arc(X(x),Y(e),3.2,0,7); ctx.fill(); });
     label(ctx,name,X(x)-name.length*3.6,below?Y(-r)+18:Y(r)-10,color,12.5);
   }
-  pupilMark(xEP,rEP,'#f6a72b','Entrance pupil',false);
-  pupilMark(xXP,rXP,'#31c9ba','Exit pupil',true);
+  pupilMark(xEP,rEP,'#f6a72b',T.ep,false);
+  pupilMark(xXP,rXP,'#31c9ba',T.xp,true);
 
   document.getElementById('roS').innerHTML=
-    `Physical stop    x=${t.toFixed(1)}   radius ${a.toFixed(1)}\n`+
-    `<span class="a">Entrance pupil   x=${xEP.toFixed(1)}   radius ${rEP.toFixed(1)}   (×${(rEP/a).toFixed(2)}) — the stop imaged by the front lens</span>\n`+
-    `<span class="c">Exit pupil       x=${xXP.toFixed(1)}   radius ${rXP.toFixed(1)}   (×${(rXP/a).toFixed(2)}) — the stop imaged by the rear lens</span>\n`+
-    `Marginal rays graze the stop edge (dots). Extend them with the glass ignored — dashed —\n`+
-    `and they land on the pupil edges; the chief rays through the stop centre land on the centres.\n`+
-    `Both hold for every field angle: that is the whole content of "a pupil is the stop, imaged".`+
-    (xXP<0?`\nNote: XP now floats in front of the whole system — pupils are virtual images, this is not an error`:``);
+    `${T.roStop}   x=${t.toFixed(1)}   ${T.roRadius} ${a.toFixed(1)}\n`+
+    `<span class="a">${T.ep}   x=${xEP.toFixed(1)}   ${T.roRadius} ${rEP.toFixed(1)}   (×${(rEP/a).toFixed(2)}) — ${T.epNote}</span>\n`+
+    `<span class="c">${T.xp}   x=${xXP.toFixed(1)}   ${T.roRadius} ${rXP.toFixed(1)}   (×${(rXP/a).toFixed(2)}) — ${T.xpNote}</span>\n`+
+    T.body+
+    (xXP<0?`\n${T.xpVirtual}`:``);
 }
 
 [rst,rsa].forEach(el=>el.addEventListener('input',drawS));

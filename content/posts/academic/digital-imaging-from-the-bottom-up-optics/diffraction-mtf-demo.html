@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,14 +11,14 @@
 </style>
 </head>
 <body>
-<canvas id="cvD" height="476" aria-label="Airy disk and diffraction MTF simulation"></canvas>
+<canvas id="cvD" height="476" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Aperture N (f-number) <output id="odn">2.8</output></label>
+    <label><span data-t="nLbl"></span> <output id="odn">2.8</output></label>
     <input type="range" id="rdn" min="1.4" max="22" value="2.8" step="0.1">
   </div>
   <div class="ctrl">
-    <label>Wavelength λ (nm) <output id="odl">550</output></label>
+    <label><span data-t="lLbl"></span> <output id="odl">550</output></label>
     <input type="range" id="rdl" min="450" max="650" value="550" step="5">
   </div>
 </div>
@@ -27,6 +27,34 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'Airy disk and diffraction MTF simulation',
+       nLbl:'Aperture N (f-number)', lLbl:'Wavelength \u03bb (nm)',
+       airy:'Airy pattern', psf:'PSF cross-section', onepx:'1 px',
+       mtf:'Diffraction MTF', lpmm:'lp/mm',
+       chart:'Resolution chart \u2014 finer bars to the right (10 \u2192 300 lp/mm, schematic)',
+       ideal:'ideal',
+       roAiry:'Airy disk', roMtf:'MTF',
+       roAiryLine:(r,d,n,px)=>`   first zero = 1.22\u00b7\u03bb\u00b7N = ${r} \u00b5m   diameter = ${d} \u00b5m \u2248 ${n} px @ ${px} \u00b5m`,
+       roMtfLine:(c,q)=>`         cutoff = 1/(\u03bbN) = ${c} lp/mm   vs   pixel Nyquist = ${q} lp/mm`,
+       limTag:'Diffraction-limited',
+       lim:(n,px)=>` \u2014 the Airy disk spans over 2 pixels: stopping down further only costs sharpness.\nFor ${px} \u00b5m pixels this territory begins around f/${n}.`,
+       okTag:'Not diffraction-limited yet',
+       ok:(n,px)=>` \u2014 the Airy disk still fits within ~2 pixels; aberrations and focus\ndominate sharpness here. Diffraction takes over around f/${n} for ${px} \u00b5m pixels.` },
+  ko:{ aria:'에어리 원반과 회절 MTF 시뮬레이션',
+       nLbl:'조리개 N (f값)', lLbl:'파장 \u03bb (nm)',
+       airy:'에어리 패턴', psf:'PSF 단면', onepx:'1 px',
+       mtf:'회절 MTF', lpmm:'lp/mm',
+       chart:'해상력 차트 \u2014 오른쪽으로 갈수록 줄무늬가 촘촘하다 (10 \u2192 300 lp/mm, 개념도)',
+       ideal:'이상',
+       roAiry:'에어리 원반', roMtf:'MTF',
+       roAiryLine:(r,d,n,px)=>`   첫 영점 = 1.22\u00b7\u03bb\u00b7N = ${r} \u00b5m   지름 = ${d} \u00b5m \u2248 ${n} px @ ${px} \u00b5m`,
+       roMtfLine:(c,q)=>`         차단주파수 = 1/(\u03bbN) = ${c} lp/mm   vs   픽셀 나이퀴스트 = ${q} lp/mm`,
+       limTag:'회절 한계',
+       lim:(n,px)=>` \u2014 에어리 원반이 2픽셀을 넘는다: 더 조여봐야 선명도만 잃는다.\n${px} \u00b5m 픽셀에서는 대략 f/${n}부터 이 영역이다.`,
+       okTag:'아직 회절 한계 아님',
+       ok:(n,px)=>` \u2014 에어리 원반이 아직 2픽셀 안에 들어온다. 여기서는 수차와 초점이\n선명도를 지배한다. ${px} \u00b5m 픽셀에서는 f/${n} 부근부터 회절이 지배한다.` }
+});
 const PIX=4;            /* sensor pixel pitch in µm */
 const SPAN=24;          /* half-width of the Airy panels in µm */
 
@@ -87,7 +115,7 @@ function drawD(){
 
   /* ---- panel 1: 2-D Airy pattern on a pixel grid ---- */
   const pS=150, pX=12, pY=24;
-  label(ctx,'Airy pattern',pX,16,'#7f93b2');
+  label(ctx,T.airy,pX,16,'#7f93b2');
   const scl=pS/(2*SPAN);           /* px per µm */
   pixelLayer(ctx,pX,pY,pS,pS,(x,y,k,data)=>{
     const r=Math.hypot(x-pS/2,y-pS/2)/scl;
@@ -110,13 +138,13 @@ function drawD(){
 
   /* ---- panel 2: PSF cross-section ---- */
   const qx0=196, qx1=W-14, qy0=24, qy1=174;
-  label(ctx,'PSF cross-section',qx0,16,'#7f93b2');
+  label(ctx,T.psf,qx0,16,'#7f93b2');
   ctx.strokeStyle='#243349';
   ctx.strokeRect(qx0,qy0,qx1-qx0,qy1-qy0);
   /* pixel-width band from r=0 */
   ctx.fillStyle='rgba(127,147,178,.12)';
   ctx.fillRect(qx0,qy0,(PIX/SPAN)*(qx1-qx0),qy1-qy0);
-  label(ctx,'1 px',qx0+3,qy1-5,'#55617a',10.5);
+  label(ctx,T.onepx,qx0+3,qy1-5,'#55617a',10.5);
   ctx.strokeStyle=tint; ctx.lineWidth=1.8;
   ctx.beginPath();
   for(let i=0;i<=300;i++){
@@ -135,7 +163,7 @@ function drawD(){
 
   /* ---- panel 3: diffraction MTF ---- */
   const mx0=46, mx1=W-14, my0=205, my1=318, numax=400;
-  label(ctx,'Diffraction MTF',mx0,197,'#7f93b2');
+  label(ctx,T.mtf,mx0,197,'#7f93b2');
   ctx.strokeStyle='#243349'; ctx.strokeRect(mx0,my0,mx1-mx0,my1-my0);
   [[1,'1'],[0.5,'0.5'],[0,'0']].forEach(([v,t])=>{
     label(ctx,t,mx0-22,my1-v*(my1-my0)+4,'#55617a',10.5);
@@ -146,7 +174,7 @@ function drawD(){
   });
   /* one row below the tick numbers: at numax the "400" tick sits flush with the
      right edge and the unit would collide with it */
-  label(ctx,'lp/mm',mx1-36,my1+26,'#55617a',10.5);
+  label(ctx,T.lpmm,mx1-36,my1+26,'#55617a',10.5);
   /* pixel Nyquist */
   const nx=mx0+(nyq/numax)*(mx1-mx0);
   dash(ctx,true); ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1;
@@ -166,8 +194,8 @@ function drawD(){
 
   /* ---- panel 4: chirp resolution chart, ideal vs diffracted ---- */
   const cx0=64, cx1=W-14, ch=40, iy=376, by=426;
-  label(ctx,'Resolution chart — finer bars to the right (10 → 300 lp/mm, schematic)',12,364,'#7f93b2');
-  label(ctx,'ideal',12,iy+ch/2+4,'#7f93b2',11);
+  label(ctx,T.chart,12,364,'#7f93b2');
+  label(ctx,T.ideal,12,iy+ch/2+4,'#7f93b2',11);
   label(ctx,`f/${N.toFixed(1)}`,12,by+ch/2+4,tint,11);
   let phi=0;
   for(let x=cx0;x<cx1;x++){
@@ -192,11 +220,11 @@ function drawD(){
   const npx=dia/PIX;
   const nLimit=2*PIX/(2.44*lam);    /* N at which the Airy diameter spans 2 pixels */
   document.getElementById('roD').innerHTML=
-    `<span class="a">Airy disk</span>   first zero = 1.22·λ·N = ${r1.toFixed(2)} µm   diameter = ${dia.toFixed(1)} µm ≈ ${npx.toFixed(1)} px @ ${PIX} µm\n`+
-    `<span class="a">MTF</span>         cutoff = 1/(λN) = ${nuc.toFixed(0)} lp/mm   vs   pixel Nyquist = ${nyq.toFixed(0)} lp/mm\n`+
+    `<span class="a">${T.roAiry}</span>${T.roAiryLine(r1.toFixed(2),dia.toFixed(1),npx.toFixed(1),PIX)}\n`+
+    `<span class="a">${T.roMtf}</span>${T.roMtfLine(nuc.toFixed(0),nyq.toFixed(0))}\n`+
     (npx>2
-      ? `<span class="sp">Diffraction-limited</span> — the Airy disk spans over 2 pixels: stopping down further only costs sharpness.\nFor ${PIX} µm pixels this territory begins around f/${nLimit.toFixed(1)}.`
-      : `<span class="ok">Not diffraction-limited yet</span> — the Airy disk still fits within ~2 pixels; aberrations and focus\ndominate sharpness here. Diffraction takes over around f/${nLimit.toFixed(1)} for ${PIX} µm pixels.`);
+      ? `<span class="sp">${T.limTag}</span>`+T.lim(nLimit.toFixed(1),PIX)
+      : `<span class="ok">${T.okTag}</span>`+T.ok(nLimit.toFixed(1),PIX));
 }
 
 [rdn,rdl].forEach(el=>el.addEventListener('input',drawD));

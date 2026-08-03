@@ -5,13 +5,22 @@
 {{- $height := .Get "height" -}}
 {{- $res := .Page.Resources.Get $src -}}
 {{- $url := "" -}}
+{{- /* Accessible name for the frame. An explicit `title` wins; otherwise fall back to
+       the demo's own <title>, so the frame is never announced as a bare filename. */ -}}
+{{- $title := .Get "title" -}}
+{{- if and (not $title) $res -}}
+  {{- with findRE "(?is)<title>(.*?)</title>" ($res.Content | string) 1 -}}
+    {{- $title = index . 0 | replaceRE "(?is)</?title>" "" | htmlUnescape -}}
+  {{- end -}}
+{{- end -}}
+{{- $title = $title | default $src -}}
 {{- with $res -}}
   {{- if .RelPermalink -}}
     {{- $url = printf "%s?v=%s" .RelPermalink (substr (.Content | md5) 0 8) -}}
   {{- end -}}
 {{- end -}}
 {{- if $url }}
-<iframe class="demo-embed" src="{{ $url }}" loading="lazy" title="{{ .Get "title" | default $src }}"
+<iframe class="demo-embed" src="{{ $url }}" loading="lazy" title="{{ $title }}"
   style="width:100%;border:0;display:block;margin:1.5rem 0;{{ with $height }}height:{{ . }};{{ end }}"></iframe>
 {{- if not $height }}
 <script>

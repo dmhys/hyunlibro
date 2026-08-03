@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,26 +11,26 @@
 </style>
 </head>
 <body>
-<canvas id="cvT" height="340" aria-label="Thick lens imaging simulation"></canvas>
+<canvas id="cvT" height="340" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Object distance <output id="oso">190</output></label>
+    <label><span data-t="u"></span> <output id="oso">190</output></label>
     <input type="range" id="rso" min="40" max="230" value="190" step="1">
   </div>
   <div class="ctrl">
-    <label>Front R₁ <output id="oc1">100</output></label>
+    <label><span data-t="r1"></span> <output id="oc1">100</output></label>
     <input type="range" id="rc1" min="-12" max="12" value="10" step="0.5">
   </div>
   <div class="ctrl">
-    <label>Rear R₂ <output id="oc2">-100</output></label>
+    <label><span data-t="r2"></span> <output id="oc2">-100</output></label>
     <input type="range" id="rc2" min="-12" max="12" value="-10" step="0.5">
   </div>
   <div class="ctrl">
-    <label>Thickness d <output id="od">45</output></label>
+    <label><span data-t="d"></span> <output id="od">45</output></label>
     <input type="range" id="rd" min="8" max="70" value="45" step="1">
   </div>
   <div class="ctrl">
-    <label>Index n <output id="on">1.52</output></label>
+    <label><span data-t="n"></span> <output id="on">1.52</output></label>
     <input type="range" id="rn" min="1.44" max="1.90" value="1.52" step="0.01">
   </div>
 </div>
@@ -39,6 +39,32 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'Thick lens imaging simulation',
+       u:'Object distance', r1:'Front R\u2081', r2:'Rear R\u2082', d:'Thickness d', n:'Index n',
+       obj:'Object', fp:'F\u2032', nodal:'nodal ray', img:'Image', vimg:'Virtual image',
+       afocal:'P \u2248 0  \u2192  afocal system: no focal length, no image',
+       atInf:'u \u2248 f  \u2192  image at infinity (rays exit parallel)',
+       farOut:v=>`image far off-screen (v = ${v})`,
+       hFrom:(a,b)=>`H: ${a} from V\u2081,  H\u2032: ${b} from V\u2082`,
+       fromHH:'   (u from H, v from H\u2032)',
+       divLens:'\nf < 0 \u2014 diverging lens: always a virtual, upright, reduced image',
+       uLtF:'\nu < f \u2014 virtual image at intersection of back-extended rays',
+       tele:'\nH\u2032 outside the glass (front side) \u2014 the telephoto principle: barrel shorter than f',
+       retro:'\nH\u2032 outside the glass (rear side) \u2014 the retrofocus principle: long back focus at short f' },
+  ko:{ aria:'두꺼운 렌즈 결상 시뮬레이션',
+       u:'물체거리', r1:'앞면 R\u2081', r2:'뒷면 R\u2082', d:'두께 d', n:'굴절률 n',
+       obj:'물체', fp:'F\u2032', nodal:'절점 광선', img:'상', vimg:'허상',
+       afocal:'P \u2248 0  \u2192  무초점계: 초점거리도 상도 없다',
+       atInf:'u \u2248 f  \u2192  상이 무한대에 맺힌다(광선이 평행하게 나간다)',
+       farOut:v=>`상이 화면 밖 멀리 맺힌다 (v = ${v})`,
+       hFrom:(a,b)=>`H: V\u2081에서 ${a},  H\u2032: V\u2082에서 ${b}`,
+       fromHH:'   (u는 H에서, v는 H\u2032에서 잰다)',
+       divLens:'\nf < 0 \u2014 발산렌즈: 언제나 정립 축소된 허상이 맺힌다',
+       uLtF:'\nu < f \u2014 광선을 뒤로 연장한 교점에 허상이 맺힌다',
+       tele:'\nH\u2032가 유리 밖(앞쪽) \u2014 망원 원리: 경통이 f보다 짧아진다',
+       retro:'\nH\u2032가 유리 밖(뒤쪽) \u2014 레트로포커스 원리: 짧은 f에서도 백포커스가 길다' }
+});
 function arrowV(ctx,sx,syBase,syTip,color,dashed){
   ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2;
   dash(ctx,!!dashed);
@@ -110,7 +136,7 @@ function drawT(){
   const h=42;
   const xObj = V1 - so;
   arrowV(ctx,X(xObj),cy,Y(h),'#e8edf6');
-  label(ctx,'Object',X(xObj)-14,Y(h)-10,'#e8edf6');
+  label(ctx,T.obj,X(xObj)-14,Y(h)-10,'#e8edf6');
 
   /* real rays: from the object tip toward three aperture heights, refracting at each surface */
   const aims=[[a*0.45,'#a8e05f'],[0,'#f6a72b'],[-a*0.45,'#ff7fa5']];
@@ -132,7 +158,7 @@ function drawT(){
       ctx.lineTo(X(V2),Y(t.h2)); ctx.lineTo(X(xmax-5),Y(t.h2+t.s2r*(xmax-5-V2)));
       ctx.stroke();
     });
-    document.getElementById('roT').innerHTML='P ≈ 0  →  afocal system: no focal length, no image';
+    document.getElementById('roT').innerHTML=T.afocal;
     return;
   }
 
@@ -159,7 +185,7 @@ function drawT(){
   if(Fp>xmin+10 && Fp<xmax-10){
     ctx.strokeStyle='#3d5273'; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(X(Fp),cy-6); ctx.lineTo(X(Fp),cy+6); ctx.stroke();
-    label(ctx,'F′',X(Fp)-6,cy+20,'#7f93b2');
+    label(ctx,T.fp,X(Fp)-6,cy+20,'#7f93b2');
   }
 
   /* ---- real rays (bend at each surface) ---- */
@@ -213,29 +239,28 @@ function drawT(){
     ctx.globalAlpha=1;
   }
   dash(ctx,false);
-  label(ctx,'nodal ray',X((xNin+xH)/2)-24,Y(h+sN*((xNin+xH)/2-xObj))-8,'#31c9ba');
+  label(ctx,T.nodal,X((xNin+xH)/2)-24,Y(h+sN*((xNin+xH)/2-xObj))-8,'#31c9ba');
 
   /* ---- image ---- */
   let note='';
-  if(nearFocal) note='u ≈ f  →  image at infinity (rays exit parallel)';
-  else if(farOut) note=`image far off-screen (v = ${v.toFixed(0)})`;
+  if(nearFocal) note=T.atInf;
+  else if(farOut) note=T.farOut(v.toFixed(0));
   else{
     arrowV(ctx,X(xImg),cy,Y(hImg),virtual?'#c9b0ff':'#e8edf6',virtual);
-    label(ctx,virtual?'Virtual image':'Image',X(xImg)+8,Y(hImg)+(hImg>0?-8:16),virtual?'#c9b0ff':'#e8edf6');
+    label(ctx,virtual?T.vimg:T.img,X(xImg)+8,Y(hImg)+(hImg>0?-8:16),virtual?'#c9b0ff':'#e8edf6');
   }
 
   /* ---- readout ---- */
   let ro=`EFL f = ${f.toFixed(1)}   BFL = ${(f+(xHp-V2)).toFixed(1)}   `
-        +`H: ${(xH-V1)>=0?'+':''}${(xH-V1).toFixed(1)} from V₁,  H′: ${(xHp-V2)>=0?'+':''}${(xHp-V2).toFixed(1)} from V₂`;
+        +T.hFrom(`${(xH-V1)>=0?'+':''}${(xH-V1).toFixed(1)}`,`${(xHp-V2)>=0?'+':''}${(xHp-V2).toFixed(1)}`);
   if(nearFocal||farOut){ ro+=`\n1/${u.toFixed(0)} + 1/v = 1/${f.toFixed(1)}   →  ${note}`; }
   else{
     ro+=`\n1/${u.toFixed(0)} + 1/v = 1/${f.toFixed(1)}   →  v = ${v.toFixed(1)},  m = ${m.toFixed(2)}`
-       +`   (u from H, v from H′)`
-       +(virtual? (f<0?'\nf < 0 — diverging lens: always a virtual, upright, reduced image'
-                      :'\nu < f — virtual image at intersection of back-extended rays'):'');
+       +T.fromHH
+       +(virtual? (f<0?T.divLens:T.uLtF):'');
   }
-  if(xHp < V1) ro+='\nH′ outside the glass (front side) — the telephoto principle: barrel shorter than f';
-  else if(xHp > V2) ro+='\nH′ outside the glass (rear side) — the retrofocus principle: long back focus at short f';
+  if(xHp < V1) ro+=T.tele;
+  else if(xHp > V2) ro+=T.retro;
   document.getElementById('roT').innerHTML=ro;
 }
 

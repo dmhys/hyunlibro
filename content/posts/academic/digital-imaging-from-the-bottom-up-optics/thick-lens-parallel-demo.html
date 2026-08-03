@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,22 +11,22 @@
 </style>
 </head>
 <body>
-<canvas id="cvP" height="320" aria-label="Thick lens parallel ray simulation"></canvas>
+<canvas id="cvP" height="320" data-t-aria="aria"></canvas>
 <div class="controls">
   <div class="ctrl">
-    <label>Front R₁ <output id="oc1">100</output></label>
+    <label><span data-t="r1"></span> <output id="oc1">100</output></label>
     <input type="range" id="rc1" min="-12" max="12" value="10" step="0.5">
   </div>
   <div class="ctrl">
-    <label>Rear R₂ <output id="oc2">-100</output></label>
+    <label><span data-t="r2"></span> <output id="oc2">-100</output></label>
     <input type="range" id="rc2" min="-12" max="12" value="-10" step="0.5">
   </div>
   <div class="ctrl">
-    <label>Thickness d <output id="od">45</output></label>
+    <label><span data-t="d"></span> <output id="od">45</output></label>
     <input type="range" id="rd" min="8" max="70" value="45" step="1">
   </div>
   <div class="ctrl">
-    <label>Index n <output id="on">1.52</output></label>
+    <label><span data-t="n"></span> <output id="on">1.52</output></label>
     <input type="range" id="rn" min="1.44" max="1.90" value="1.52" step="0.01">
   </div>
 </div>
@@ -35,6 +35,24 @@
 <script src="/js/demo-lib.js"></script>
 <script>
 "use strict";
+const T = i18n({
+  en:{ aria:'Thick lens parallel ray simulation',
+       r1:'Front R\u2081', r2:'Rear R\u2082', d:'Thickness d', n:'Index n',
+       parallel:'Parallel rays', fpV:'F\u2032 (virtual)', fp:'F\u2032',
+       afocal:'P \u2248 0  \u2192  afocal system: parallel light exits parallel',
+       hFrom:(a,b)=>`H: ${a} from V\u2081,  H\u2032: ${b} from V\u2082`,
+       diverging:'\nf < 0 \u2014 diverging system: F\u2032 is virtual (back-extension of exit rays)',
+       tele:'\nH\u2032 outside the glass (front side) \u2014 the telephoto principle: barrel shorter than f',
+       retro:'\nH\u2032 outside the glass (rear side) \u2014 the retrofocus principle: long back focus at short f' },
+  ko:{ aria:'두꺼운 렌즈 평행광선 시뮬레이션',
+       r1:'앞면 R\u2081', r2:'뒷면 R\u2082', d:'두께 d', n:'굴절률 n',
+       parallel:'평행광선', fpV:'F\u2032 (허초점)', fp:'F\u2032',
+       afocal:'P \u2248 0  \u2192  무초점계: 평행광이 평행하게 나간다',
+       hFrom:(a,b)=>`H: V\u2081에서 ${a},  H\u2032: V\u2082에서 ${b}`,
+       diverging:'\nf < 0 \u2014 발산계: F\u2032는 허초점이다(출사광선을 뒤로 연장한 지점)',
+       tele:'\nH\u2032가 유리 밖(앞쪽) \u2014 망원 원리: 경통이 f보다 짧아진다',
+       retro:'\nH\u2032가 유리 밖(뒤쪽) \u2014 레트로포커스 원리: 짧은 f에서도 백포커스가 길다' }
+});
 const cvP=document.getElementById('cvP');
 const rc1=document.getElementById('rc1'), rc2=document.getElementById('rc2');
 const rd=document.getElementById('rd'), rn=document.getElementById('rn');
@@ -107,8 +125,8 @@ function drawP(){
       ctx.lineTo(X(V2),Y(t.h2)); ctx.lineTo(X(xmax-5),Y(t.h2+t.s2r*(xmax-5-V2)));
       ctx.stroke();
     });
-    label(ctx,'Parallel rays',X(xmin+12),Y(a*0.62)-8,'#9fb0c8');
-    document.getElementById('roP').innerHTML='P ≈ 0  →  afocal system: parallel light exits parallel';
+    label(ctx,T.parallel,X(xmin+12),Y(a*0.62)-8,'#9fb0c8');
+    document.getElementById('roP').innerHTML=T.afocal;
     return;
   }
 
@@ -145,7 +163,7 @@ function drawP(){
       ctx.globalAlpha=1; dash(ctx,false);
     }
   });
-  label(ctx,'Parallel rays',X(xmin+12),Y(heights[0][0])-8,'#9fb0c8');
+  label(ctx,T.parallel,X(xmin+12),Y(heights[0][0])-8,'#9fb0c8');
 
   /* ---- model rays (dashed, one per real ray): no bend until H′ ----
      Coming in from the left the model and the real ray are the same horizontal line,
@@ -168,7 +186,7 @@ function drawP(){
   if(Fp>xmin+10 && Fp<xmax-10){
     ctx.fillStyle= virtual?'#c9b0ff':'#e8edf6';
     ctx.beginPath(); ctx.arc(X(Fp),Y(0),4,0,Math.PI*2); ctx.fill();
-    label(ctx,virtual?'F′ (virtual)':'F′',X(Fp)-8,Y(0)+20,virtual?'#c9b0ff':'#e8edf6',13);
+    label(ctx,virtual?T.fpV:T.fp,X(Fp)-8,Y(0)+20,virtual?'#c9b0ff':'#e8edf6',13);
   }
 
   /* ---- EFL / BFL brackets ---- */
@@ -188,10 +206,10 @@ function drawP(){
 
   /* ---- readout ---- */
   let ro=`EFL f = ${f.toFixed(1)}   BFL = ${BFL.toFixed(1)}\n`
-        +`H: ${(xH-V1)>=0?'+':''}${(xH-V1).toFixed(1)} from V₁,  H′: ${(xHp-V2)>=0?'+':''}${(xHp-V2).toFixed(1)} from V₂`;
-  if(virtual) ro+='\nf < 0 — diverging system: F′ is virtual (back-extension of exit rays)';
-  else if(xHp < V1) ro+='\nH′ outside the glass (front side) — the telephoto principle: barrel shorter than f';
-  else if(xHp > V2) ro+='\nH′ outside the glass (rear side) — the retrofocus principle: long back focus at short f';
+        +T.hFrom(`${(xH-V1)>=0?'+':''}${(xH-V1).toFixed(1)}`,`${(xHp-V2)>=0?'+':''}${(xHp-V2).toFixed(1)}`);
+  if(virtual) ro+=T.diverging;
+  else if(xHp < V1) ro+=T.tele;
+  else if(xHp > V2) ro+=T.retro;
   document.getElementById('roP').innerHTML=ro;
 }
 
