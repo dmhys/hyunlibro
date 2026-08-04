@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axial Chromatic Aberration Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>#cvS{margin-top:8px}</style>
+</head>
+<body>
+<canvas id="cvR" height="230" data-t-aria="ariaR"></canvas>
+<canvas id="cvS" height="186" data-t-aria="ariaS"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label><span data-t="vLbl"></span> <output id="ov">64.2</output></label>
+    <input type="range" id="rv" min="15" max="70" value="64.2" step="0.2">
+  </div>
+  <div class="ctrl">
+    <label><span data-t="zLbl"></span> <output id="oz">0.50</output></label>
+    <input type="range" id="rz" min="-0.35" max="1.35" value="0.5" step="0.01">
+  </div>
+</div>
+<div class="readout" id="ro"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script>
+"use strict";
+/* Chromatic aberration is a FIRST-order effect: it already exists in the paraxial
+   region, where every other aberration here is still exactly zero. So this models a
+   thin equiconvex element paraxially, once per wavelength —
+
+       f(lambda) = R / (2 (n(lambda) - 1))
+
+   — and nothing else. Tracing real rays through a real sphere instead would drag in
+   third-order spherical aberration, which at this aperture is larger than the colour
+   spread itself and would swamp the very thing the demo is about.
+
+   The index spread comes from the Abbe number V, which is what a glass catalogue
+   quotes:  n_F - n_C = (n_d - 1) / V.  The partial split between lines follows BK7.
+   Real glasses run from about V=20 (dense flint) to V=70 (light crown), and the focus
+   spread lands on f/V, which the readout checks against the model. */
+const T = i18n({
+  en:{ ariaR:'Three wavelengths focusing at three different distances',
+       ariaS:'Spot at the sensor, and through the focal range',
+       vLbl:'Abbe number V', zLbl:'Sensor position  (0 = blue focus, 1 = red focus)',
+       lens:'lens', sensor:'sensor', spot:'spot at the sensor', series:'through focus',
+       spread:'focus spread',
+       ro:'Refractive index falls as wavelength rises, so blue is bent hardest and comes to focus first.\nOne glass cannot put them in the same place: the spread lands on f/V, and V is the only\nhandle. That is why an achromat pairs a crown element with a flint one instead of using one glass.' },
+  ko:{ ariaR:'세 파장이 서로 다른 거리에서 초점을 맺는 모습',
+       ariaS:'센서 위의 스폿과 초점 통과 계열',
+       vLbl:'아베수 V', zLbl:'센서 위치  (0 = 파랑 초점, 1 = 빨강 초점)',
+       lens:'렌즈', sensor:'센서', spot:'센서 위의 스폿', series:'초점을 통과시키며',
+       spread:'초점 퍼짐',
+       ro:'굴절률은 파장이 길수록 작아지므로 파란빛이 가장 세게 꺾여 가장 먼저 초점을 맺는다.\n유리 한 장으로는 셋을 같은 자리에 모을 수 없고, 그 퍼짐은 f/V로 정해진다. V가 유일한 손잡이다.\n아크로매트가 유리 한 종류가 아니라 크라운과 플린트를 짝지어 쓰는 이유가 이것이다.' }
+});
+
+const R=100, ND=1.5168, SD=20;
+/* F 486nm, d 587nm, C 656nm — split following BK7's partial dispersion */
+const LINES=[{k:0.692,c:'#4d7dff',nm:486},{k:0,c:'#c8e04d',nm:587},{k:-0.308,c:'#ff5a4d',nm:656}];
+
+const idx  = (V,k) => ND + k*(ND-1)/V;
+const foc  = n => R/(2*(n-1));
+
+function model(V){
+  const L=LINES.map(l=>{ const n=idx(V,l.k); return {...l, n, z:foc(n)}; });
+  return {L, zF:L[0].z, zd:L[1].z, zC:L[2].z, spread:L[2].z-L[0].z};
+}
+/* half-height of one wavelength's cone at plane z: zero at its own focus */
+const blur = (l,z) => SD*Math.abs(z-l.z)/l.z;
+
+function drawSide(M,zs){
+  const {ctx,W,H}=fit(document.getElementById('cvR'));
+  ctx.clearRect(0,0,W,H);
+  const cy=H*0.5, xA=M.zd*0.42, xB=M.zd*1.14;
+  const sc=(W-150)/(xB-xA), X=x=>110+(x-xA)*sc, Y=y=>cy-y*(H*0.36)/SD;
+
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(16,cy); ctx.lineTo(W-10,cy); ctx.stroke();
+
+  /* the element sits off to the left of the window; show its rim as a stub */
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.globalAlpha=.8;
+  ctx.beginPath(); ctx.moveTo(60,Y(SD)); ctx.lineTo(60,Y(-SD)); ctx.stroke(); ctx.globalAlpha=1;
+  label(ctx,T.lens,44,Y(-SD)+15,'#6ea8e8',10.5);
+
+  M.L.forEach(l=>{
+    ctx.strokeStyle=l.c; ctx.lineWidth=1.5; ctx.globalAlpha=.92;
+    [1,-1].forEach(s=>{
+      ctx.beginPath();
+      ctx.moveTo(60,Y(s*SD));
+      ctx.lineTo(X(l.z),cy);
+      ctx.lineTo(X(xB),Y(-s*blur(l,xB)));
+      ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+    ctx.fillStyle=l.c;
+    ctx.beginPath(); ctx.arc(X(l.z),cy,3.6,0,Math.PI*2); ctx.fill();
+    label(ctx,l.nm+'nm',X(l.z)-16,cy+(l.k>0?-10:(l.k?22:-10)),l.c,10);
+  });
+
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(X(zs),Y(SD*1.15)); ctx.lineTo(X(zs),Y(-SD*1.15)); ctx.stroke();
+  label(ctx,T.sensor,X(zs)-12,Y(-SD*1.15)+15,'#c3ccdb',10.5);
+
+  /* bracket over the focus spread */
+  const yb=Y(SD*1.3);
+  ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1.2;
+  ctx.beginPath();
+  ctx.moveTo(X(M.zF),yb-4); ctx.lineTo(X(M.zF),yb+4);
+  ctx.moveTo(X(M.zF),yb);   ctx.lineTo(X(M.zC),yb);
+  ctx.moveTo(X(M.zC),yb-4); ctx.lineTo(X(M.zC),yb+4);
+  ctx.stroke();
+  label(ctx,T.spread+' '+M.spread.toFixed(2)+'mm',X(M.zF),yb-8,'#8b97ad',10.5);
+}
+
+function drawSpots(M,zs){
+  const {ctx,W,H}=fit(document.getElementById('cvS'));
+  ctx.clearRect(0,0,W,H);
+  let ext=1e-9;
+  for(let i=0;i<=20;i++){
+    const z=M.zF-0.35*M.spread+1.7*M.spread*i/20;
+    M.L.forEach(l=>ext=Math.max(ext,blur(l,z)));
+  }
+  ext*=1.1;
+  const top=30, big=Math.min(H-top-30,W*0.28), bx=14;
+  const paint=(cx,cy,size,z)=>{
+    ctx.strokeStyle='#31435f'; ctx.lineWidth=1;
+    ctx.strokeRect(cx-size/2,cy-size/2,size,size);
+    ctx.globalCompositeOperation='lighter';       /* three colours add to white */
+    M.L.forEach(l=>{
+      const r=Math.max(blur(l,z)/ext*size/2,0.8);
+      ctx.fillStyle=l.c; ctx.globalAlpha=.55;
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+  };
+  paint(bx+big/2, top+big/2, big, zs);
+  label(ctx,T.spot,bx,20,'#7f93b2',11);
+
+  const n=5, sx0=bx+big+28, avail=W-sx0-14;
+  const sz=Math.min(big*0.74,(avail-(n-1)*10)/n);
+  label(ctx,T.series,sx0,20,'#7f93b2',11);
+  for(let i=0;i<n;i++){
+    const f=i/(n-1), z=M.zF+f*M.spread;
+    const cx=sx0+sz/2+i*(sz+10), cy=top+big/2;
+    paint(cx,cy,sz,z);
+    label(ctx,f.toFixed(2),cx-12,cy+sz/2+15,
+          Math.abs(z-zs)<M.spread*0.14?'#e8edf6':'#55617a',10.5);
+  }
+}
+
+const rv=document.getElementById('rv'), rz=document.getElementById('rz');
+function draw(){
+  const V=+rv.value, f=+rz.value;
+  const M=model(V), zs=M.zF+f*M.spread;
+  document.getElementById('ov').textContent=V.toFixed(1);
+  document.getElementById('oz').textContent=f.toFixed(2);
+  drawSide(M,zs); drawSpots(M,zs);
+  document.getElementById('ro').textContent =
+    T.ro+'\n'+
+    `V = ${V.toFixed(1)}  ·  486nm ${M.zF.toFixed(2)}mm / 587nm ${M.zd.toFixed(2)}mm / 656nm ${M.zC.toFixed(2)}mm  ·  `+
+    `${T.spread} ${M.spread.toFixed(2)}mm = f/${(M.zd/M.spread).toFixed(1)}`;
+}
+[rv,rz].forEach(el=>el.addEventListener('input',draw));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>

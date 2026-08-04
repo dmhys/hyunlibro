@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astigmatism Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>#cvS{margin-top:8px}</style>
+</head>
+<body>
+<canvas id="cvR" height="280" data-t-aria="ariaR"></canvas>
+<canvas id="cvS" height="176" data-t-aria="ariaS"></canvas>
+
+<div class="controls">
+  <div class="ctrl">
+    <label><span data-t="aLbl"></span> <output id="oap">1.00</output></label>
+    <input type="range" id="rap" min="0.2" max="1" value="1" step="0.02">
+  </div>
+  <div class="ctrl">
+    <label><span data-t="hLbl"></span> <output id="oh">1.00</output></label>
+    <input type="range" id="rh" min="0" max="1" value="1" step="0.05">
+  </div>
+  <div class="ctrl">
+    <label><span data-t="zLbl"></span> <output id="oz">0.00</output></label>
+    <input type="range" id="rz" min="-1.2" max="0.6" value="0" step="0.01">
+  </div>
+</div>
+<div class="readout" id="ro"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script>
+"use strict";
+/* Third-order (Seidel) wavefront in normalised pupil coordinates, pupil radius 1:
+
+     coma         W = B h y (x^2+y^2)
+     astigmatism  W = C h^2 y^2
+     defocus      W = D (x^2+y^2)
+
+   Two independent coordinates run through all of this and are easy to conflate:
+
+     rho  where a ray crosses the APERTURE   — picks a ray inside one bundle
+     h    where that bundle lands on the SENSOR — picks which point is imaged
+
+   So the upper panel shows the aperture face-on (rho) beside the light path for one
+   chosen h, and the lower panel lays h out as a spatial axis. Colour always means rho.
+
+   Rays travel straight from the exit pupil to wherever they land, so the side view is
+   a real ray diagram: each line runs from its pupil height to (ideal image point +
+   transverse aberration). */
+const T = i18n({
+  en:{ ariaR:'Tangential and sagittal fans focusing at different distances',
+       ariaS:'Spot diagram across field height',
+       hLbl:'Field height h', zLbl:'Lens travel',
+       aLbl:'Aperture opening', wide:'wide open',
+       pupil:'aperture, face-on', tanAx:'tangential', sagAx:'sagittal',
+       side:'light path for this h', pupilPlane:'aperture', imgPlane:'sensor',
+       ideal:'where it should land',
+       focusNote:'the lens travels and the sensor does not \u00b7 the sagittal fan really lies perpendicular to the page, drawn here rotated onto it',
+       field:'field height h  \u2014  centre to corner, one shared scale',
+       tFocus:'T', sFocus:'S',
+       ro:'The tangential fan (aperture\u2019s vertical diameter) and the sagittal fan (its horizontal one)\nfocus at different distances, so no single focus exists. The gap grows with h\u00b2: a focus that\nsuits the centre misses the corner, and the corner runs line \u2192 circle \u2192 line rotated 90\u00b0.' },
+  ko:{ ariaR:'자오 다발과 구결 다발이 서로 다른 거리에서 모이는 모습',
+       ariaS:'상높이별 스폿 다이어그램',
+       hLbl:'상높이 h', zLbl:'렌즈 이동',
+       aLbl:'조리개 개방', wide:'최대 개방',
+       pupil:'조리개, 정면', tanAx:'자오', sagAx:'구결',
+       side:'이 상고에서의 광경로', pupilPlane:'조리개', imgPlane:'센서',
+       ideal:'원래 맺혀야 할 자리',
+       focusNote:'움직이는 것은 렌즈이고 센서는 고정이다 \u00b7 구결 다발은 실제로는 지면에 수직인 면에 있고, 여기서는 90\u00b0 돌려 겹쳐 그렸다',
+       field:'상높이 h  \u2014  중심에서 모서리까지, 배율 동일',
+       tFocus:'T', sFocus:'S',
+       ro:'자오 다발(조리개의 세로 지름)과 구결 다발(가로 지름)이 서로 다른 거리에서 모인다. 그래서 초점이\n하나로 정해지지 않는다. 그 간격이 h\u00b2로 커지므로 중심에 맞춘 초점은 모서리에서 어긋나고,\n모서리는 선 → 원 → 90° 돌아간 선으로 지나간다.' }
+});
+
+const mode='ast';
+const C=1.0;
+const FIELDS=[0,0.25,0.5,0.75,1.0];
+/* Pupil zones are fractions of whatever the aperture is currently opened to, so
+   stopping down shrinks every ray in step, exactly as a real diaphragm does. */
+const FRACS=[0.25,0.5,0.75,1.0];
+const ZCOL=['#6ea8e8','#31c9ba','#f6a72b','#ff7fa5'];
+let ZONES=FRACS.slice();
+
+function aber(px,py,h,dz){
+  const r2=px*px+py*py;
+  let ex=2*dz*px, ey=2*dz*py;
+  ey+=2*C*h*h*py;
+  return [ex,ey];
+}
+const tanFocus = h => -C*h*h;
+
+function refExtent(){
+  let m=1e-9;
+  for(let i=0;i<=12;i++){
+    const dz=-1.2+1.8*i/12;
+    for(const z of FRACS) for(let j=0;j<48;j++){
+      const a=2*Math.PI*j/48, e=aber(z*Math.cos(a),z*Math.sin(a),1,dz);
+      m=Math.max(m,Math.hypot(e[0],e[1]));
+    }
+  }
+  return m;
+}
+
+/* ---------- upper panel: aperture face-on, then the light path ---------- */
+function drawPath(h,dz,ap){
+  const {ctx,W,H}=fit(document.getElementById('cvR'));
+  ctx.clearRect(0,0,W,H);
+  const cy=H*0.50;
+
+  /* --- aperture, seen face-on --- */
+  const pcx=64, prad=Math.min(46,H*0.20);
+  label(ctx,T.pupil,10,16,'#7f93b2',11);
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.4; ctx.globalAlpha=.75;
+  ctx.beginPath(); ctx.arc(pcx,cy,prad,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.strokeStyle='#f6a72b'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pcx,cy-prad); ctx.lineTo(pcx,cy+prad); ctx.stroke();
+  ctx.strokeStyle='#31c9ba'; dash(ctx,true);
+  ctx.beginPath(); ctx.moveTo(pcx-prad,cy); ctx.lineTo(pcx+prad,cy); ctx.stroke(); dash(ctx,false);
+  ZONES.forEach((z,zi)=>{
+    ctx.fillStyle=ZCOL[zi];
+    [-1,1].forEach(s=>{
+      ctx.beginPath(); ctx.arc(pcx,cy-s*z*prad,3.2,0,Math.PI*2); ctx.fill();   /* tangential */
+      ctx.beginPath(); ctx.arc(pcx+s*z*prad,cy,2.4,0,Math.PI*2); ctx.fill();   /* sagittal  */
+    });
+  });
+  label(ctx,T.tanAx,pcx-14,cy-prad-7,'#f6a72b',10);
+  label(ctx,T.sagAx,pcx+prad+5,cy+4,'#31c9ba',10);
+  /* the diaphragm as actually opened, against the full aperture drawn faintly above */
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.arc(pcx,cy,ap*prad,0,Math.PI*2); ctx.stroke();
+  if(ap<0.99) label(ctx,'×'+(1/ap).toFixed(1),pcx-11,cy+prad+15,'#c3ccdb',10.5);
+  else        label(ctx,T.wide,pcx-20,cy+prad+15,'#c3ccdb',10.5);
+
+  /* --- side view: the sensor plane slides along the axis ---
+     Rays run straight from the aperture to wherever they land, so each fan pinches at
+     its own focus. Ray height is measured from the chief ray, which is what the Seidel
+     aberration is defined against. Solving "a ray at pupil height p sits at p·RP on the
+     aperture" fixes the defocus-to-pixels scale, so the geometry and the formula agree. */
+  /* The sensor is bolted down and the lens travels, which is how a camera actually
+     focuses. With the object at infinity the lens keeps working at the same conjugate,
+     so no aberration coefficient changes — the whole bundle just translates, and only
+     its offset from the sensor moves. Same arithmetic as sliding the sensor, but the
+     picture now matches what the photographer does. */
+  const x0=150, xSen=470, PUPD=220, xEnd=W-30;
+  const RP=H*0.18, IMG=H*0.20, ZSC=125, SENH=H*0.36;
+  const xFoc=xSen-dz*ZSC, xPup=xFoc-PUPD;
+  const SCALE=ZSC*RP/(2*PUPD);
+  const yIdeal=cy-h*IMG;
+  const chief = x => cy + (x-xPup)*(yIdeal-cy)/(xFoc-xPup);
+  const rayY  = (p,idx,x) => chief(x) - SCALE*aber(idx?0:p, idx?p:0, h, (x-xFoc)/ZSC)[idx];
+  label(ctx,T.side,x0,16,'#7f93b2',11);
+
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x0,cy); ctx.lineTo(xEnd+10,cy); ctx.stroke();
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.globalAlpha=.85;
+  ctx.beginPath(); ctx.moveTo(xPup,cy-RP*1.15); ctx.lineTo(xPup,cy+RP*1.15); ctx.stroke();
+  ctx.globalAlpha=1;
+  label(ctx,T.pupilPlane,xPup-16,cy+RP*1.15+15,'#6ea8e8',10.5);
+
+  /* where each fan actually pinches */
+  if(mode==='ast'){
+    [[tanFocus(h),'#f6a72b',T.tFocus],[0,'#31c9ba',T.sFocus]].forEach(([z,col,txt])=>{
+      const x=xFoc+z*ZSC;
+      ctx.strokeStyle=col; ctx.globalAlpha=.5; dash(ctx,true); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x,cy-SENH*0.92); ctx.lineTo(x,cy+SENH*0.92); ctx.stroke();
+      dash(ctx,false); ctx.globalAlpha=1;
+      label(ctx,txt,x-3,cy-SENH*0.92-4,col,11);
+    });
+  }
+
+  /* tangential fan solid; sagittal fan dashed, rotated onto the page */
+  [[1,false],[0,true]].forEach(([idx,dashed])=>{
+    ZONES.forEach((z,zi)=>{
+      [-1,1].forEach(sgn=>{
+        const p=sgn*z;
+        ctx.strokeStyle=ZCOL[zi]; ctx.lineWidth=dashed?1.1:1.5; ctx.globalAlpha=.38; dash(ctx,dashed);
+        ctx.beginPath();
+        ctx.moveTo(x0, rayY(p,idx,x0));
+        ctx.lineTo(xEnd, rayY(p,idx,xEnd));
+        ctx.stroke(); dash(ctx,false); ctx.globalAlpha=1;
+      });
+    });
+  });
+
+  /* symmetric about the axis: it is a plane, not a one-sided marker */
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(xSen,cy-SENH); ctx.lineTo(xSen,cy+SENH); ctx.stroke();
+  label(ctx,T.imgPlane,xSen-12,cy+SENH+15,'#c3ccdb',10.5);
+  label(ctx,T.focusNote,x0,H-7,'#55617a',10);
+  /* Reference point on the sensor plane: the chief ray, which is what the transverse
+     aberration is measured from. It rides up and down with the plane, so it must be
+     read off chief(xSen) rather than pinned to the paraxial image height. */
+  const yRef=chief(xSen);
+  ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.moveTo(xSen-5,yRef); ctx.lineTo(xSen+5,yRef);
+  ctx.moveTo(xSen,yRef-5); ctx.lineTo(xSen,yRef+5);
+  ctx.stroke();
+  label(ctx,T.ideal,x0,yRef-8,'#8b97ad',10.5);
+}
+
+/* ---------- lower panel: field height as a spatial axis ---------- */
+function drawSpots(h,dz){
+  const {ctx,W,H}=fit(document.getElementById('cvS'));
+  ctx.clearRect(0,0,W,H);
+  const ext=refExtent()*1.08, n=FIELDS.length, gap=12, top=30;
+  const box=Math.min(H-top-30,(W-24-(n-1)*gap)/n), x0=(W-(box*n+gap*(n-1)))/2;
+  label(ctx,T.field,x0,18,'#7f93b2',11);
+  FIELDS.forEach((hv,i)=>{
+    const cx=x0+i*(box+gap)+box/2, cy=top+box/2, s=box/2/ext;
+    const cur=Math.abs(hv-h)<0.13;
+    ctx.strokeStyle=cur?'#e8edf6':'#31435f'; ctx.lineWidth=cur?1.6:1;
+    ctx.strokeRect(cx-box/2,cy-box/2,box,box);
+    ZONES.forEach((z,zi)=>{
+      ctx.fillStyle=ZCOL[zi];
+      for(let j=0;j<150;j++){
+        const a=2*Math.PI*j/150, e=aber(z*Math.cos(a),z*Math.sin(a),hv,dz);
+        ctx.fillRect(cx+e[0]*s-0.55, cy-e[1]*s-0.55, 1.1, 1.1);
+      }
+    });
+    label(ctx,hv.toFixed(2),cx-12,top+box+16,cur?'#e8edf6':'#55617a',10.5);
+  });
+}
+
+const rh=document.getElementById('rh'), rz=document.getElementById('rz');
+const rap=document.getElementById('rap');
+function draw(){
+  const h=+rh.value, dz=+rz.value, ap=+rap.value;
+  ZONES=FRACS.map(f=>f*ap);          /* zones follow the diaphragm */
+  document.getElementById('oh').textContent=h.toFixed(2);
+  document.getElementById('oz').textContent=dz.toFixed(2);
+  document.getElementById('oap').textContent=ap.toFixed(2);
+  drawPath(h,dz,ap); drawSpots(h,dz);
+  document.getElementById('ro').textContent=T.ro;
+}
+[rh,rz,rap].forEach(el=>el.addEventListener('input',draw));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>

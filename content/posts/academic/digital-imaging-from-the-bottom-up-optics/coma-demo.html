@@ -3,17 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Coma &amp; Astigmatism Demo</title>
+<title>Coma Demo</title>
 <link rel="stylesheet" href="/css/demo-lib.css">
 <style>#cvS{margin-top:8px}</style>
 </head>
 <body>
 <canvas id="cvR" height="280" data-t-aria="ariaR"></canvas>
 <canvas id="cvS" height="176" data-t-aria="ariaS"></canvas>
-<div class="btns">
-  <button id="bC" class="active" data-t="mComa"></button>
-  <button id="bA" data-t="mAst"></button>
-</div>
+
 <div class="controls">
   <div class="ctrl">
     <label><span data-t="aLbl"></span> <output id="oap">1.00</output></label>
@@ -51,9 +48,8 @@
    a real ray diagram: each line runs from its pupil height to (ideal image point +
    transverse aberration). */
 const T = i18n({
-  en:{ ariaR:'Aperture plane and the light path for one field point',
+  en:{ ariaR:'Aperture plane and the light path that makes coma',
        ariaS:'Spot diagram across field height',
-       mComa:'Coma', mAst:'Astigmatism',
        hLbl:'Field height h', zLbl:'Lens travel',
        aLbl:'Aperture opening', wide:'wide open',
        pupil:'aperture, face-on', tanAx:'tangential', sagAx:'sagittal',
@@ -61,12 +57,9 @@ const T = i18n({
        ideal:'where it should land',
        focusNote:'the lens travels and the sensor does not \u00b7 the sagittal fan really lies perpendicular to the page, drawn here rotated onto it',
        field:'field height h  \u2014  centre to corner, one shared scale',
-       tFocus:'T', sFocus:'S',
-       comaRo:'Fix one point on the sensor (h) and the whole aperture still feeds it. Colour tracks where in\nthe aperture each ray passes: every zone lands as a circle offset by twice its own radius, and\nstacked they make a comet. Both rim rays fall on the same side — that asymmetry is coma.',
-       astRo:'The tangential fan (aperture\u2019s vertical diameter) and the sagittal fan (its horizontal one)\nfocus at different distances, so no single focus exists. The gap grows with h\u00b2: a focus that\nsuits the centre misses the corner, and the corner runs line \u2192 circle \u2192 line rotated 90\u00b0.' },
-  ko:{ ariaR:'조리개면과 한 상고에서의 광경로',
+       ro:'Fix one point on the sensor (h) and the whole aperture still feeds it. Colour tracks where in\nthe aperture each ray passes: every zone lands as a circle offset by twice its own radius, and\nstacked they make a comet. Both rim rays fall on the same side — that asymmetry is coma.', },
+  ko:{ ariaR:'코마가 만들어지는 조리개면과 광경로',
        ariaS:'상높이별 스폿 다이어그램',
-       mComa:'코마', mAst:'비점수차',
        hLbl:'상높이 h', zLbl:'렌즈 이동',
        aLbl:'조리개 개방', wide:'최대 개방',
        pupil:'조리개, 정면', tanAx:'자오', sagAx:'구결',
@@ -74,13 +67,11 @@ const T = i18n({
        ideal:'원래 맺혀야 할 자리',
        focusNote:'움직이는 것은 렌즈이고 센서는 고정이다 \u00b7 구결 다발은 실제로는 지면에 수직인 면에 있고, 여기서는 90\u00b0 돌려 겹쳐 그렸다',
        field:'상높이 h  \u2014  중심에서 모서리까지, 배율 동일',
-       tFocus:'T', sFocus:'S',
-       comaRo:'센서 위의 점 하나(h)를 정해도, 그 점에는 조리개 전체를 통과한 빛이 모인다. 색은 각 광선이 조리개의\n어디를 지났는지를 나타낸다. 각 구역은 자기 반지름의 두 배만큼 밀린 원이 되고, 그 원들이 쌓여\n혜성이 된다. 위아래 가장자리 광선이 같은 쪽에 앉는 이 비대칭이 코마다.',
-       astRo:'자오 다발(조리개의 세로 지름)과 구결 다발(가로 지름)이 서로 다른 거리에서 모인다. 그래서 초점이\n하나로 정해지지 않는다. 그 간격이 h\u00b2로 커지므로 중심에 맞춘 초점은 모서리에서 어긋나고,\n모서리는 선 → 원 → 90° 돌아간 선으로 지나간다.' }
+       ro:'센서 위의 점 하나(h)를 정해도, 그 점에는 조리개 전체를 통과한 빛이 모인다. 색은 각 광선이 조리개의\n어디를 지났는지를 나타낸다. 각 구역은 자기 반지름의 두 배만큼 밀린 원이 되고, 그 원들이 쌓여\n혜성이 된다. 위아래 가장자리 광선이 같은 쪽에 앉는 이 비대칭이 코마다.', }
 });
 
-let mode='coma';
-const B=1.0, C=1.0;
+const mode='coma';
+const B=1.0;
 const FIELDS=[0,0.25,0.5,0.75,1.0];
 /* Pupil zones are fractions of whatever the aperture is currently opened to, so
    stopping down shrinks every ray in step, exactly as a real diaphragm does. */
@@ -91,11 +82,9 @@ let ZONES=FRACS.slice();
 function aber(px,py,h,dz){
   const r2=px*px+py*py;
   let ex=2*dz*px, ey=2*dz*py;
-  if(mode==='coma'){ ex+=2*B*h*px*py; ey+=B*h*(r2+2*py*py); }
-  else             {                  ey+=2*C*h*h*py; }
+  ex+=2*B*h*px*py; ey+=B*h*(r2+2*py*py);
   return [ex,ey];
 }
-const tanFocus = h => mode==='coma' ? 0 : -C*h*h;
 
 function refExtent(){
   let m=1e-9;
@@ -166,16 +155,6 @@ function drawPath(h,dz,ap){
   label(ctx,T.pupilPlane,xPup-16,cy+RP*1.15+15,'#6ea8e8',10.5);
 
   /* where each fan actually pinches */
-  if(mode==='ast'){
-    [[tanFocus(h),'#f6a72b',T.tFocus],[0,'#31c9ba',T.sFocus]].forEach(([z,col,txt])=>{
-      const x=xFoc+z*ZSC;
-      ctx.strokeStyle=col; ctx.globalAlpha=.5; dash(ctx,true); ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(x,cy-SENH*0.92); ctx.lineTo(x,cy+SENH*0.92); ctx.stroke();
-      dash(ctx,false); ctx.globalAlpha=1;
-      label(ctx,txt,x-3,cy-SENH*0.92-4,col,11);
-    });
-  }
-
   /* tangential fan solid; sagittal fan dashed, rotated onto the page */
   [[1,false],[0,true]].forEach(([idx,dashed])=>{
     ZONES.forEach((z,zi)=>{
@@ -232,7 +211,6 @@ function drawSpots(h,dz){
 
 const rh=document.getElementById('rh'), rz=document.getElementById('rz');
 const rap=document.getElementById('rap');
-const bC=document.getElementById('bC'), bA=document.getElementById('bA');
 function draw(){
   const h=+rh.value, dz=+rz.value, ap=+rap.value;
   ZONES=FRACS.map(f=>f*ap);          /* zones follow the diaphragm */
@@ -240,16 +218,8 @@ function draw(){
   document.getElementById('oz').textContent=dz.toFixed(2);
   document.getElementById('oap').textContent=ap.toFixed(2);
   drawPath(h,dz,ap); drawSpots(h,dz);
-  document.getElementById('ro').textContent = mode==='coma'?T.comaRo:T.astRo;
+  document.getElementById('ro').textContent=T.ro;
 }
-function setMode(m){
-  mode=m;
-  bC.classList.toggle('active',m==='coma');
-  bA.classList.toggle('active',m==='ast');
-  draw();
-}
-bC.addEventListener('click',()=>setMode('coma'));
-bA.addEventListener('click',()=>setMode('ast'));
 [rh,rz,rap].forEach(el=>el.addEventListener('input',draw));
 let rzT;
 window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distortion &amp; Stop Position Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>#cvG{margin-top:8px}</style>
+</head>
+<body>
+<canvas id="cvS" height="150" data-t-aria="ariaS"></canvas>
+<canvas id="cvG" height="320" data-t-aria="ariaG"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label><span data-t="tLbl"></span> <output id="ot">0</output></label>
+    <input type="range" id="rt" min="-55" max="55" value="0" step="1">
+  </div>
+</div>
+<div class="readout" id="ro"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script>
+"use strict";
+/* Unlike the other aberrations here, distortion has no pupil dependence at all — its
+   Seidel term is h^3 rho^0, so nothing blurs and the aperture size is irrelevant. What
+   sets it is WHERE the stop sits, because the stop picks which part of the glass the
+   chief ray crosses, and that choice depends on field angle.
+
+   Everything below is an exact ray trace through one equiconvex element: real Snell,
+   real sphere sag, no small-angle approximation. Only the chief ray matters, so the
+   whole image is built from the radial map r(theta) that the trace produces. The system
+   is rotationally symmetric, so that one radial map is enough to warp a 2-D grid. */
+const T = i18n({
+  en:{ ariaS:'Chief ray through a stop at an adjustable position',
+       ariaG:'Square grid imaged with the resulting distortion',
+       tLbl:'Stop position t  (t<0: in front of the lens)',
+       lens:'lens', stop:'stop', sensor:'sensor', chief:'chief ray',
+       ideal:'undistorted', actual:'as imaged',
+       barrel:'barrel', pincushion:'pincushion', none:'essentially none',
+       hits:'chief ray crosses the glass at',
+       ro:'One element, one aperture, nothing else changed. The stop decides where on the glass the chief\nray crosses, and that height grows with field angle — so magnification stops being constant.\nPut the stop on the lens and the chief ray always goes through the centre: distortion vanishes.' },
+  ko:{ ariaS:'위치를 바꿀 수 있는 조리개를 지나는 주광선',
+       ariaG:'그 결과로 생기는 격자의 왜곡',
+       tLbl:'조리개 위치 t  (t<0: 렌즈 앞)',
+       lens:'렌즈', stop:'조리개', sensor:'센서', chief:'주광선',
+       ideal:'왜곡 없을 때', actual:'실제로 맺힌 상',
+       barrel:'배럴(통형)', pincushion:'핀쿠션(실패형)', none:'거의 없음',
+       hits:'주광선이 유리를 지나는 높이',
+       ro:'렌즈 한 장, 조리개 하나, 나머지는 전부 그대로다. 조리개는 주광선이 유리의 어디를 지날지를 정하고,\n그 높이가 화각에 따라 커지므로 배율이 일정하지 않게 된다. 조리개를 렌즈에 붙이면 주광선은 언제나\n렌즈 중심을 지나고, 그때 왜곡은 사라진다.' }
+});
+
+/* ---------- exact ray trace through one equiconvex element ---------- */
+const R=100, NG=1.5, SD=20;
+const SAG=R-Math.sqrt(R*R-SD*SD), TH=2*SAG+2;
+const C1X=-TH/2+R, C2X=TH/2-R;
+const THMAX=15*Math.PI/180;
+
+function refract(dx,dy,nx,ny,mu){
+  if(nx*dx+ny*dy>0){ nx=-nx; ny=-ny; }
+  const c1=-(nx*dx+ny*dy), s=1-mu*mu*(1-c1*c1);
+  if(s<0) return null;
+  const k=mu*c1-Math.sqrt(s);
+  return [mu*dx+k*nx, mu*dy+k*ny];
+}
+function thru(ox,oy,dx,dy){
+  let ax=ox-C1X, ay=oy, b=ax*dx+ay*dy, disc=b*b-(ax*ax+ay*ay-R*R);
+  if(disc<0) return null;
+  const px=ox+(-b-Math.sqrt(disc))*dx, py=oy+(-b-Math.sqrt(disc))*dy;
+  if(Math.abs(py)>SD) return null;
+  const d1=refract(dx,dy,(px-C1X)/R,py/R,1/NG);
+  if(!d1) return null;
+  ax=px-C2X; ay=py; b=ax*d1[0]+ay*d1[1]; disc=b*b-(ax*ax+ay*ay-R*R);
+  if(disc<0) return null;
+  const s2=-b+Math.sqrt(disc);
+  const qx=px+s2*d1[0], qy=py+s2*d1[1];
+  if(Math.abs(qy)>SD) return null;
+  const d2=refract(d1[0],d1[1],(qx-C2X)/R,qy/R,NG);
+  if(!d2) return null;
+  return {px,py,qx,qy,ex:d2[0],ey:d2[1]};
+}
+const ZIMG=(()=>{ const r=thru(-300,0.02,1,0); return r.qx-r.qy*r.ex/r.ey; })();
+
+/* Chief ray at field angle theta, forced through the stop centre at (t,0). */
+function chief(theta,t){
+  const dx=Math.cos(theta), dy=Math.sin(theta);
+  return thru(t-dx*300, -dy*300, dx, dy);
+}
+function imgH(theta,t){
+  const r=chief(theta,t);
+  return r ? r.qy+(ZIMG-r.qx)*r.ey/r.ex : null;
+}
+
+/* Radial map r(theta), sampled once per stop position and interpolated afterwards. */
+let MAP=null;
+function buildMap(t){
+  const N=48, th=[], rr=[];
+  for(let i=0;i<=N;i++){
+    const a=THMAX*i/N, y=imgH(a,t);
+    th.push(a); rr.push(y===null?NaN:y);
+  }
+  const k=imgH(1e-4,t)/Math.tan(1e-4);          /* paraxial scale */
+  MAP={th,rr,k,rMaxIdeal:k*Math.tan(THMAX)};
+}
+function mapRadius(rIdeal){                      /* undistorted radius -> actual */
+  const a=Math.atan(rIdeal/MAP.k);
+  if(a>=THMAX) return null;
+  const f=a/THMAX*(MAP.th.length-1), i=Math.min(Math.floor(f),MAP.th.length-2);
+  const w=f-i;
+  const v=MAP.rr[i]*(1-w)+MAP.rr[i+1]*w;
+  return isNaN(v)?null:v;
+}
+
+/* ---------- upper panel: where the stop puts the chief ray ---------- */
+function drawSide(t){
+  const {ctx,W,H}=fit(document.getElementById('cvS'));
+  ctx.clearRect(0,0,W,H);
+  const cy=H*0.52, sc=Math.min((H*0.34)/SD, (W-150)/(ZIMG+120));
+  const xL=110, X=x=>xL+(x+60)*sc, Y=y=>cy-y*sc;
+
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(20,cy); ctx.lineTo(W-12,cy); ctx.stroke();
+
+  /* the element */
+  ctx.beginPath();
+  for(let i=0;i<=40;i++){ const y=-SD+2*SD*i/40, x=C1X-Math.sqrt(R*R-y*y);
+    i?ctx.lineTo(X(x),Y(y)):ctx.moveTo(X(x),Y(y)); }
+  for(let i=40;i>=0;i--){ const y=-SD+2*SD*i/40, x=C2X+Math.sqrt(R*R-y*y);
+    ctx.lineTo(X(x),Y(y)); }
+  ctx.closePath();
+  ctx.fillStyle='rgba(110,168,232,.10)'; ctx.fill();
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.5; ctx.stroke();
+  label(ctx,T.lens,X(0)-12,Y(SD)-8,'#6ea8e8',10.5);
+
+  /* the stop: two jaws with a gap on the axis */
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=2.6;
+  ctx.beginPath();
+  ctx.moveTo(X(t),Y(SD*1.5)); ctx.lineTo(X(t),Y(SD*0.42));
+  ctx.moveTo(X(t),Y(-SD*0.42)); ctx.lineTo(X(t),Y(-SD*1.5));
+  ctx.stroke();
+  label(ctx,T.stop,X(t)-12,Y(-SD*1.5)-6,'#c3ccdb',10.5);
+
+  /* sensor */
+  ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(X(ZIMG),Y(SD*1.5)); ctx.lineTo(X(ZIMG),Y(-SD*1.5)); ctx.stroke();
+  label(ctx,T.sensor,X(ZIMG)-14,Y(-SD*1.5)-6,'#8b97ad',10.5);
+
+  /* chief rays: on-axis, and at the corner of the field */
+  [[0,'#55617a'],[THMAX,'#ff7fa5']].forEach(([a,col])=>{
+    const r=chief(a,t); if(!r) return;
+    const yi=r.qy+(ZIMG-r.qx)*r.ey/r.ex;
+    ctx.strokeStyle=col; ctx.lineWidth=a?1.8:1.2;
+    ctx.beginPath();
+    ctx.moveTo(X(r.px-90),Y(r.py-90*Math.tan(a)));
+    ctx.lineTo(X(r.px),Y(r.py));
+    ctx.lineTo(X(r.qx),Y(r.qy));
+    ctx.lineTo(X(ZIMG),Y(yi));
+    ctx.stroke();
+    if(a){
+      ctx.fillStyle=col;
+      ctx.beginPath(); ctx.arc(X(r.px),Y(r.py),3.4,0,Math.PI*2); ctx.fill();
+      label(ctx,T.hits+' '+r.py.toFixed(1),12,20,col,11);
+      label(ctx,T.chief,X(r.px)+6,Y(r.py)-7,col,10.5);
+    }
+  });
+}
+
+/* ---------- lower panel: a square grid pushed through that radial map ---------- */
+function drawGrid(){
+  const {ctx,W,H}=fit(document.getElementById('cvG'));
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2;
+  const half=Math.min(W*0.42,H*0.42), rm=MAP.rMaxIdeal;
+  const s=half/rm*1.24;                       /* fit the ideal frame on screen */
+  const gx=6, gy=4, ux=rm*0.62, uy=rm*0.44;   /* image half-width / half-height */
+
+  const put=(u,v,warp)=>{
+    const r=Math.hypot(u,v);
+    if(!warp||r<1e-9) return [cx+u*s, cy-v*s];
+    const ra=mapRadius(r);
+    if(ra===null) return null;
+    const f=ra/r;
+    return [cx+u*f*s, cy-v*f*s];
+  };
+  const poly=(pts,col,wid,alpha)=>{
+    ctx.strokeStyle=col; ctx.lineWidth=wid; ctx.globalAlpha=alpha;
+    ctx.beginPath(); let pen=false;
+    pts.forEach(p=>{ if(!p){pen=false;return;} pen?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]); pen=true; });
+    ctx.stroke(); ctx.globalAlpha=1;
+  };
+  [[false,'#55617a',1,.9],[true,'#f6a72b',1.7,1]].forEach(([warp,col,wid,al])=>{
+    for(let i=0;i<=gx;i++){ const u=-ux+2*ux*i/gx, pts=[];
+      for(let j=0;j<=80;j++) pts.push(put(u,-uy+2*uy*j/80,warp)); poly(pts,col,wid,al); }
+    for(let j=0;j<=gy;j++){ const v=-uy+2*uy*j/gy, pts=[];
+      for(let i=0;i<=80;i++) pts.push(put(-ux+2*ux*i/80,v,warp)); poly(pts,col,wid,al); }
+  });
+  label(ctx,T.ideal,14,20,'#55617a',11);
+  label(ctx,T.actual,14,36,'#f6a72b',11);
+}
+
+const rt=document.getElementById('rt');
+function draw(){
+  const t=+rt.value;
+  document.getElementById('ot').textContent=t;
+  buildMap(t);
+  drawSide(t); drawGrid();
+  const rc=Math.hypot(MAP.rMaxIdeal*0.62,MAP.rMaxIdeal*0.44);
+  const ra=mapRadius(rc);
+  const d=ra===null?NaN:(ra/rc-1)*100;
+  const kind=isNaN(d)?'':(Math.abs(d)<0.05?T.none:(d<0?T.barrel:T.pincushion));
+  document.getElementById('ro').textContent =
+    T.ro+'\n'+(isNaN(d)?'':`t = ${t} :  ${d>0?'+':''}${d.toFixed(2)}%  ${kind}`);
+}
+rt.addEventListener('input',draw);
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>

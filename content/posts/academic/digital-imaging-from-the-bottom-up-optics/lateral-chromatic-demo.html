@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lateral Chromatic Aberration Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>#cvG{margin-top:8px}</style>
+</head>
+<body>
+<canvas id="cvS" height="176" data-t-aria="ariaS"></canvas>
+<canvas id="cvG" height="300" data-t-aria="ariaG"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label><span data-t="tLbl"></span> <output id="ot">-40</output></label>
+    <input type="range" id="rt" min="-60" max="60" value="-40" step="1">
+  </div>
+  <div class="ctrl">
+    <label><span data-t="vLbl"></span> <output id="ov">25.8</output></label>
+    <input type="range" id="rv" min="15" max="70" value="25.8" step="0.2">
+  </div>
+</div>
+<div class="readout" id="ro"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script>
+"use strict";
+/* Lateral colour, like axial colour, is a first-order effect, so a paraxial model is
+   the exact model for it — and it keeps third-order distortion out of the picture,
+   which would otherwise warp the grid for reasons that have nothing to do with colour.
+
+   Chief ray at field angle theta, forced through a stop sitting at x = t:
+   it meets the lens at height -t·tan(theta), leaves with slope tan(theta)(1 + t/f),
+   and lands on the sensor (placed at the d-line focus) at
+
+       h(lambda) = tan(theta) · [ f_d - t + f_d · t / f(lambda) ]
+
+   Divide by the d-line height and the magnification ratio falls out clean:
+
+       s(lambda) = 1 + t · ( 1/f(lambda) - 1/f_d )
+
+   which is zero-difference at t = 0. With the stop on the lens the chief ray runs
+   through the centre undeviated, so every wavelength lands together no matter how
+   strongly the glass disperses. Lateral colour is a stop-position aberration, the same
+   family as distortion and coma — which is why a design symmetric about the stop
+   cancels all three at once. */
+const T = i18n({
+  en:{ ariaS:'Chief rays of three wavelengths landing at three heights',
+       ariaG:'A grid imaged at three slightly different magnifications',
+       tLbl:'Stop position t  (t<0: in front of the lens)', vLbl:'Abbe number V',
+       lens:'lens', stop:'stop', sensor:'sensor', zoom:'sensor, magnified',
+       fringe:'colour spread at the corner',
+       ro:'Every wavelength is in focus here — nothing is blurred. They simply arrive at slightly\ndifferent magnifications, so a white grid splits into coloured copies that separate further\nthe further out you look. Put the stop on the lens and the split vanishes at any dispersion.' },
+  ko:{ ariaS:'세 파장의 주광선이 서로 다른 높이에 닿는 모습',
+       ariaG:'배율이 조금씩 다르게 맺힌 격자',
+       tLbl:'조리개 위치 t  (t<0: 렌즈 앞)', vLbl:'아베수 V',
+       lens:'렌즈', stop:'조리개', sensor:'센서', zoom:'센서 확대',
+       fringe:'모서리에서의 색 벌어짐',
+       ro:'여기서는 모든 파장이 초점이 맞아 있다. 흐린 것이 하나도 없다. 다만 배율이 조금씩 달라서,\n흰 격자가 색깔별 사본으로 갈라지고 바깥으로 갈수록 더 벌어질 뿐이다.\n조리개를 렌즈에 붙이면 분산이 아무리 커도 이 갈라짐은 사라진다.' }
+});
+
+const R=100, ND=1.5168;
+const LINES=[{k:0.692,c:'#4d7dff',nm:486},{k:0,c:'#c8e04d',nm:587},{k:-0.308,c:'#ff5a4d',nm:656}];
+const THMAX=15*Math.PI/180, TMAX=Math.tan(THMAX);
+
+const idx = (V,k) => ND + k*(ND-1)/V;
+const foc = n => R/(2*(n-1));
+
+function model(V,t){
+  const fd=foc(ND);
+  const L=LINES.map(l=>{ const f=foc(idx(V,l.k)); return {...l, f, s:1+t*(1/f-1/fd)}; });
+  return {L, fd, t, spread:L[0].s-L[2].s};
+}
+
+function drawSide(M){
+  const {ctx,W,H}=fit(document.getElementById('cvS'));
+  ctx.clearRect(0,0,W,H);
+  const cy=H*0.54, xA=-70, xB=M.fd*1.06;
+  const sc=(W-190)/(xB-xA), X=x=>16+(x-xA)*sc;
+  const IMG=H*0.30, Y=y=>cy-y*IMG/(M.fd*TMAX);
+
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(10,cy); ctx.lineTo(X(xB),cy); ctx.stroke();
+
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(X(0),cy-IMG*1.05); ctx.lineTo(X(0),cy+IMG*1.05); ctx.stroke();
+  label(ctx,T.lens,X(0)-10,cy+IMG*1.05+15,'#6ea8e8',10.5);
+
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=2.4;
+  ctx.beginPath();
+  ctx.moveTo(X(M.t),cy-IMG*1.05); ctx.lineTo(X(M.t),cy-IMG*0.3);
+  ctx.moveTo(X(M.t),cy+IMG*0.3);  ctx.lineTo(X(M.t),cy+IMG*1.05);
+  ctx.stroke();
+  label(ctx,T.stop,X(M.t)-10,cy-IMG*1.05-6,'#c3ccdb',10.5);
+
+  ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(X(M.fd),cy-IMG*1.1); ctx.lineTo(X(M.fd),cy+IMG*1.1); ctx.stroke();
+  label(ctx,T.sensor,X(M.fd)-14,cy+IMG*1.1+15,'#8b97ad',10.5);
+
+  /* chief rays: through the stop centre, bent once at the lens */
+  const yL=-M.t*TMAX;
+  M.L.forEach(l=>{
+    const h=M.fd*TMAX*l.s;
+    ctx.strokeStyle=l.c; ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(X(xA), Y(yL-(0-xA)*TMAX));
+    ctx.lineTo(X(0),  Y(yL));
+    ctx.lineTo(X(M.fd), Y(h));
+    ctx.stroke();
+  });
+
+  /* the split is around a percent, so show the landing zone magnified */
+  const bw=132, bh=88, bx=W-bw-12, by=10, ZM=Math.min(26, bh*0.4/Math.max(M.fd*TMAX*Math.abs(M.spread),1e-4));
+  ctx.strokeStyle='#31435f'; ctx.lineWidth=1; ctx.strokeRect(bx,by,bw,bh);
+  label(ctx,T.zoom+'  ×'+ZM.toFixed(0),bx+4,by-4,'#7f93b2',10);
+  const mid=(M.L[0].s+M.L[2].s)/2, cyz=by+bh/2;
+  ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(bx+bw/2,by+6); ctx.lineTo(bx+bw/2,by+bh-6); ctx.stroke();
+  M.L.forEach(l=>{
+    const dy=(l.s-mid)*M.fd*TMAX*ZM;
+    ctx.fillStyle=l.c;
+    ctx.beginPath(); ctx.arc(bx+bw/2, cyz-dy, 4, 0, Math.PI*2); ctx.fill();
+    label(ctx,l.nm,bx+bw/2+9,cyz-dy+4,l.c,10);
+  });
+}
+
+function drawGrid(M){
+  const {ctx,W,H}=fit(document.getElementById('cvG'));
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2;
+  const ux=Math.min(W*0.40,H*0.62), uy=ux*0.66;
+  const gx=6, gy=4;
+  ctx.globalCompositeOperation='lighter';        /* three copies add back to white */
+  M.L.forEach(l=>{
+    ctx.strokeStyle=l.c; ctx.lineWidth=1.4; ctx.globalAlpha=.8;
+    const f=l.s;
+    for(let i=0;i<=gx;i++){
+      const u=(-ux+2*ux*i/gx)*f;
+      ctx.beginPath(); ctx.moveTo(cx+u,cy-uy*f); ctx.lineTo(cx+u,cy+uy*f); ctx.stroke();
+    }
+    for(let j=0;j<=gy;j++){
+      const v=(-uy+2*uy*j/gy)*f;
+      ctx.beginPath(); ctx.moveTo(cx-ux*f,cy+v); ctx.lineTo(cx+ux*f,cy+v); ctx.stroke();
+    }
+  });
+  ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+}
+
+const rt=document.getElementById('rt'), rv=document.getElementById('rv');
+function draw(){
+  const t=+rt.value, V=+rv.value;
+  document.getElementById('ot').textContent=t;
+  document.getElementById('ov').textContent=V.toFixed(1);
+  const M=model(V,t);
+  drawSide(M); drawGrid(M);
+  const hc=M.fd*TMAX;
+  document.getElementById('ro').textContent =
+    T.ro+'\n'+
+    `t = ${t}  ·  V = ${V.toFixed(1)}  ·  ${T.fringe} `+
+    `${(Math.abs(M.spread)*hc*1000).toFixed(0)}µm  (${(Math.abs(M.spread)*100).toFixed(3)}%)`;
+}
+[rt,rv].forEach(el=>el.addEventListener('input',draw));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>
