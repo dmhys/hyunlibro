@@ -36,6 +36,7 @@
                 data-srcset="{{ $small | safeURL }}, {{ $src | safeURL }} 1.5x, {{ $large | safeURL }} 2x"
                 data-sizes="auto"
                 alt="{{ $alt }}"
+                {{- with .Style }} style="{{ . | safeCSS }}"{{ end }}
                 {{- with $width }} width="{{ . }}"{{ end }}
                 {{- with $height }} height="{{ . }}"{{ end }} />
         </a>
@@ -48,6 +49,7 @@
             data-sizes="auto"
             alt="{{ $alt }}"
             title="{{ .Title | default $alt }}"
+            {{- with .Style }} style="{{ . | safeCSS }}"{{ end }}
             {{- with $width }} width="{{ . }}"{{ end }}
             {{- with $height }} height="{{ . }}"{{ end }} />
     {{- end -}}
@@ -57,5 +59,6 @@
         src="{{ $src }}"
         alt="{{ $alt }}"
         title="{{ .Title | default $alt }}"
+        {{- with .Style }} style="{{ . | safeCSS }}"{{ end }}
     />
 {{ end }}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pupil Coordinate and Field Height Demo</title>
+<link rel="stylesheet" href="/css/demo-lib.css">
+<style>#cvF{margin-top:8px}</style>
+</head>
+<body>
+<canvas id="cvR" height="240" data-t-aria="ariaR"></canvas>
+<canvas id="cvF" height="200" data-t-aria="ariaF"></canvas>
+<div class="controls">
+  <div class="ctrl">
+    <label><span data-t="rLbl"></span> <output id="orh">0.70</output></label>
+    <input type="range" id="rrh" min="0" max="1" value="0.7" step="0.02">
+  </div>
+  <div class="ctrl">
+    <label><span data-t="pLbl"></span> <output id="oph">90</output>&deg;</label>
+    <input type="range" id="rph" min="0" max="360" value="90" step="2">
+  </div>
+  <div class="ctrl">
+    <label><span data-t="hLbl"></span> <output id="oh">0.75</output></label>
+    <input type="range" id="rh" min="0" max="1" value="0.75" step="0.01">
+  </div>
+</div>
+<div class="readout" id="ro"></div>
+
+<script src="/js/demo-lib.js"></script>
+<script>
+"use strict";
+/* An ideal lens, on purpose: nothing here is aberrated.
+
+   Two coordinates run through the whole of aberration theory and are easy to conflate
+   because both read as "how far from the centre":
+
+     rho  where a ray crosses the APERTURE  — which ray, inside one bundle
+     h    where that bundle lands on the SENSOR — which point is being imaged
+
+   They are independent, and the demo is built so that independence is something you
+   can operate rather than something you have to be told: move rho or phi and the image
+   point does not budge, because a perfect lens sends every ray of one bundle to one
+   place. Move h and the whole bundle tilts and the image point travels.
+
+   That gives the definition the rest of the chapter needs — an aberration is what you
+   get when changing rho DOES move the landing point. Every Seidel term is h^a rho^b,
+   and b tells you whether the point blurs (b>0) or merely shifts (b=0, distortion). */
+const T = i18n({
+  en:{ ariaR:'Side view of one ray from aperture to sensor',
+       ariaF:'The aperture seen face-on, and the sensor seen face-on',
+       rLbl:'Aperture radius ρ', pLbl:'Aperture azimuth φ', hLbl:'Field height h',
+       apPlane:'aperture', senPlane:'sensor', ray:'this ray', obj:'a point in the scene',
+       apFace:'aperture, face-on  —  ρ lives here',
+       senFace:'sensor, face-on  —  h lives here',
+       inv:'move ρ or φ and the image point does not move',
+       moved:'change h and it does',
+       ro1:'One point in the scene sends light through the WHOLE aperture. ρ says which of those rays\nyou are looking at; h says which point in the scene it came from. They are independent.',
+       ro2:'A perfect lens puts every ray of one bundle on one spot, so ρ cannot move the landing point.\nAn aberration is exactly the failure of that: changing ρ moves where the ray lands.' },
+  ko:{ ariaR:'조리개에서 센서까지 광선 하나의 측면도',
+       ariaF:'조리개를 정면에서 본 모습과 센서를 정면에서 본 모습',
+       rLbl:'동공 반지름 ρ', pLbl:'동공 방위 φ', hLbl:'상높이 h',
+       apPlane:'조리개', senPlane:'센서', ray:'이 광선', obj:'장면의 한 점',
+       apFace:'조리개 정면  —  ρ 는 여기 산다',
+       senFace:'센서 정면  —  h 는 여기 산다',
+       inv:'ρ 나 φ 를 움직여도 상점은 꿈쩍 않는다',
+       moved:'h 를 움직이면 상점이 따라 움직인다',
+       ro1:'장면의 점 하나가 조리개 전체로 빛을 보낸다. ρ 는 그중 어느 광선을 보고 있는지를,\nh 는 그 광선이 장면의 어느 점에서 왔는지를 가리킨다. 둘은 서로 독립이다.',
+       ro2:'이상적인 렌즈는 한 광속의 모든 광선을 한 점에 놓으므로, ρ 로는 착지점을 움직일 수 없다.\n수차란 바로 그것이 깨지는 일이다 — ρ 를 바꿨는데 광선이 앉는 자리가 움직이는 것.' }
+});
+
+
+/* ---------- side view ---------- */
+function drawSide(rho,phi,h){
+  const {ctx,W,H}=fit(document.getElementById('cvR'));
+  ctx.clearRect(0,0,W,H);
+  const cy=H*0.50, xObj=34, xPup=Math.round(W*0.42), xSen=W-46;
+  const AP=H*0.28, IMG=H*0.19;
+  /* A point at finite distance, so the bundle visibly belongs to something. Object,
+     aperture centre and image sit on one line — that ray is the chief ray — which fixes
+     the object height and lets the inversion fall out on its own. */
+  const yImg=cy-h*IMG, yObj=cy+h*IMG*(xPup-xObj)/(xSen-xPup);
+
+  ctx.strokeStyle='#243349'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(12,cy); ctx.lineTo(W-12,cy); ctx.stroke();
+
+  /* a diaphragm, not a wall: solid above and below, open in between */
+  const JAW=H*0.11;
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=3.2;
+  ctx.beginPath();
+  ctx.moveTo(xPup,cy-AP); ctx.lineTo(xPup,cy-AP-JAW);
+  ctx.moveTo(xPup,cy+AP); ctx.lineTo(xPup,cy+AP+JAW);
+  ctx.stroke();
+  label(ctx,T.apPlane,xPup-16,cy+AP+JAW+14,'#6ea8e8',10.5);
+
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(xSen,cy-IMG*1.5); ctx.lineTo(xSen,cy+IMG*1.5); ctx.stroke();
+  label(ctx,T.senPlane,xSen-14,cy+IMG*1.5+16,'#c3ccdb',10.5);
+
+  /* every ray of this bundle lands on the same point — that is what "ideal" means */
+  const seg=(yp,col,wid,alpha)=>{
+    ctx.strokeStyle=col; ctx.lineWidth=wid; ctx.globalAlpha=alpha;
+    ctx.beginPath();
+    ctx.moveTo(xObj, yObj);
+    ctx.lineTo(xPup, cy-yp);
+    ctx.lineTo(xSen, yImg);
+    ctx.stroke(); ctx.globalAlpha=1;
+  };
+  for(let i=-7;i<=7;i++) if(i) seg(i/7*AP,'#f6a72b',1,.22);   /* the rest of the bundle */
+  seg(rho*Math.sin(phi)*AP,'#f6a72b',2.4,1);                   /* the one being pointed at */
+
+  ctx.fillStyle='#e8edf6';
+  ctx.beginPath(); ctx.arc(xPup,cy-rho*Math.sin(phi)*AP,4.4,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(xSen,yImg,4.4,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#e8edf6';
+  ctx.beginPath(); ctx.arc(xObj,yObj,4.4,0,Math.PI*2); ctx.fill();
+  label(ctx,T.obj,xObj-4,yObj+18,'#c3ccdb',10.5);
+  label(ctx,T.ray,xPup-64,cy-rho*Math.sin(phi)*AP-8,'#f6a72b',10.5);
+  label(ctx,T.inv,12,18,'#7f93b2',11);
+}
+
+/* ---------- the two face-on views ---------- */
+function drawFaces(rho,phi,h){
+  const {ctx,W,H}=fit(document.getElementById('cvF'));
+  ctx.clearRect(0,0,W,H);
+  const cy=H*0.54, rad=Math.min(H*0.34,W*0.16);
+  const acx=W*0.27, scx=W*0.73;
+
+  /* aperture */
+  ctx.strokeStyle='#6ea8e8'; ctx.lineWidth=1.6; ctx.globalAlpha=.85;
+  ctx.beginPath(); ctx.arc(acx,cy,rad,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.strokeStyle='#31435f'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(acx-rad,cy); ctx.lineTo(acx+rad,cy);
+  ctx.moveTo(acx,cy-rad); ctx.lineTo(acx,cy+rad); ctx.stroke();
+  ctx.fillStyle='#f6a72b'; ctx.globalAlpha=.35;
+  for(let i=-7;i<=7;i++) if(i){ ctx.beginPath(); ctx.arc(acx,cy-i/7*rad,2.6,0,Math.PI*2); ctx.fill(); }
+  ctx.globalAlpha=1;
+  ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.1; ctx.globalAlpha=.6;
+  ctx.beginPath(); ctx.arc(acx,cy,rho*rad,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.fillStyle='#e8edf6';
+  ctx.beginPath(); ctx.arc(acx+rho*rad*Math.cos(phi),cy-rho*rad*Math.sin(phi),5,0,Math.PI*2); ctx.fill();
+  label(ctx,T.apFace,acx-rad,cy-rad-12,'#6ea8e8',11);
+
+  /* sensor */
+  const sw=rad*1.34, sh=rad*0.92;
+  ctx.strokeStyle='#c3ccdb'; ctx.lineWidth=1.6;
+  ctx.strokeRect(scx-sw,cy-sh,sw*2,sh*2);
+  ctx.strokeStyle='#31435f'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(scx-sw,cy); ctx.lineTo(scx+sw,cy);
+  ctx.moveTo(scx,cy-sh); ctx.lineTo(scx,cy+sh); ctx.stroke();
+  /* h is a radius, not an "upwards": the rings say so without a sentence */
+  ctx.strokeStyle='#8b97ad'; ctx.lineWidth=1; ctx.globalAlpha=.28;
+  [0.25,0.5,0.75,1].forEach(r=>{ ctx.beginPath(); ctx.arc(scx,cy,r*sh,0,Math.PI*2); ctx.stroke(); });
+  ctx.globalAlpha=1;
+  ctx.strokeStyle='#e8edf6'; ctx.lineWidth=1.2; ctx.globalAlpha=.65;
+  ctx.beginPath(); ctx.arc(scx,cy,h*sh,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.fillStyle='#e8edf6';
+  ctx.beginPath(); ctx.arc(scx,cy-h*sh,5,0,Math.PI*2); ctx.fill();
+  label(ctx,T.senFace,scx-sw,cy-sh-12,'#c3ccdb',11);
+  label(ctx,T.moved,scx-sw,cy+sh+18,'#7f93b2',10.5);
+}
+
+const rrh=document.getElementById('rrh'), rph=document.getElementById('rph'), rh=document.getElementById('rh');
+function draw(){
+  const rho=+rrh.value, phiDeg=+rph.value, h=+rh.value, phi=phiDeg*Math.PI/180;
+  document.getElementById('orh').textContent=rho.toFixed(2);
+  document.getElementById('oph').textContent=phiDeg;
+  document.getElementById('oh').textContent=h.toFixed(2);
+  drawSide(rho,phi,h); drawFaces(rho,phi,h);
+  document.getElementById('ro').textContent =
+    `ρ = ${rho.toFixed(2)}   φ = ${phiDeg}°   h = ${h.toFixed(2)}\n`+
+    T.ro1+'\n'+T.ro2;
+}
+[rrh,rph,rh].forEach(el=>el.addEventListener('input',draw));
+let rzT;
+window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(draw,120);});
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{{- /* Adds an optional size override to the standard markdown image syntax:
+
+         ![alt](pic.png?w=420 "caption")     -> 420px wide
+         ![alt](pic.png?w=60% "caption")     -> 60% of the column
+
+   Content images are styled `width:auto; max-width:100%; max-height:25rem`, so they
+   render at their intrinsic size and can only ever be shrunk. Small source diagrams
+   therefore stay small no matter what, and the only way up is an explicit width, which
+   has to be inline to beat the stylesheet. `max-height` is released along with it or a
+   tall image would be clamped by the 25rem cap and come out stretched.
+
+   Images without a query string take no style at all and render exactly as before. */ -}}
+{{- $dest := .Destination -}}
+{{- $style := "" -}}
+{{- if strings.Contains $dest "?" -}}
+    {{- $parts := split $dest "?" -}}
+    {{- $dest = index $parts 0 -}}
+    {{- range split (index $parts 1) "&" -}}
+        {{- $kv := split . "=" -}}
+        {{- if and (eq (index $kv 0) "w") (gt (len $kv) 1) -}}
+            {{- $v := index $kv 1 -}}
+            {{- if not (or (strings.HasSuffix $v "%") (strings.HasSuffix $v "px") (strings.HasSuffix $v "rem") (strings.HasSuffix $v "em")) -}}
+                {{- $v = printf "%spx" $v -}}
+            {{- end -}}
+            {{- $style = printf "width:%s;max-height:none" $v -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- if .Title -}}
+    <figure>
+        {{- dict "Src" $dest "Title" .Text "Caption" .Title "Linked" true "Style" $style "Resources" .Page.Resources | partial "plugin/image.html" -}}
+        <figcaption class="image-caption">
+            {{- .Title | safeHTML -}}
+        </figcaption>
+    </figure>
+{{- else -}}
+    {{- dict "Src" $dest "Title" .Text "Style" $style "Resources" .Page.Resources | partial "plugin/image.html" -}}
+{{- end -}}
