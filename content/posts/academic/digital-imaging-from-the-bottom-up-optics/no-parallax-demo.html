@@ -110,11 +110,12 @@ function drawN(){
     ctx.stroke(); dash(ctx,false); ctx.globalAlpha=1;
   }
 
-  /* camera body drawn in world coordinates: local frame is EP-centered, +x = forward */
-  const T=(lx,ly)=>[X(E.ex+lx*E.c-ly*E.s), Y(E.ey+lx*E.s+ly*E.c)];
+  /* camera body drawn in world coordinates: local frame is EP-centered, +x = forward.
+     Named w2s, not T: `T` is the i18n string table and shadowing it here blanked every label. */
+  const w2s=(lx,ly)=>[X(E.ex+lx*E.c-ly*E.s), Y(E.ey+lx*E.s+ly*E.c)];
   function poly(pts,close){
     ctx.beginPath();
-    pts.forEach((q,i)=>{const s=T(q[0],q[1]); i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});
+    pts.forEach((q,i)=>{const s=w2s(q[0],q[1]); i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});
     if(close) ctx.closePath();
   }
   ctx.strokeStyle='#3d5273'; ctx.lineWidth=1.4;
@@ -182,7 +183,7 @@ function drawN(){
   /* ---- readout ---- */
   const fmt=m=> m===null?T.behindCam:m.toFixed(1);
   const where= p<-0.5?T.behindEp : p>0.5?T.frontEp:'';
-  let ro=`θ = ${thDeg.toFixed(1)}°,  pivot p = ${p.toFixed(0)}  ${where}\n`
+  let ro=`θ = ${thDeg.toFixed(1)}°,  ${T.pivot} p = ${p.toFixed(0)}  ${where}\n`
         +`<span class="c">${T.imgFar}  = ${fmt(mF)}</span>   <span class="a">${T.imgNear} = ${fmt(mN)}</span>`;
   if(mF!==null&&mN!==null){
     ro+=`   →   ${T.parallax} Δ = ${(mN-mF).toFixed(1)}`;

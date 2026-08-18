@@ -1,6 +1,6 @@
 +++
-date = 2026-06-25T20:54:26+09:00
-lastmod = 2026-08-17T23:57:27+09:00
+date = 2026-08-17T23:57:27+09:00
+lastmod = ""
 draft = false
 
 title = "Digital Imaging from the Bottom Up - Introduction"
